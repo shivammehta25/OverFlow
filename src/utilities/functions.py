@@ -114,3 +114,52 @@ def get_mask_for_last_item(lengths, device="cpu", out_tensor=None):
     ids = torch.arange(0, max_len, device=device) if out_tensor is None else torch.arange(0, max_len, out=out_tensor)
     mask = ids == lengths.unsqueeze(1) - 1
     return mask
+
+
+######################################################
+# Begin Glow-TTS methods
+# https://github.com/jaywalnut310/glow-tts
+######################################################
+
+
+@torch.jit.script
+def fused_add_tanh_sigmoid_multiply(input_a, input_b, n_channels):
+    n_channels_int = n_channels[0]
+    in_act = input_a + input_b
+    t_act = torch.tanh(in_act[:, :n_channels_int, :])
+    s_act = torch.sigmoid(in_act[:, n_channels_int:, :])
+    acts = t_act * s_act
+    return acts
+
+
+def squeeze(x, x_mask=None, n_sqz=2):
+    b, c, t = x.size()
+
+    t = (t // n_sqz) * n_sqz
+    x = x[:, :, :t]
+    x_sqz = x.view(b, c, t // n_sqz, n_sqz)
+    x_sqz = x_sqz.permute(0, 3, 1, 2).contiguous().view(b, c * n_sqz, t // n_sqz)
+
+    if x_mask is not None:
+        x_mask = x_mask[:, :, n_sqz - 1 :: n_sqz]
+    else:
+        x_mask = torch.ones(b, 1, t // n_sqz).to(device=x.device, dtype=x.dtype)
+    return x_sqz * x_mask, x_mask
+
+
+def unsqueeze(x, x_mask=None, n_sqz=2):
+    b, c, t = x.size()
+
+    x_unsqz = x.view(b, n_sqz, c // n_sqz, t)
+    x_unsqz = x_unsqz.permute(0, 2, 3, 1).contiguous().view(b, c // n_sqz, t * n_sqz)
+
+    if x_mask is not None:
+        x_mask = x_mask.unsqueeze(-1).repeat(1, 1, 1, n_sqz).view(b, 1, t * n_sqz)
+    else:
+        x_mask = torch.ones(b, 1, t * n_sqz).to(device=x.device, dtype=x.dtype)
+    return x_unsqz * x_mask, x_mask
+
+
+######################################################
+# End Glow TTS Methods
+######################################################

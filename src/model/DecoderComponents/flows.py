@@ -192,7 +192,7 @@ class InvConvNear(nn.Module):
         self.n_split = n_split
         self.no_jacobian = no_jacobian
 
-        w_init = torch.qr(torch.FloatTensor(self.n_split, self.n_split).normal_())[0]
+        w_init = torch.linalg.qr(torch.FloatTensor(self.n_split, self.n_split).normal_())[0]
         if torch.det(w_init) < 0:
             w_init[:, 0] = -1 * w_init[:, 0]
         self.weight = nn.Parameter(w_init)
@@ -282,13 +282,14 @@ class CouplingBlock(nn.Module):
         logs = out[:, self.in_channels // 2 :, :]
         if self.sigmoid_scale:
             logs = torch.log(1e-6 + torch.sigmoid(logs + 2))
+            # s = (1e-6 + torch.sigmoid(logs)) // (1e-6 + 0.5)
 
         if reverse:
             z_1 = (x_1 - m) * torch.exp(-logs) * x_mask
             logdet = None
         else:
             z_1 = (m + torch.exp(logs) * x_1) * x_mask
-            logdet = torch.sum(logs * x_mask, [1, 2])
+            logdet = torch.sum(logs * x_mask, [1, 2])  # log(s)
 
         z = torch.cat([z_0, z_1], 1)
         return z, logdet

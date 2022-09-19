@@ -157,7 +157,7 @@ def test_perform_data_dropout_of_ar_mel_inputs(hparams, dummy_embedded_data, dro
     ) = dummy_embedded_data
     mel_padded = mel_padded.transpose(1, 2)
     mel_padded = model.perform_data_dropout_of_ar_mel_inputs(mel_padded, dropout_flag)
-    mask = get_mask_from_len(output_lengths, output_lengths.device)
+    mask = get_mask_from_len(output_lengths, device=output_lengths.device)
     if dropout_flag:
         assert (mel_padded.sum(2).masked_select(mask) == 0).any()
     else:
@@ -180,8 +180,8 @@ def test_get_absorption_state_scaling_factor(hparams, dummy_embedded_data, test_
     model.transition_vector = torch.randn_like(model.transition_vector).sigmoid().log()
     sum_final_log_c = model.get_absorption_state_scaling_factor(output_lengths, model.log_alpha_scaled, input_lengths)
 
-    text_mask = ~get_mask_from_len(input_lengths, input_lengths.device)
-    transition_prob_mask = ~get_mask_for_last_item(input_lengths, input_lengths.device)
+    text_mask = ~get_mask_from_len(input_lengths, device=input_lengths.device)
+    transition_prob_mask = ~get_mask_for_last_item(input_lengths, device=input_lengths.device)
 
     outputs = []
 
@@ -197,7 +197,7 @@ def test_get_absorption_state_scaling_factor(hparams, dummy_embedded_data, test_
 
     sum_final_log_c_computed = torch.logsumexp(torch.stack(outputs), dim=1)
 
-    assert (sum_final_log_c_computed == sum_final_log_c).all()
+    assert torch.isclose(sum_final_log_c_computed, sum_final_log_c).all()
 
 
 def test_sample(hparams, dummy_embedded_data, test_batch_size):

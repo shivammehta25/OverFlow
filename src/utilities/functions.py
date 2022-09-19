@@ -94,9 +94,10 @@ def masked_log_softmax(vec, dim=0):
     return softmax_values
 
 
-def get_mask_from_len(lengths, device="cpu", out_tensor=None):
-    max_len = torch.max(lengths).item()
-    ids = torch.arange(0, max_len, device=device) if out_tensor is None else torch.arange(0, max_len, out=out_tensor)
+def get_mask_from_len(lengths, max_len=None, device="cpu", out_tensor=None):
+    if max_len is None:
+        max_len = lengths.max().item()
+    ids = torch.arange(max_len, device=device) if out_tensor is None else torch.arange(max_len, out=out_tensor)
     mask = ids < lengths.unsqueeze(1)
     return mask
 

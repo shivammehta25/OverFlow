@@ -3,6 +3,7 @@ from math import sqrt
 import torch
 from torch import nn
 
+from src.model.Decoder import FlowSpecDecoder
 from src.model.Encoder import Encoder
 from src.model.HMM import HMM
 
@@ -21,6 +22,7 @@ class NeuralHMM(nn.Module):
 
         self.encoder = Encoder(hparams)
         self.hmm = HMM(hparams)
+        self.decoder = FlowSpecDecoder(hparams)
         self.logger = hparams.logger
 
     def parse_batch(self, batch):
@@ -51,9 +53,10 @@ class NeuralHMM(nn.Module):
         embedded_inputs = self.embedding(text_inputs).transpose(1, 2)
         encoder_outputs, text_lengths = self.encoder(embedded_inputs, text_lengths)
 
-        log_probs = self.hmm(encoder_outputs, text_lengths, mels, mel_lengths)
+        z, z_lengths, logdet = self.decoder(mels, mel_lengths)
 
-        return log_probs
+        log_probs = self.hmm(encoder_outputs, text_lengths, z, z_lengths)
+        return log_probs + logdet
 
     @torch.inference_mode()
     def inference(self, text_inputs):
@@ -109,3 +112,6 @@ class NeuralHMM(nn.Module):
         ) = self.hmm.sample(encoder_outputs)
 
         return mel_output, states_travelled, input_parameters, output_parameters
+
+    def store_inverse(self):
+        self.decoder.store_inverse()

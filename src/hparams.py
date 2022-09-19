@@ -137,6 +137,19 @@ def create_hparams(generate_parameters=False):
         ################################
         parameternetwork=[1024],
         ################################
+        # Decoder Flow Parameters      #
+        ################################
+        flow_hidden_channels=192,
+        kernel_size_dec=5,
+        dilation_rate=1,
+        n_blocks_dec=12,
+        n_block_layers=4,
+        p_dropout_dec=0.05,
+        n_split=4,
+        n_sqz=2,
+        sigmoid_scale=False,
+        gin_channels=0,
+        ################################
         # Optimization Hyperparameters #
         ################################
         learning_rate=1e-3,

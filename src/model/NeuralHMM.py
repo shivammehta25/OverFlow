@@ -3,8 +3,8 @@ from math import sqrt
 import torch
 from torch import nn
 
-from src.model.Decoder import FlowSpecDecoder
 from src.model.Encoder import Encoder
+from src.model.FlowDecoder import FlowSpecDecoder
 from src.model.HMM import HMM
 
 

@@ -1,6 +1,7 @@
 """
 Glow-TTS Code from https://github.com/jaywalnut310/glow-tts
 """
+import torch
 import torch.nn as nn
 
 import src.model.DecoderComponents.flows as flows
@@ -26,7 +27,9 @@ class FlowSpecDecoder(nn.Module):
         self.flows = nn.ModuleList()
         for b in range(hparams.n_blocks_dec):
             self.flows.append(flows.ActNorm(channels=hparams.n_mel_channels * hparams.n_sqz))
-            self.flows.append(flows.InvConvNear(channels=hparams.n_mel_channels * self.n_sqz, n_split=hparams.n_split))
+            self.flows.append(
+                flows.InvConvNear(channels=hparams.n_mel_channels * hparams.n_sqz, n_split=hparams.n_split)
+            )
             self.flows.append(
                 flows.CouplingBlock(
                     hparams.n_mel_channels * hparams.n_sqz,
@@ -81,7 +84,7 @@ class FlowSpecDecoder(nn.Module):
 
     def preprocess(self, y, y_lengths, y_max_length):
         if y_max_length is not None:
-            y_max_length = (y_max_length // self.n_sqz) * self.n_sqz
+            y_max_length = torch.div(y_max_length, self.n_sqz, rounding_mode="floor") * self.n_sqz
             y = y[:, :, :y_max_length]
-        y_lengths = (y_lengths // self.n_sqz) * self.n_sqz
+        y_lengths = torch.div(y_lengths, self.n_sqz, rounding_mode="floor") * self.n_sqz
         return y, y_lengths, y_max_length

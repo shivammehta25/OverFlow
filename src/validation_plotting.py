@@ -12,6 +12,7 @@ from src.utilities.plotting import (
 
 
 @rank_zero_only
+@torch.inference_mode()
 def log_validation(
     logger,
     model,
@@ -73,14 +74,14 @@ def log_validation(
 
     logger.add_image(
         "synthesised/mel_synthesised",
-        plot_mel_spectrogram_to_numpy(mel_output.cpu().numpy().T),
+        plot_mel_spectrogram_to_numpy(mel_output.squeeze(0).T),
         iteration,
         dataformats="HWC",
     )
 
     logger.add_image(
         "synthesised/mel_synthesised_normalised",
-        plot_mel_spectrogram_to_numpy(mel_output_normalised.T),
+        plot_mel_spectrogram_to_numpy(mel_output_normalised.squeeze(0).T),
         iteration,
         dataformats="HWC",
     )
@@ -122,9 +123,12 @@ def log_validation(
     max_state_numbers = max_state_numbers.unsqueeze(1).unsqueeze(1).expand(max_len, 1, n_mel_channels)
     means = torch.gather(means, 1, max_state_numbers).squeeze(1)
 
+    # Passing through the decoder
+    mel_mean, _, _ = model.decoder(means.T.unsqueeze(0), means.new_tensor([means.shape[0]]).int(), reverse=True)
+
     logger.add_image(
         "mel_from_the_means_predicted_by_most_probable_state",
-        plot_mel_spectrogram_to_numpy(means.T),
+        plot_mel_spectrogram_to_numpy(mel_mean.squeeze(0)),
         iteration,
         dataformats="HWC",
     )

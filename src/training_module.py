@@ -107,9 +107,7 @@ class TrainingModule(pl.LightningModule):
             optimizer ([type]): [description]
         """
 
-        if self.trainer.is_global_zero and (
-            self.global_step % self.hparams.save_model_checkpoint == 0
-        ):
+        if self.trainer.is_global_zero and (self.global_step % self.hparams.save_model_checkpoint == 0):
             (
                 text_inputs,
                 text_lengths,
@@ -123,9 +121,7 @@ class TrainingModule(pl.LightningModule):
                 input_parameters,
                 output_parameters,
             ) = self.model.sample(text_inputs[0], text_lengths[0])
-            mel_output_normalised = self.model.hmm.normaliser(
-                mels.new_tensor(mel_output)
-            )
+            mel_output_normalised = self.model.normaliser(mel_output)
 
             with torch.no_grad():
                 _ = self.model((text_inputs, text_lengths, mels, max_len, mel_lengths))
@@ -175,10 +171,36 @@ class TrainingModule(pl.LightningModule):
 
         return text_inputs, text_lengths, mels, max_len, mel_lengths
 
+    @torch.inference_mode()
     def inference(self, text_inputs):
-        return self.model.inference(text_inputs)
+        """
+        Similar to sampling but returns only mel outputs and states travelled.
 
-    def sample(self, text_inputs, text_lengths):
+        Args:
+            text_inputs (torch.IntTensor): phonetised text inputs
+
+        Returns:
+            torch.FloatTensor: mel outputs
+            torch.IntTensor: states travelled
+        """
+        mel_output, states_travelled, _, _ = self.sample(text_inputs)
+        return mel_output, states_travelled
+
+    @torch.inference_mode()
+    def sample(self, text_inputs, text_lengths=None):
+        """
+        Samples from the model
+
+        Args:
+            text_inputs (torch.IntTensor): phonetised text inputs
+            text_lengths (torch.IntTensor, Optional): text lengths
+
+        Returns:
+            torch.FloatTensor: mel outputs
+            torch.InteTensor: states travelled
+            List[Tuple[torch.FloatTensor]]: input parameters
+            List[Tuple[torch.FloatTensor]]: output parameters
+        """
         return self.model.sample(text_inputs, text_lengths)
 
     def log_grad_norm(self, grad_norm_dict):
@@ -190,6 +212,4 @@ class TrainingModule(pl.LightningModule):
             grad_norm_dict: Dictionary containing current grad norm metrics
 
         """
-        self.log_dict(
-            grad_norm_dict, on_step=True, on_epoch=True, prog_bar=False, logger=True
-        )
+        self.log_dict(grad_norm_dict, on_step=True, on_epoch=True, prog_bar=False, logger=True)

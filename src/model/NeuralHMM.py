@@ -20,6 +20,9 @@ class NeuralHMM(nn.Module):
             val = sqrt(3.0) * std  # uniform bounds for std
             self.embedding.weight.data.uniform_(-val, val)
 
+        # Data Properties
+        self.normaliser = hparams.normaliser
+
         self.encoder = Encoder(hparams)
         self.hmm = HMM(hparams)
         self.decoder = FlowSpecDecoder(hparams)
@@ -59,39 +62,12 @@ class NeuralHMM(nn.Module):
         return log_probs + logdet
 
     @torch.inference_mode()
-    def inference(self, text_inputs):
-        r"""
-        Sampling audio based on single text input
-        Args:
-            text_inputs (int tensor) : shape: (1, x) where x is length of phoneme input
-        Returns:
-            mel_outputs (list): list of len of the output of mel spectrogram each
-                    containing n_mel_channels channels
-                shape: (len, n_mel_channels)
-            states_travelled (list): list of phoneme travelled at each time step t
-                shape: (len)
-        """
-
-        text_lengths = text_inputs.new_tensor(text_inputs.shape[1]).unsqueeze(0)
-        embedded_inputs = self.embedding(text_inputs).transpose(1, 2)
-        encoder_outputs, text_lengths = self.encoder(embedded_inputs, text_lengths)
-
-        (
-            mel_output,
-            states_travelled,
-            input_parameters,
-            output_parameters,
-        ) = self.hmm.sample(encoder_outputs)
-
-        return mel_output, states_travelled
-
-    @torch.inference_mode()
-    def sample(self, text_inputs, text_lengths):
+    def sample(self, text_inputs, text_lengths=None):
         r"""
         Sampling mel spectrogram based on text inputs
         Args:
             text_inputs (int tensor) : shape ([x]) where x is the phoneme input
-            text_lengths (int tensor):  single value scalar with length of input (x)
+            text_lengths (int tensor, Optional):  single value scalar with length of input (x)
 
         Returns:
             mel_outputs (list): list of len of the output of mel spectrogram
@@ -100,18 +76,28 @@ class NeuralHMM(nn.Module):
             states_travelled (list): list of phoneme travelled at each time step t
                 shape: (len)
         """
+        if text_lengths is None:
+            text_lengths = text_inputs.new_tensor(text_inputs.shape[1])
+
         text_inputs, text_lengths = text_inputs.unsqueeze(0), text_lengths.unsqueeze(0)
         embedded_inputs = self.embedding(text_inputs).transpose(1, 2)
         encoder_outputs, text_lengths = self.encoder(embedded_inputs, text_lengths)
 
         (
-            mel_output,
+            mel_latent,
             states_travelled,
             input_parameters,
             output_parameters,
         ) = self.hmm.sample(encoder_outputs)
 
-        return mel_output, states_travelled, input_parameters, output_parameters
+        mel_output, mel_lengths, _ = self.decoder(
+            mel_latent.unsqueeze(0).transpose(1, 2), text_lengths.new_tensor([mel_latent.shape[0]]), reverse=True
+        )
+
+        if self.normaliser:
+            mel_output = self.normaliser.inverse_normalise(mel_output)
+
+        return mel_output.transpose(1, 2), states_travelled, input_parameters, output_parameters
 
     def store_inverse(self):
         self.decoder.store_inverse()

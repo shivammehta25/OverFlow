@@ -13,10 +13,6 @@ class HMM(nn.Module):
     def __init__(self, hparams):
         super().__init__()
         self.hparams = hparams
-
-        # Data Properties
-        self.normaliser = hparams.normaliser
-
         self.transition_model = TransitionModel()
         self.emission_model = EmissionModel()
 
@@ -337,7 +333,7 @@ class HMM(nn.Module):
         sum_final_log_c = torch.logsumexp(final_log_c, dim=1)
         return sum_final_log_c
 
-    @torch.no_grad()
+    @torch.inference_mode()
     def sample(self, encoder_outputs, T=None):
         r"""
         Samples an output from the parameter models
@@ -425,12 +421,7 @@ class HMM(nn.Module):
 
             t += 1
 
-        if self.normaliser:
-            x = self.normaliser.inverse_normalise(torch.stack(x)).tolist()
-        else:
-            x = x.tolist()
-
-        return x, z, input_parameter_values, output_parameter_values
+        return torch.stack(x), z, input_parameter_values, output_parameter_values
 
     def initialize_log_state_priors(self, text_embeddings):
         """Creates the log pi in forward algorithm.

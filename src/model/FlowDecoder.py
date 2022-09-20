@@ -55,6 +55,12 @@ class FlowSpecDecoder(nn.Module):
         Returns:
             _type_: _description_
         """
+        assert x.shape == (
+            x_lengths.shape[0],
+            self.in_channels,
+            x_lengths.max(),
+        ), f"The shape of the  \
+            input should be (batch_dim, n_mel_channels, T_max) but received {x.shape}"
         x, x_lengths, x_max_length = self.preprocess(x, x_lengths, x_lengths.max())
 
         x_mask = get_mask_from_len(x_lengths, x_max_length, device=x_lengths.device).float().unsqueeze(1)

@@ -1,4 +1,3 @@
-import numpy as np
 import torch
 from pytorch_lightning.utilities import rank_zero_only
 
@@ -74,7 +73,7 @@ def log_validation(
 
     logger.add_image(
         "synthesised/mel_synthesised",
-        plot_mel_spectrogram_to_numpy(np.array(mel_output).T),
+        plot_mel_spectrogram_to_numpy(mel_output.cpu().numpy().T),
         iteration,
         dataformats="HWC",
     )

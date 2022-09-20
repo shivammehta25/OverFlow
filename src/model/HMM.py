@@ -1,6 +1,7 @@
 import torch
 from torch import nn
 from torch.nn import functional as F
+from torch.utils.checkpoint import checkpoint
 
 from src.model.HMMComponents.Decoder import Decoder
 from src.model.HMMComponents.EmissionModel import EmissionModel
@@ -90,7 +91,8 @@ class HMM(nn.Module):
             )
 
             # Get mean, std and transition vector from decoder for this timestep
-            mean, std, transition_vector = self.decoder(h_post_prenet, text_embeddings)
+            # with gradient checkpointing
+            mean, std, transition_vector = checkpoint(self.decoder, h_post_prenet, text_embeddings)
 
             # Forward algorithm for this timestep
             if t == 0:

@@ -83,7 +83,6 @@ class NeuralHMM(nn.Module):
             text_lengths = text_inputs.new_tensor(text_inputs.shape[0])
 
         text_inputs, text_lengths = text_inputs.unsqueeze(0), text_lengths.unsqueeze(0)
-        print(text_inputs.shape)
         embedded_inputs = self.embedding(text_inputs).transpose(1, 2)
         encoder_outputs, text_lengths = self.encoder(embedded_inputs, text_lengths)
 

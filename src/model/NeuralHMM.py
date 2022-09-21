@@ -76,10 +76,14 @@ class NeuralHMM(nn.Module):
             states_travelled (list): list of phoneme travelled at each time step t
                 shape: (len)
         """
+        if text_inputs.ndim > 1:
+            text_inputs = text_inputs.squeeze(0)
+
         if text_lengths is None:
-            text_lengths = text_inputs.new_tensor(text_inputs.shape[1])
+            text_lengths = text_inputs.new_tensor(text_inputs.shape[0])
 
         text_inputs, text_lengths = text_inputs.unsqueeze(0), text_lengths.unsqueeze(0)
+        print(text_inputs.shape)
         embedded_inputs = self.embedding(text_inputs).transpose(1, 2)
         encoder_outputs, text_lengths = self.encoder(embedded_inputs, text_lengths)
 

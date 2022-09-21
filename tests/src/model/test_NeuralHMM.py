@@ -1,3 +1,4 @@
+import pytest
 import torch
 
 from src.model.NeuralHMM import NeuralHMM
@@ -18,15 +19,13 @@ def test_forward(hparams, dummy_data, test_batch_size):
     assert log_probs.shape == (test_batch_size,)
 
 
-def test_sample(hparams, dummy_data_uncollated):
+@pytest.mark.parametrize("send_len", [True, False])
+def test_sample(hparams, dummy_data_uncollated, send_len):
     neural_hmm = NeuralHMM(hparams)
     text = dummy_data_uncollated[0][0]
-    (
-        mel_output,
-        states_travelled,
-        input_parameters,
-        output_parameters,
-    ) = neural_hmm.sample(text, torch.tensor(len(text)))
+    (mel_output, states_travelled, input_parameters, output_parameters,) = (
+        neural_hmm.sample(text, torch.tensor(len(text))) if send_len else neural_hmm.sample(text)
+    )
     assert mel_output.shape[2] == hparams.n_mel_channels
     assert input_parameters[0][0].shape[-1] == hparams.n_mel_channels
     assert output_parameters[0][0].shape[-1] == hparams.n_mel_channels

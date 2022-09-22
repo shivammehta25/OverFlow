@@ -32,6 +32,7 @@ def warm_start_model(checkpoint_path, model, ignore_layers):
 
 
 if __name__ == "__main__":
+    # torch.autograd.set_detect_anomaly(True)
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "-c",

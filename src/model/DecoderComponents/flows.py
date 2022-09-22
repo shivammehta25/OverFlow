@@ -243,7 +243,7 @@ class CouplingBlock(nn.Module):
         n_layers,
         gin_channels=0,
         p_dropout=0,
-        sigmoid_scale=True,
+        sigmoid_scale=False,
     ):
         super().__init__()
         self.in_channels = in_channels
@@ -280,16 +280,13 @@ class CouplingBlock(nn.Module):
         z_0 = x_0
         m = out[:, : self.in_channels // 2, :]
         logs = out[:, self.in_channels // 2 :, :]
-        if self.sigmoid_scale:
-            logs = torch.log(1e-6 + torch.sigmoid(logs + 2))
-            # s = (1e-6 + torch.sigmoid(logs)) // (1e-6 + 0.5)
-
+        s = (1e-6 + torch.sigmoid(logs)) / (1e-6 + 0.5)
         if reverse:
-            z_1 = (x_1 - m) * torch.exp(-logs) * x_mask
+            z_1 = ((x_1 - m) / s) * x_mask
             logdet = None
         else:
-            z_1 = (m + torch.exp(logs) * x_1) * x_mask
-            logdet = torch.sum(logs * x_mask, [1, 2])  # log(s)
+            z_1 = (m + s * x_1) * x_mask
+            logdet = torch.sum(torch.log(s) * x_mask, [1, 2])
 
         z = torch.cat([z_0, z_1], 1)
         return z, logdet

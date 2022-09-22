@@ -49,7 +49,7 @@ def create_hparams(generate_parameters=False):
         ################################
         # Experiment Parameters        #
         ################################
-        run_name="RunDecoder1",
+        run_name="Scaled_Run",
         gpus=[0],
         max_epochs=50000,
         val_check_interval=100,
@@ -113,7 +113,7 @@ def create_hparams(generate_parameters=False):
         ################################
         n_frames_per_step=1,  # AR Order
         train_go=True,
-        variance_floor=0.001,
+        variance_floor=0.1,
         data_dropout=0,
         data_dropout_while_eval=True,
         data_dropout_while_sampling=False,

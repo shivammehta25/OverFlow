@@ -233,7 +233,7 @@ class InvConvNear(nn.Module):
         self.weight_inv = torch.inverse(self.weight.float()).to(dtype=self.weight.dtype)
 
 
-class CouplingBlock(nn.Module):
+class CouplingBlock_scale1(nn.Module):
     def __init__(
         self,
         in_channels,
@@ -307,7 +307,7 @@ class CouplingBlock(nn.Module):
         self.wn.remove_weight_norm()
 
 
-class CouplingBlock2(nn.Module):
+class CouplingBlock_orig(nn.Module):
     def __init__(
         self,
         in_channels,
@@ -371,7 +371,7 @@ class CouplingBlock2(nn.Module):
         self.wn.remove_weight_norm()
 
 
-class CouplingBlock3(nn.Module):
+class CouplingBlock(nn.Module):
     def __init__(
         self,
         in_channels,
@@ -419,16 +419,6 @@ class CouplingBlock3(nn.Module):
         m = out[:, : self.in_channels // 2, :]
         logs = out[:, self.in_channels // 2 :, :]
         s = 2 * (1e-6 + torch.sigmoid(logs))
-
-        # if self.sigmoid_scale:
-        #   logs = torch.log(1e-6 + torch.sigmoid(logs + 2))
-
-        # if reverse:
-        #   z_1 = (x_1 - m) * torch.exp(-logs) * x_mask
-        #   logdet = None
-        # else:
-        #   z_1 = (m + torch.exp(logs) * x_1) * x_mask
-        #   logdet = torch.sum(logs * x_mask, [1, 2])
 
         if reverse:
             z_1 = ((x_1 - m) * torch.pow(s, -1)) * x_mask

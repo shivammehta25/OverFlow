@@ -26,7 +26,7 @@ class FlowSpecDecoder(nn.Module):
 
         self.flows = nn.ModuleList()
         for b in range(hparams.n_blocks_dec):
-            self.flows.append(flows.ActNorm(channels=hparams.n_mel_channels * hparams.n_sqz))
+            # self.flows.append(flows.ActNorm(channels=hparams.n_mel_channels * hparams.n_sqz))
             self.flows.append(
                 flows.InvConvNear(channels=hparams.n_mel_channels * hparams.n_sqz, n_split=hparams.n_split)
             )

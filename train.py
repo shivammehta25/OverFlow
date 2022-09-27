@@ -7,7 +7,6 @@ import argparse
 import os
 
 import pytorch_lightning as pl
-import torch
 from pytorch_lightning.loggers import TensorBoardLogger
 from pytorch_lightning.plugins import DDPPlugin
 from pytorch_lightning.utilities.seed import seed_everything
@@ -15,21 +14,6 @@ from pytorch_lightning.utilities.seed import seed_everything
 from src.data_module import LightningLoader
 from src.hparams import create_hparams
 from src.training_module import TrainingModule
-
-
-def warm_start_model(checkpoint_path, model, ignore_layers):
-    assert os.path.isfile(checkpoint_path)
-    print(f"Warm starting model from checkpoint '{checkpoint_path}'")
-    checkpoint_dict = torch.load(checkpoint_path, map_location="cpu")
-    model_dict = checkpoint_dict["state_dict"]
-    if len(ignore_layers) > 0:
-        model_dict = {k: v for k, v in model_dict.items() if k not in ignore_layers}
-        dummy_dict = model.state_dict()
-        dummy_dict.update(model_dict)
-        model_dict = dummy_dict
-    model.load_state_dict(model_dict)
-    return model
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -64,11 +48,6 @@ if __name__ == "__main__":
 
     data_module = LightningLoader(hparams)
     model = TrainingModule(hparams)
-
-    if hparams.warm_start:
-        model = warm_start_model(args.checkpoint_path, model, hparams.ignore_layers)
-        args.checkpoint_path = None
-        # We have already loaded the model weights, so we don't want to load optimizer states from checkpoint
 
     logger = TensorBoardLogger(hparams.tensorboard_log_dir, name=hparams.run_name)
 

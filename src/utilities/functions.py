@@ -161,6 +161,12 @@ def unsqueeze(x, x_mask=None, n_sqz=2):
     return x_unsqz * x_mask, x_mask
 
 
+def convert_pad_shape(pad_shape):
+    list_l = pad_shape[::-1]
+    pad_shape = [item for sublist in list_l for item in sublist]
+    return pad_shape
+
+
 ######################################################
 # End Glow TTS Methods
 ######################################################

@@ -334,7 +334,7 @@ class HMM(nn.Module):
         return sum_final_log_c
 
     @torch.inference_mode()
-    def sample(self, encoder_outputs, T=None):
+    def sample(self, encoder_outputs, sampling_temp=1.0, T=None):
         r"""
         Samples an output from the parameter models
 
@@ -394,7 +394,7 @@ class HMM(nn.Module):
             input_parameter_values.append([ar_mel_inputs, current_z_number])
             output_parameter_values.append([mean, std, transition_probability])
 
-            x_t = self.emission_model.sample(mean, std)
+            x_t = self.emission_model.sample(mean, std, sampling_temp=sampling_temp)
 
             if self.hparams.predict_means:
                 x_t = mean

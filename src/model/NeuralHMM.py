@@ -62,7 +62,7 @@ class NeuralHMM(nn.Module):
         return log_probs + logdet
 
     @torch.inference_mode()
-    def sample(self, text_inputs, text_lengths=None):
+    def sample(self, text_inputs, text_lengths=None, sampling_temp=1.0):
         r"""
         Sampling mel spectrogram based on text inputs
         Args:
@@ -91,7 +91,7 @@ class NeuralHMM(nn.Module):
             states_travelled,
             input_parameters,
             output_parameters,
-        ) = self.hmm.sample(encoder_outputs)
+        ) = self.hmm.sample(encoder_outputs, sampling_temp=sampling_temp)
 
         mel_output, mel_lengths, _ = self.decoder(
             mel_latent.unsqueeze(0).transpose(1, 2), text_lengths.new_tensor([mel_latent.shape[0]]), reverse=True

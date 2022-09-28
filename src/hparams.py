@@ -49,8 +49,8 @@ def create_hparams(generate_parameters=False):
         ################################
         # Experiment Parameters        #
         ################################
-        run_name="RunDecoder1",
-        gpus=[0],
+        run_name="TransformerEncoder",
+        gpus=[1],
         max_epochs=50000,
         val_check_interval=100,
         save_model_checkpoint=500,
@@ -67,14 +67,14 @@ def create_hparams(generate_parameters=False):
         ################################
         # Data Parameters             #
         ################################
-        batch_size=7,
+        batch_size=3,
         load_mel_from_disk=False,
         training_files="data/filelists/ljs_audio_text_train_filelist.txt",
         validation_files="data/filelists/ljs_audio_text_val_filelist.txt",
         text_cleaners=["english_cleaners"],
         phonetise=True,
         cmu_phonetiser=CMUDict("src/phonetised_files/cmudict-0.7b.txt"),
-        num_workers=20,
+        num_workers=0,
         ################################
         # Audio Parameters             #
         ################################
@@ -100,13 +100,20 @@ def create_hparams(generate_parameters=False):
         # Model Parameters             #
         ################################
         n_symbols=len(symbols),
-        symbols_embedding_dim=512,
         ################################
         # Encoder parameters           #
         ################################
-        encoder_kernel_size=5,
-        encoder_n_convolutions=3,
-        encoder_embedding_dim=512,
+        encoder_hidden_channels=192,
+        encoder_kernel_size=3,
+        encoder_filter_channels=768,
+        encoder_filter_channels_dp=256,
+        encoder_n_layers=6,
+        encoder_n_heads=2,
+        encoder_p_dropout=0.1,
+        encoder_embedding_dim=256,
+        encoder_window_size=4,
+        encoder_block_length=None,
+        encoder_prenet=True,
         state_per_phone=2,
         ################################
         # HMM Parameters               #

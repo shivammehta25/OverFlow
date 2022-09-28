@@ -83,42 +83,50 @@ class Encoder_T2(nn.Module):
 class Encoder(nn.Module):
     """Glow TTS encoder with custom modifications"""
 
-    def __init__(
-        self,
-        n_vocab,
-        out_channels,
-        hidden_channels,
-        filter_channels,
-        filter_channels_dp,
-        n_heads,
-        n_layers,
-        kernel_size,
-        p_dropout,
-        window_size=None,
-        block_length=None,
-        mean_only=False,
-        prenet=False,
-        gin_channels=0,
-    ):
+    def __init__(self, hparams):
+        super().__init__()
 
-        if prenet:
+        # hparams.n_symbols,
+        # hparams.encoder_embedding_dim,
+        # hparams.encoder_hidden_channels,
+        # hparams.encoder_filter_channels,
+        # hparams.encoder_filter_channels_dp,
+        # hparams.encoder_n_heads,
+        # hparams.encoder_n_layers,
+        # hparams.encoder_kernel_size,
+        # hparams.encoder_p_dropout,
+        # hparams.encoder_window_size,
+        # hparams.encoder_block_length,
+        # hparams.encoder_prenet,
+
+        self.prenet = hparams.encoder_prenet
+        self.state_per_phone = hparams.state_per_phone
+        self.encoder_embedding_dim = hparams.encoder_embedding_dim
+
+        if hparams.encoder_prenet:
             self.pre = ConvReluNorm(
-                hidden_channels, hidden_channels, hidden_channels, kernel_size=5, n_layers=3, p_dropout=0.5
+                hparams.encoder_hidden_channels,
+                hparams.encoder_hidden_channels,
+                hparams.encoder_hidden_channels,
+                kernel_size=5,
+                n_layers=3,
+                p_dropout=0.5,
             )
 
         self.encoder = TransformerEncoder(
-            hidden_channels,
-            filter_channels,
-            n_heads,
-            n_layers,
-            kernel_size,
-            p_dropout,
-            window_size=window_size,
-            block_length=block_length,
+            hparams.encoder_hidden_channels,
+            hparams.encoder_filter_channels,
+            hparams.encoder_n_heads,
+            hparams.encoder_n_layers,
+            hparams.encoder_kernel_size,
+            hparams.encoder_p_dropout,
+            window_size=hparams.encoder_window_size,
+            block_length=hparams.encoder_block_length,
         )
 
-        hparams = None
-        self.proj = nn.Conv1d(hidden_channels, out_channels * hparams.state_per_phone, 1)
+        self.proj = nn.Conv1d(
+            hparams.encoder_hidden_channels, hparams.encoder_embedding_dim * hparams.state_per_phone, 1
+        )
 
     def forward(self, x, x_lengths):
         """
@@ -133,17 +141,17 @@ class Encoder(nn.Module):
             x_lengths: text lengths
         """
         x = torch.transpose(x, 1, -1)  # [b, h, t]
-        x_mask = torch.unsqueeze(get_mask_from_len(x_lengths, x.size(2)), 1).to(x.dtype)
+        x_mask = torch.unsqueeze(get_mask_from_len(x_lengths, x.size(2), device=x.device), 1).to(x.dtype)
 
         if self.prenet:
             x = self.pre(x, x_mask)
         x = self.encoder(x, x_mask)
 
-        outputs = self.proj_m(x) * x_mask
+        outputs = self.proj(x) * x_mask
 
-        outputs = outputs.reshape(x.shape[0], x.shape[2] * self.state_per_phone, self.encoder_embedding_dim)
+        outputs = outputs.reshape(x.shape[0], self.encoder_embedding_dim, x.shape[2] * self.state_per_phone)
         x_lengths = x_lengths * self.state_per_phone
-        return outputs, x_lengths
+        return outputs.transpose(1, 2), x_lengths
 
 
 class TransformerEncoder(nn.Module):

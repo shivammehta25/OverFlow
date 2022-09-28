@@ -13,11 +13,11 @@ class NeuralHMM(nn.Module):
         super().__init__()
         self.n_mel_channels = hparams.n_mel_channels
         self.n_frames_per_step = hparams.n_frames_per_step
-        self.embedding = nn.Embedding(hparams.n_symbols, hparams.symbols_embedding_dim)
+        self.embedding = nn.Embedding(hparams.n_symbols, hparams.encoder_hidden_channels)
 
         if hparams.checkpoint_path is None:
             # resuming the training does not re-initialize embeddings
-            std = sqrt(2.0 / (hparams.n_symbols + hparams.symbols_embedding_dim))
+            std = sqrt(2.0 / (hparams.n_symbols + hparams.encoder_hidden_channels))
             val = sqrt(3.0) * std  # uniform bounds for std
             self.embedding.weight.data.uniform_(-val, val)
 
@@ -54,7 +54,7 @@ class NeuralHMM(nn.Module):
     def forward(self, inputs):
         text_inputs, text_lengths, mels, max_len, mel_lengths = inputs
         text_lengths, mel_lengths = text_lengths.data, mel_lengths.data
-        embedded_inputs = self.embedding(text_inputs).transpose(1, 2)
+        embedded_inputs = self.embedding(text_inputs)
         encoder_outputs, text_lengths = self.encoder(embedded_inputs, text_lengths)
 
         z, z_lengths, logdet = self.decoder(mels, mel_lengths)
@@ -84,7 +84,7 @@ class NeuralHMM(nn.Module):
             text_lengths = text_inputs.new_tensor(text_inputs.shape[0])
 
         text_inputs, text_lengths = text_inputs.unsqueeze(0), text_lengths.unsqueeze(0)
-        embedded_inputs = self.embedding(text_inputs).transpose(1, 2)
+        embedded_inputs = self.embedding(text_inputs)
         encoder_outputs, text_lengths = self.encoder(embedded_inputs, text_lengths)
 
         (

@@ -34,5 +34,5 @@ def dummy_data(dummy_data_uncollated, hparams):
 @pytest.fixture
 def dummy_embedded_data(dummy_data, hparams):
     text_padded, input_lengths, mel_padded, gate_padded, output_lengths = dummy_data
-    embedded_input = torch.nn.Embedding(hparams.n_symbols, hparams.symbols_embedding_dim)(text_padded)
+    embedded_input = torch.nn.Embedding(hparams.n_symbols, hparams.encoder_embedding_dim)(text_padded)
     return (embedded_input, input_lengths, mel_padded, gate_padded, output_lengths)

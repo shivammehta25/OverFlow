@@ -215,3 +215,34 @@ def test_sample(hparams, dummy_embedded_data, test_batch_size):
     assert input_parameters[0][0].shape[-1] == hparams.n_mel_channels
     assert output_parameters[0][0].shape[-1] == hparams.n_mel_channels
     assert output_parameters[0][1].shape[-1] == hparams.n_mel_channels
+
+
+@pytest.mark.parametrize("sampling_temp", [0.0, 0.5, 1.0])
+def test_sample_temperature(hparams, dummy_embedded_data, test_batch_size, sampling_temp):
+    model = HMM(hparams)
+    (
+        embedded_input,
+        input_lengths,
+        mel_padded,
+        _,
+        output_lengths,
+    ) = dummy_embedded_data
+
+    # Without sampling
+    (mel_output1, states_travelled, input_parameters, output_parameters) = model.sample(
+        embedded_input[0:1], sampling_temp=sampling_temp
+    )
+
+    # Sampling with temperature
+    model.hparams.predict_means = False
+    (mel_output2, states_travelled, input_parameters, output_parameters) = model.sample(
+        embedded_input[0:1], sampling_temp=sampling_temp
+    )
+
+    if sampling_temp == 0.0:
+        assert torch.isclose(mel_output1, mel_output2).all()
+
+    assert len(mel_output2[0]) == hparams.n_mel_channels
+    assert input_parameters[0][0].shape[-1] == hparams.n_mel_channels
+    assert output_parameters[0][0].shape[-1] == hparams.n_mel_channels
+    assert output_parameters[0][1].shape[-1] == hparams.n_mel_channels

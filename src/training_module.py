@@ -172,7 +172,7 @@ class TrainingModule(pl.LightningModule):
         return text_inputs, text_lengths, mels, max_len, mel_lengths
 
     @torch.inference_mode()
-    def inference(self, text_inputs):
+    def inference(self, text_inputs, sampling_temp=1.0):
         """
         Similar to sampling but returns only mel outputs and states travelled.
 
@@ -183,11 +183,11 @@ class TrainingModule(pl.LightningModule):
             torch.FloatTensor: mel outputs
             torch.IntTensor: states travelled
         """
-        mel_output, states_travelled, _, _ = self.sample(text_inputs)
+        mel_output, states_travelled, _, _ = self.sample(text_inputs, sampling_temp=sampling_temp)
         return mel_output, states_travelled
 
     @torch.inference_mode()
-    def sample(self, text_inputs, text_lengths=None):
+    def sample(self, text_inputs, text_lengths=None, sampling_temp=1.0):
         """
         Samples from the model
 
@@ -201,7 +201,7 @@ class TrainingModule(pl.LightningModule):
             List[Tuple[torch.FloatTensor]]: input parameters
             List[Tuple[torch.FloatTensor]]: output parameters
         """
-        return self.model.sample(text_inputs, text_lengths)
+        return self.model.sample(text_inputs, text_lengths, sampling_temp=sampling_temp)
 
     def log_grad_norm(self, grad_norm_dict):
         r"""

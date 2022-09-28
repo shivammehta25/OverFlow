@@ -4,6 +4,7 @@ import torch
 
 from src.model.FlowDecoder import FlowSpecDecoder
 from src.utilities.functions import get_mask_from_len
+from tests.test_utilities import reset_all_weights
 
 
 @pytest.mark.parametrize(
@@ -32,14 +33,17 @@ def test_FlowDecoder(
     hparams.p_dropout_dec = 0.0  # Turn off dropout to check invertibility
 
     decoder = FlowSpecDecoder(hparams)
+
+    reset_all_weights(decoder)
+
     _, _, mel_padded, _, output_lengths = dummy_data
     z, z_lengths, logdet = decoder(mel_padded, output_lengths)
     assert logdet.shape[0] == test_batch_size
     assert z.shape[1] == hparams.n_mel_channels
-    assert (z.shape[2] == mel_padded.shape[2]) or (z.shape[2] == (mel_padded.shape[2] - 1))
+    assert (z.shape[2] == mel_padded.shape[2]) or (z.shape[2] == (mel_padded.shape[2] - 1)), "Output format matches"
 
     mel_, _, logdet_ = decoder(z, z_lengths, reverse=True)
     len_mask = get_mask_from_len(z_lengths, device=z_lengths.device).unsqueeze(1)
     mel_padded = mel_padded[:, :, : z.shape[2]] * len_mask
-    assert torch.isclose(mel_padded, mel_, atol=1e-5).all()
+    assert torch.isclose(mel_padded, mel_, atol=1e-5).all(), "Invertible"
     assert logdet_ is None

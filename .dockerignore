@@ -1,3 +1,6 @@
 data/
 .home/
 checkpoints/
+hifigan/
+waveglow/
+tb_logs/

@@ -36,7 +36,7 @@ class FlowSpecDecoder(nn.Module):
                     hparams.flow_hidden_channels,
                     kernel_size=hparams.kernel_size_dec,
                     dilation_rate=hparams.dilation_rate,
-                    n_layers=hparams.n_blocks_dec,
+                    n_layers=hparams.n_block_layers,
                     gin_channels=hparams.gin_channels,
                     p_dropout=hparams.p_dropout_dec,
                     sigmoid_scale=hparams.sigmoid_scale,

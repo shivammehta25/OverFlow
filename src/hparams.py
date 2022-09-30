@@ -49,7 +49,7 @@ def create_hparams(generate_parameters=False):
         ################################
         # Experiment Parameters        #
         ################################
-        run_name="RunDecoder1",
+        run_name="FixingDecoderSize",
         gpus=[0],
         max_epochs=50000,
         val_check_interval=100,
@@ -67,7 +67,7 @@ def create_hparams(generate_parameters=False):
         ################################
         # Data Parameters             #
         ################################
-        batch_size=7,
+        batch_size=28,
         load_mel_from_disk=False,
         training_files="data/filelists/ljs_audio_text_train_filelist.txt",
         validation_files="data/filelists/ljs_audio_text_val_filelist.txt",

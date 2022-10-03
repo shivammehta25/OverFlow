@@ -66,6 +66,17 @@ if __name__ == "__main__":
     data_module = LightningLoader(hparams)
     model = TrainingModule(hparams)
 
+    def count_parameters(model, element_name):
+        return f"{element_name}  has {sum(p.numel() for p in model.parameters() if p.requires_grad): ,} trainable \
+            parameters"
+
+    elements = {"Encoder": model.model.encoder, "HMM": model.model.hmm, "Decoder": model.model.decoder}
+
+    print(model.model.decoder)
+
+    for element_name, element in elements.items():
+        print(count_parameters(element, element_name))
+
     if hparams.warm_start:
         model = warm_start_model(args.checkpoint_path, model, hparams.ignore_layers)
         args.checkpoint_path = None

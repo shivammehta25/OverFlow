@@ -1,4 +1,4 @@
-# OverFlow: Putting flows on top of neural HMMs for better TTS
+# OverFlow: Putting flows on top of neural transducers for better TTS
 ##### [Shivam Mehta][shivam_profile], [Ambika Kirkland][ambika_profile], [Harm Lameris][harm_profile], [Jonas Beskow][jonas_profile], [Éva Székely][eva_profile], and [Gustav Eje Henter][gustav_profile]
 
 [arxiv_link]: https://arxiv.org/abs/2108.13320

@@ -1,3 +1,0 @@
-[submodule "hifigan"]
-	path = hifigan
-	url = https://github.com/jik876/hifi-gan.git

@@ -29,7 +29,7 @@ class HMM(nn.Module):
 
         if self.hparams.n_frames_per_step < 1:
             raise ValueError(
-                "Being an Autoregressive model NeuralHMM requires value > 0 for  \
+                "Being an Autoregressive model OverFlow requires value > 0 for  \
                 n_frames_per_step in hparams the given value is {}".format(
                     hparams.n_frames_per_step
                 )

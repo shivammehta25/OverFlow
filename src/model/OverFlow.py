@@ -8,13 +8,13 @@ from src.model.FlowDecoder import FlowSpecDecoder
 from src.model.HMM import HMM
 
 
-class NeuralHMM(nn.Module):
+class OverFlow(nn.Module):
     def __init__(self, hparams):
         super().__init__()
         self.n_mel_channels = hparams.n_mel_channels
         self.n_frames_per_step = hparams.n_frames_per_step
         self.embedding = nn.Embedding(hparams.n_symbols, hparams.symbols_embedding_dim)
-        if hparams.warm_start or hparams.checkpoint_path:
+        if hparams.warm_start or (hparams.checkpoint_path is None):
             # If warm start or resuming training do not re-initialize embeddings
             std = sqrt(2.0 / (hparams.n_symbols + hparams.symbols_embedding_dim))
             val = sqrt(3.0) * std  # uniform bounds for std

@@ -1,11 +1,11 @@
 import pytest
 import torch
 
-from src.model.NeuralHMM import NeuralHMM
+from src.model.OverFlow import OverFlow
 
 
 def test_parse_batch(hparams, dummy_data):
-    neural_hmm = NeuralHMM(hparams)
+    neural_hmm = OverFlow(hparams)
     parsed_batch = neural_hmm.parse_batch(dummy_data)
     text_padded, input_lengths, mel_padded, max_len, mel_lengths = parsed_batch[0]
     mel_padded, _ = parsed_batch[1]
@@ -14,14 +14,14 @@ def test_parse_batch(hparams, dummy_data):
 
 
 def test_forward(hparams, dummy_data, test_batch_size):
-    neural_hmm = NeuralHMM(hparams)
+    neural_hmm = OverFlow(hparams)
     log_probs = neural_hmm.forward(dummy_data)
     assert log_probs.shape == (test_batch_size,)
 
 
 @pytest.mark.parametrize("send_len", [True, False])
 def test_sample(hparams, dummy_data_uncollated, send_len):
-    neural_hmm = NeuralHMM(hparams)
+    neural_hmm = OverFlow(hparams)
     text = dummy_data_uncollated[0][0]
     (mel_output, states_travelled, input_parameters, output_parameters,) = (
         neural_hmm.sample(text, torch.tensor(len(text))) if send_len else neural_hmm.sample(text)

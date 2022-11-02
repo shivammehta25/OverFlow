@@ -2,7 +2,7 @@
 ##### [Shivam Mehta][shivam_profile], [Ambika Kirkland][ambika_profile], [Harm Lameris][harm_profile], [Jonas Beskow][jonas_profile], [Éva Székely][eva_profile], and [Gustav Eje Henter][gustav_profile]
 
 [arxiv_link]: https://arxiv.org/abs/2108.13320
-[github_link]: https://github.com/shivammehta007/Neural-HMM
+[github_link]: https://github.com/shivammehta25/OverFlow
 [shivam_profile]: https://www.kth.se/profile/smehta
 [ambika_profile]: https://www.kth.se/profile/kirkland
 [harm_profile]: https://www.kth.se/profile/lameris

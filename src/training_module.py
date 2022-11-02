@@ -10,7 +10,7 @@ from argparse import Namespace
 import pytorch_lightning as pl
 import torch
 
-from src.model.NeuralHMM import NeuralHMM
+from src.model.OverFlow import OverFlow
 from src.validation_plotting import log_validation
 
 
@@ -23,7 +23,7 @@ class TrainingModule(pl.LightningModule):
         self.save_hyperparameters(hparams)
         hparams.logger = self.logger
 
-        self.model = NeuralHMM(hparams)
+        self.model = OverFlow(hparams)
 
     def forward(self, x):
         r"""

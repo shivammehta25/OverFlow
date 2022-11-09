@@ -102,11 +102,22 @@
   background: #409cff;
   cursor: pointer;
 }
+
+audio {
+    width: 110px;
+}
 </style>
 
 ## Summary
 
-[Neural-HMMs][Neural_HMM_link] fuse classical HMM-based statistical speech synthesis and modern neural text-to-speech (TTS) retaining the best of both approaches. They require fewer data and fewer training updates to work while being less prone to gibberish output caused by neural attention failures. However, they could not model the highly non-Gaussian distribution of speech acoustics and despite being probabilistic we could not sample high-quality speech samples. To address these limitations, we propose a new approach **[OverFlow][github_link]** to improve the performance of neural HMMs by putting flows on top of them. This results in a powerful fully probabilistic model of durations and speech acoustics that can be trained using exact maximum likelihood giving more accurate pronunciations and better speech quality than comparable methods with or without sampling from the model.
+We propose a new approach **[OverFlow][github_link]** to address the shortcomings of [neural-HMM TTS][Neural_HMM_link] by adding flows over them. We model the distribution of the latent space of the neural-HMM TTS using normalizing flows. Having a stronger probabilistic model, we can now model the highly non-Gaussian distribution of speech acoustics resulting in improvements in pronunciation and naturalness. We showed that our model converges to lower word error rate (WER) faster and achieves higher naturalness scores than comparable methods. The resulting system:
+* Learns to speak and align fast
+* Is fully probabilistic and compute tighter bounds on the data likelihood
+* Can generate samples at different temperatures
+* Requires small amount of data
+* Can adapt to new speaker with limited data (Should we put it here?)
+
+[Neural-HMM TTS][Neural_HMM_link] fuse classical HMM-based statistical speech synthesis and modern neural text-to-speech (TTS) retaining the best of both approaches. They require fewer data and fewer training updates to work while being less prone to gibberish output caused by neural attention failures. However, they could not model the highly non-Gaussian distribution of speech acoustics and despite being probabilistic we could not sample high-quality speech samples. To address these limitations, we propose a new approach **[OverFlow][github_link]** to improve the performance of neural HMMs by putting flows on top of them. This results in a powerful fully probabilistic model of durations and speech acoustics that can be trained using exact maximum likelihood giving more accurate pronunciations and better speech quality than comparable methods with or without sampling from the model.
 
 
 ## Architecture
@@ -136,6 +147,7 @@ function playAudio(url) {
       <th class="tg-0pky" colspan="3">Proposed OverFlow</th>
       <th class="tg-0pky">Tacotron 2</th>
       <th class="tg-0pky">GlowTTS</th>
+      <th class="tg-0pky">Neural-HMM TTS</th>
     </tr>
   </thead>
   <tbody>
@@ -146,228 +158,264 @@ function playAudio(url) {
       <th class="tg-fymr">OFZT (Zero Temperature)</th>
       <th class="tg-fymr">T2</th>
       <th class="tg-fymr">GTTS</th>
+      <th class="tg-fymr">NHMTTS</th>
     </tr>
     <tr>
         <td class="tg-0pky">
-          <audio id="audio-small" controls  style="width: 110px;">
+          <audio id="audio-small" controls>
             <source src="./audio/VOC/ListeningTest/1.wav" type="audio/wav">
           </audio>
         </td>
         <td class="tg-0pky">
-          <audio id="audio-small" controls  style="width: 110px;">
+          <audio id="audio-small" controls>
             <source src="./audio/OF/ListeningTest/1.wav" type="audio/wav">
           </audio>
         </td>
         <td class="tg-0pky">
-          <audio id="audio-small" controls  style="width: 110px;">
+          <audio id="audio-small" controls>
             <source src="./audio/OFND/ListeningTest/1.wav" type="audio/wav">
           </audio>
         </td>
         <td class="tg-0pky">
-          <audio id="audio-small" controls  style="width: 110px;">
+          <audio id="audio-small" controls>
             <source src="./audio/OFZT/ListeningTest/1.wav" type="audio/wav">
           </audio>
         </td>
         <td class="tg-0pky">
-          <audio id="audio-small" controls  style="width: 110px;">
+          <audio id="audio-small" controls>
             <source src="./audio/T2/ListeningTest/1.wav" type="audio/wav">
           </audio>
         </td>
         <td class="tg-0pky">
-          <audio id="audio-small" controls  style="width: 110px;">
+          <audio id="audio-small" controls>
             <source src="./audio/GTTS/ListeningTest/1.wav" type="audio/wav">
+          </audio>
+        </td>
+        <td class="tg-0pky">
+          <audio id="audio-small" controls>
+            <source src="./audio/NHMM/ListeningTest/1.wav" type="audio/wav">
           </audio>
         </td>
     </tr>
     <tr>
         <td class="tg-0pky">
-          <audio id="audio-small" controls  style="width: 110px;">
+          <audio id="audio-small" controls>
             <source src="./audio/VOC/ListeningTest/2.wav" type="audio/wav">
           </audio>
         </td>
         <td class="tg-0pky">
-          <audio id="audio-small" controls  style="width: 110px;">
+          <audio id="audio-small" controls>
             <source src="./audio/OF/ListeningTest/2.wav" type="audio/wav">
           </audio>
         </td>
         <td class="tg-0pky">
-          <audio id="audio-small" controls  style="width: 110px;">
+          <audio id="audio-small" controls>
             <source src="./audio/OFND/ListeningTest/2.wav" type="audio/wav">
           </audio>
         </td>
         <td class="tg-0pky">
-          <audio id="audio-small" controls  style="width: 110px;">
+          <audio id="audio-small" controls>
             <source src="./audio/OFZT/ListeningTest/2.wav" type="audio/wav">
           </audio>
         </td>
         <td class="tg-0pky">
-          <audio id="audio-small" controls  style="width: 110px;">
+          <audio id="audio-small" controls>
             <source src="./audio/T2/ListeningTest/2.wav" type="audio/wav">
           </audio>
         </td>
         <td class="tg-0pky">
-          <audio id="audio-small" controls  style="width: 110px;">
+          <audio id="audio-small" controls>
             <source src="./audio/GTTS/ListeningTest/2.wav" type="audio/wav">
+          </audio>
+        </td>
+        <td class="tg-0pky">
+          <audio id="audio-small" controls>
+            <source src="./audio/NHMM/ListeningTest/2.wav" type="audio/wav">
           </audio>
         </td>
     </tr>
     <tr>
         <td class="tg-0pky">
-          <audio id="audio-small" controls  style="width: 110px;">
+          <audio id="audio-small" controls>
             <source src="./audio/VOC/ListeningTest/3.wav" type="audio/wav">
           </audio>
         </td>
         <td class="tg-0pky">
-          <audio id="audio-small" controls  style="width: 110px;">
+          <audio id="audio-small" controls>
             <source src="./audio/OF/ListeningTest/3.wav" type="audio/wav">
           </audio>
         </td>
         <td class="tg-0pky">
-          <audio id="audio-small" controls  style="width: 110px;">
+          <audio id="audio-small" controls>
             <source src="./audio/OFND/ListeningTest/3.wav" type="audio/wav">
           </audio>
         </td>
         <td class="tg-0pky">
-          <audio id="audio-small" controls  style="width: 110px;">
+          <audio id="audio-small" controls>
             <source src="./audio/OFZT/ListeningTest/3.wav" type="audio/wav">
           </audio>
         </td>
         <td class="tg-0pky">
-          <audio id="audio-small" controls  style="width: 110px;">
+          <audio id="audio-small" controls>
             <source src="./audio/T2/ListeningTest/3.wav" type="audio/wav">
           </audio>
         </td>
         <td class="tg-0pky">
-          <audio id="audio-small" controls  style="width: 110px;">
+          <audio id="audio-small" controls>
             <source src="./audio/GTTS/ListeningTest/3.wav" type="audio/wav">
+          </audio>
+        </td>
+        <td class="tg-0pky">
+          <audio id="audio-small" controls>
+            <source src="./audio/NHMM/ListeningTest/3.wav" type="audio/wav">
           </audio>
         </td>
     </tr>
     <tr>
         <td class="tg-0pky">
-          <audio id="audio-small" controls  style="width: 110px;">
+          <audio id="audio-small" controls>
             <source src="./audio/VOC/ListeningTest/4.wav" type="audio/wav">
           </audio>
         </td>
         <td class="tg-0pky">
-          <audio id="audio-small" controls  style="width: 110px;">
+          <audio id="audio-small" controls>
             <source src="./audio/OF/ListeningTest/4.wav" type="audio/wav">
           </audio>
         </td>
         <td class="tg-0pky">
-          <audio id="audio-small" controls  style="width: 110px;">
+          <audio id="audio-small" controls>
             <source src="./audio/OFND/ListeningTest/4.wav" type="audio/wav">
           </audio>
         </td>
         <td class="tg-0pky">
-          <audio id="audio-small" controls  style="width: 110px;">
+          <audio id="audio-small" controls>
             <source src="./audio/OFZT/ListeningTest/4.wav" type="audio/wav">
           </audio>
         </td>
         <td class="tg-0pky">
-          <audio id="audio-small" controls  style="width: 110px;">
+          <audio id="audio-small" controls>
             <source src="./audio/T2/ListeningTest/4.wav" type="audio/wav">
           </audio>
         </td>
         <td class="tg-0pky">
-          <audio id="audio-small" controls  style="width: 110px;">
+          <audio id="audio-small" controls>
             <source src="./audio/GTTS/ListeningTest/4.wav" type="audio/wav">
+          </audio>
+        </td>
+        <td class="tg-0pky">
+          <audio id="audio-small" controls>
+            <source src="./audio/NHMM/ListeningTest/4.wav" type="audio/wav">
           </audio>
         </td>
     </tr>
     <tr>
         <td class="tg-0pky">
-          <audio id="audio-small" controls  style="width: 110px;">
+          <audio id="audio-small" controls>
             <source src="./audio/VOC/ListeningTest/5.wav" type="audio/wav">
           </audio>
         </td>
         <td class="tg-0pky">
-          <audio id="audio-small" controls  style="width: 110px;">
+          <audio id="audio-small" controls>
             <source src="./audio/OF/ListeningTest/5.wav" type="audio/wav">
           </audio>
         </td>
         <td class="tg-0pky">
-          <audio id="audio-small" controls  style="width: 110px;">
+          <audio id="audio-small" controls>
             <source src="./audio/OFND/ListeningTest/5.wav" type="audio/wav">
           </audio>
         </td>
         <td class="tg-0pky">
-          <audio id="audio-small" controls  style="width: 110px;">
+          <audio id="audio-small" controls>
             <source src="./audio/OFZT/ListeningTest/5.wav" type="audio/wav">
           </audio>
         </td>
         <td class="tg-0pky">
-          <audio id="audio-small" controls  style="width: 110px;">
+          <audio id="audio-small" controls>
             <source src="./audio/T2/ListeningTest/5.wav" type="audio/wav">
           </audio>
         </td>
         <td class="tg-0pky">
-          <audio id="audio-small" controls  style="width: 110px;">
+          <audio id="audio-small" controls>
             <source src="./audio/GTTS/ListeningTest/5.wav" type="audio/wav">
+          </audio>
+        </td>
+        <td class="tg-0pky">
+          <audio id="audio-small" controls>
+            <source src="./audio/NHMM/ListeningTest/5.wav" type="audio/wav">
           </audio>
         </td>
     </tr>
     <tr>
         <td class="tg-0pky">
-          <audio id="audio-small" controls  style="width: 110px;">
+          <audio id="audio-small" controls>
             <source src="./audio/VOC/ListeningTest/6.wav" type="audio/wav">
           </audio>
         </td>
         <td class="tg-0pky">
-          <audio id="audio-small" controls  style="width: 110px;">
+          <audio id="audio-small" controls>
             <source src="./audio/OF/ListeningTest/6.wav" type="audio/wav">
           </audio>
         </td>
         <td class="tg-0pky">
-          <audio id="audio-small" controls  style="width: 110px;">
+          <audio id="audio-small" controls>
             <source src="./audio/OFND/ListeningTest/6.wav" type="audio/wav">
           </audio>
         </td>
         <td class="tg-0pky">
-          <audio id="audio-small" controls  style="width: 110px;">
+          <audio id="audio-small" controls>
             <source src="./audio/OFZT/ListeningTest/6.wav" type="audio/wav">
           </audio>
         </td>
         <td class="tg-0pky">
-          <audio id="audio-small" controls  style="width: 110px;">
+          <audio id="audio-small" controls>
             <source src="./audio/T2/ListeningTest/6.wav" type="audio/wav">
           </audio>
         </td>
         <td class="tg-0pky">
-          <audio id="audio-small" controls  style="width: 110px;">
+          <audio id="audio-small" controls>
             <source src="./audio/GTTS/ListeningTest/6.wav" type="audio/wav">
+          </audio>
+        </td>
+        <td class="tg-0pky">
+          <audio id="audio-small" controls>
+            <source src="./audio/NHMM/ListeningTest/6.wav" type="audio/wav">
           </audio>
         </td>
     </tr>
     <tr>
         <td class="tg-0pky">
-          <audio id="audio-small" controls  style="width: 110px;">
+          <audio id="audio-small" controls>
             <source src="./audio/VOC/ListeningTest/7.wav" type="audio/wav">
           </audio>
         </td>
         <td class="tg-0pky">
-          <audio id="audio-small" controls  style="width: 110px;">
+          <audio id="audio-small" controls>
             <source src="./audio/OF/ListeningTest/7.wav" type="audio/wav">
           </audio>
         </td>
         <td class="tg-0pky">
-          <audio id="audio-small" controls  style="width: 110px;">
+          <audio id="audio-small" controls>
             <source src="./audio/OFND/ListeningTest/7.wav" type="audio/wav">
           </audio>
         </td>
         <td class="tg-0pky">
-          <audio id="audio-small" controls  style="width: 110px;">
+          <audio id="audio-small" controls>
             <source src="./audio/OFZT/ListeningTest/7.wav" type="audio/wav">
           </audio>
         </td>
         <td class="tg-0pky">
-          <audio id="audio-small" controls  style="width: 110px;">
+          <audio id="audio-small" controls>
             <source src="./audio/T2/ListeningTest/7.wav" type="audio/wav">
           </audio>
         </td>
         <td class="tg-0pky">
-          <audio id="audio-small" controls  style="width: 110px;">
+          <audio id="audio-small" controls>
             <source src="./audio/GTTS/ListeningTest/7.wav" type="audio/wav">
+          </audio>
+        </td>
+        <td class="tg-0pky">
+          <audio id="audio-small" controls>
+            <source src="./audio/NHMM/ListeningTest/7.wav" type="audio/wav">
           </audio>
         </td>
     </tr>

@@ -135,32 +135,34 @@ function playAudio(url) {
 <img src='images/play.png' onclick="playAudio('./audio/VOC/ListeningTest/1.wav')" />
 
 </script> -->
-
-3, 11, 19, 21, 29, 33, 37
-
 ## Stimuli from the listening tests
 
 <table class="tg">
   <thead>
     <tr>
-      <th class="tg-0pky">Vocoded Speech</th>
-      <th class="tg-0pky" colspan="3">Proposed OverFlow</th>
+      <th class="tg-0pky">Sentence</th>
+      <th class="tg-0pky">Vocoded speech</th>
+      <th class="tg-0pky" colspan="3">Proposed (OverFlow)</th>
       <th class="tg-0pky">Tacotron 2</th>
-      <th class="tg-0pky">GlowTTS</th>
-      <th class="tg-0pky">Neural-HMM TTS</th>
+      <th class="tg-0pky">Glow-TTS</th>
+      <th class="tg-0pky">Neural HMM TTS</th>
     </tr>
   </thead>
   <tbody>
     <tr>
+      <th class="tg-fymr"></th>
       <th class="tg-fymr">VOC</th>
       <th class="tg-fymr">OF</th>
       <th class="tg-fymr">OFND (No Dropout)</th>
       <th class="tg-fymr">OFZT (Zero Temperature)</th>
       <th class="tg-fymr">T2</th>
       <th class="tg-fymr">GTTS</th>
-      <th class="tg-fymr">NHMTTS</th>
+      <th class="tg-fymr">NHMM</th>
     </tr>
     <tr>
+        <td nowrap class="tg-0pky">
+            <span style="font-weight:bold">Sentence 1</span>
+        </td>
         <td class="tg-0pky">
           <audio id="audio-small" controls>
             <source src="./audio/VOC/ListeningTest/1.wav" type="audio/wav">
@@ -198,6 +200,9 @@ function playAudio(url) {
         </td>
     </tr>
     <tr>
+        <td nowrap class="tg-0pky">
+            <span style="font-weight:bold">Sentence 2</span>
+        </td>
         <td class="tg-0pky">
           <audio id="audio-small" controls>
             <source src="./audio/VOC/ListeningTest/2.wav" type="audio/wav">
@@ -235,6 +240,9 @@ function playAudio(url) {
         </td>
     </tr>
     <tr>
+        <td nowrap class="tg-0pky">
+            <span style="font-weight:bold">Sentence 3</span>
+        </td>
         <td class="tg-0pky">
           <audio id="audio-small" controls>
             <source src="./audio/VOC/ListeningTest/3.wav" type="audio/wav">
@@ -272,6 +280,9 @@ function playAudio(url) {
         </td>
     </tr>
     <tr>
+        <td nowrap class="tg-0pky">
+            <span style="font-weight:bold">Sentence 4</span>
+        </td>
         <td class="tg-0pky">
           <audio id="audio-small" controls>
             <source src="./audio/VOC/ListeningTest/4.wav" type="audio/wav">
@@ -309,6 +320,9 @@ function playAudio(url) {
         </td>
     </tr>
     <tr>
+        <td nowrap class="tg-0pky">
+            <span style="font-weight:bold">Sentence 5</span>
+        </td>
         <td class="tg-0pky">
           <audio id="audio-small" controls>
             <source src="./audio/VOC/ListeningTest/5.wav" type="audio/wav">
@@ -346,6 +360,9 @@ function playAudio(url) {
         </td>
     </tr>
     <tr>
+        <td nowrap class="tg-0pky">
+            <span style="font-weight:bold">Sentence 6</span>
+        </td>
         <td class="tg-0pky">
           <audio id="audio-small" controls>
             <source src="./audio/VOC/ListeningTest/6.wav" type="audio/wav">
@@ -383,6 +400,9 @@ function playAudio(url) {
         </td>
     </tr>
     <tr>
+        <td nowrap class="tg-0pky">
+            <span style="font-weight:bold">Sentence 7</span>
+        </td>
         <td class="tg-0pky">
           <audio id="audio-small" controls>
             <source src="./audio/VOC/ListeningTest/7.wav" type="audio/wav">
@@ -421,6 +441,249 @@ function playAudio(url) {
     </tr>
   </tbody>
 </table>
+
+
+## Sampling at different temperatures
+
+
+<div class="slidecontainer">
+  <label for="myRange"><span style="font-weight:bold"> 0 </span></label>
+  <input type="range" min="0" max="3" value="2" step="1" class="slider" id="myRange">
+  <label for="myRange"><span style="font-weight:bold"> 1 </span> </label>
+  <p><span style="font-weight:bold">Sampling temperature:</span> <span id="demo"></span>
+  </p>
+</div>
+<table class="tg">
+  <thead>
+    <tr>
+      <th class="tg-0pky">Sentence</th>
+      <th class="tg-0pky">VocodedSpeech</th>
+      <th class="tg-0pky">OF</th>
+      <th class="tg-0pky">OFND</th>
+      <th class="tg-0pky">GTTS</th>
+      <th class="tg-0pky">NHMM</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td nowrap class="tg-0pky">
+        <span style="font-weight:bold">Sentence 1</span>
+      </td>
+      <td class="tg-0pky">
+        <audio controls>
+          <source src="./audio/VOC/SamplingTemperature/1.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="tg-0pky">
+        <audio controls id="OF_a_1">
+          <source id="OF_s_1" src="./audio/OF/SamplingTemperature/1_667.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="tg-0pky">
+        <audio controls id="OFND_a_1">
+          <source id="OFND_s_1" src="./audio/OFND/SamplingTemperature/1_667.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="tg-0pky">
+        <audio controls id="GTTS_a_1">
+          <source id="GTTS_s_1" src="./audio/GTTS/SamplingTemperature/1_667.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="tg-0pky">
+        <audio controls id="NHMM_a_1">
+          <source id="NHMM_s_1" src="./audio/NHMM/SamplingTemperature/1_667.wav" type="audio/wav">
+        </audio>
+      </td>
+    </tr>
+    <tr>
+      <td nowrap class="tg-0pky">
+        <span style="font-weight:bold">Sentence 2</span>
+      </td>
+      <td class="tg-0pky">
+        <audio controls>
+          <source src="./audio/VOC/SamplingTemperature/2.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="tg-0pky">
+        <audio controls id="OF_a_2">
+          <source id="OF_s_2" src="./audio/OF/SamplingTemperature/2_667.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="tg-0pky">
+        <audio controls id="OFND_a_2">
+          <source id="OFND_s_2" src="./audio/OFND/SamplingTemperature/2_667.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="tg-0pky">
+        <audio controls id="GTTS_a_2">
+          <source id="GTTS_s_2" src="./audio/GTTS/SamplingTemperature/2_667.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="tg-0pky">
+        <audio controls id="NHMM_a_2">
+          <source id="NHMM_s_2" src="./audio/NHMM/SamplingTemperature/2_667.wav" type="audio/wav">
+        </audio>
+      </td>
+    </tr>
+    <tr>
+      <td nowrap class="tg-0pky">
+        <span style="font-weight:bold">Sentence 3</span>
+      </td>
+      <td class="tg-0pky">
+        <audio controls>
+          <source src="./audio/VOC/SamplingTemperature/3.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="tg-0pky">
+        <audio controls id="OF_a_3">
+          <source id="OF_s_3" src="./audio/OF/SamplingTemperature/3_667.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="tg-0pky">
+        <audio controls id="OFND_a_3">
+          <source id="OFND_s_3" src="./audio/OFND/SamplingTemperature/3_667.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="tg-0pky">
+        <audio controls id="GTTS_a_3">
+          <source id="GTTS_s_3" src="./audio/GTTS/SamplingTemperature/3_667.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="tg-0pky">
+        <audio controls id="NHMM_a_3">
+          <source id="NHMM_s_3" src="./audio/NHMM/SamplingTemperature/3_667.wav" type="audio/wav">
+        </audio>
+      </td>
+    </tr>
+    <tr>
+      <td nowrap class="tg-0pky">
+        <span style="font-weight:bold">Sentence 4</span>
+      </td>
+      <td class="tg-0pky">
+        <audio controls>
+          <source src="./audio/VOC/SamplingTemperature/4.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="tg-0pky">
+        <audio controls id="OF_a_4">
+          <source id="OF_s_4" src="./audio/OF/SamplingTemperature/4_667.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="tg-0pky">
+        <audio controls id="OFND_a_4">
+          <source id="OFND_s_4" src="./audio/OFND/SamplingTemperature/4_667.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="tg-0pky">
+        <audio controls id="GTTS_a_4">
+          <source id="GTTS_s_4" src="./audio/GTTS/SamplingTemperature/4_667.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="tg-0pky">
+        <audio controls id="NHMM_a_4">
+          <source id="NHMM_s_4" src="./audio/NHMM/SamplingTemperature/4_667.wav" type="audio/wav">
+        </audio>
+      </td>
+    </tr>
+    <tr>
+      <td nowrap class="tg-0pky">
+        <span style="font-weight:bold">Sentence 5</span>
+      </td>
+      <td class="tg-0pky">
+        <audio controls>
+          <source src="./audio/VOC/SamplingTemperature/5.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="tg-0pky">
+        <audio controls id="OF_a_5">
+          <source id="OF_s_5" src="./audio/OF/SamplingTemperature/5_667.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="tg-0pky">
+        <audio controls id="OFND_a_5">
+          <source id="OFND_s_5" src="./audio/OFND/SamplingTemperature/5_667.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="tg-0pky">
+        <audio controls id="GTTS_a_5">
+          <source id="GTTS_s_5" src="./audio/GTTS/SamplingTemperature/5_667.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="tg-0pky">
+        <audio controls id="NHMM_a_5">
+          <source id="NHMM_s_5" src="./audio/NHMM/SamplingTemperature/5_667.wav" type="audio/wav">
+        </audio>
+      </td>
+    </tr>
+    <tr>
+      <td nowrap class="tg-0pky">
+        <span style="font-weight:bold">Sentence 6</span>
+      </td>
+      <td class="tg-0pky">
+        <audio controls>
+          <source src="./audio/VOC/SamplingTemperature/6.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="tg-0pky">
+        <audio controls id="OF_a_6">
+          <source id="OF_s_6" src="./audio/OF/SamplingTemperature/6_667.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="tg-0pky">
+        <audio controls id="OFND_a_6">
+          <source id="OFND_s_6" src="./audio/OFND/SamplingTemperature/6_667.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="tg-0pky">
+        <audio controls id="GTTS_a_6">
+          <source id="GTTS_s_6" src="./audio/GTTS/SamplingTemperature/6_667.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="tg-0pky">
+        <audio controls id="NHMM_a_6">
+          <source id="NHMM_s_6" src="./audio/NHMM/SamplingTemperature/6_667.wav" type="audio/wav">
+        </audio>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<script>
+  const values = [0, 0.334, 0.667, 1];
+  const n_sent = 6;
+  const file_names = ['0', '334', '667', '1'];
+  var slider = document.getElementById("myRange");
+  var output = document.getElementById("demo");
+  const systems = ["OF", "OFND", "GTTS", "NHMM"];
+
+  let audios = [];
+  // initialize audios
+  for(let i=0; i<systems.length; i++){
+    let row = [];
+    for(let j=0; j< n_sent; j++){
+      src_audio = {
+        'src': document.getElementById(`${systems[i]}_s_${j+1}`),
+        'audio': document.getElementById(`${systems[i]}_a_${j+1}`)
+      }
+
+      row.push(src_audio);
+    }
+    audios.push(row);
+  }
+
+  output.innerHTML = values[slider.value];
+  slider.oninput = function() {
+    output.innerHTML = values[this.value];
+
+    for (let i = 0; i < systems.length; i++){
+      let number = this.value;
+
+      for (let j=0; j< n_sent; j++){
+        audios[i][j]['src'].src = `./audio/${systems[i]}/SamplingTemperature/${j+1}_${file_names[number]}.wav`;
+        audios[i][j]['audio'].load();
+      }
+    }
+  }
+</script>
 
 
 ## Audio examples and code coming soon!

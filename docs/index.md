@@ -137,6 +137,9 @@ function playAudio(url) {
 </script> -->
 ## Stimuli from the listening tests
 
+<span style="font-weight: bold">Dataset:</span> [LJ-Speech](https://keithito.com/LJ-Speech-Dataset/) <br>
+<span style="font-weight: bold">Training data duration:</span> ~22.8 hours <p>
+
 <table class="tg">
   <thead>
     <tr>
@@ -444,6 +447,9 @@ function playAudio(url) {
 
 
 ## Sampling at different temperatures
+
+<span style="font-weight: bold">Dataset:</span> [LJ-Speech](https://keithito.com/LJ-Speech-Dataset/) <br>
+<span style="font-weight: bold">Training data duration:</span> ~22.8 hours <p>
 
 
 <div class="slidecontainer">

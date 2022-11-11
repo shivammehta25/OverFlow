@@ -138,7 +138,7 @@ function playAudio(url) {
 ## Stimuli from the listening tests
 
 <span style="font-weight: bold">Dataset:</span> [LJ-Speech](https://keithito.com/LJ-Speech-Dataset/) <br>
-<span style="font-weight: bold">Training data duration:</span> ~22.8 hours <p>
+<span style="font-weight: bold">Training data duration:</span> ~22.8 hours
 
 <table class="tg">
   <thead>
@@ -449,7 +449,7 @@ function playAudio(url) {
 ## Sampling at different temperatures
 
 <span style="font-weight: bold">Dataset:</span> [LJ-Speech](https://keithito.com/LJ-Speech-Dataset/) <br>
-<span style="font-weight: bold">Training data duration:</span> ~22.8 hours <p>
+<span style="font-weight: bold">Training data duration:</span> ~22.8 hours
 
 
 <div class="slidecontainer">
@@ -692,4 +692,216 @@ function playAudio(url) {
 </script>
 
 
-## Audio examples and code coming soon!
+## Variation in synthesis
+
+
+<span style="font-weight: bold">Dataset:</span> [RyanSpeech](https://keithito.com/LJ-Speech-Dataset/) <br>
+<span style="font-weight: bold">Training data duration:</span> ~9 hours
+
+
+<table class="tg">
+<thead>
+  <tr>
+    <th class="tg-0pky">VOC</th>
+    <th class="tg-0pky" colspan="2">OF</th>
+    <th class="tg-0pky" colspan="2">OFND</th>
+    <th class="tg-0pky" colspan="2">OFZT</th>
+  </tr>
+  <tr>
+    <th class="tg-0pky"></td>
+    <th class="tg-0pky">Realisation 1</td>
+    <th class="tg-0pky">Realisation 2</td>
+    <th class="tg-0pky">Realisation 1</td>
+    <th class="tg-0pky">Realisation 2</td>
+    <th class="tg-0pky">Realisation 1</td>
+    <th class="tg-0pky">Realisation 2</td>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/VOC/RyanVariations/1.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/RyanVariations/1a.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/RyanVariations/1b.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OFND/RyanVariations/1a.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OFND/RyanVariations/1b.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OFZT/RyanVariations/1a.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OFZT/RyanVariations/1b.wav" type="audio/wav">
+      </audio>
+    </td>
+  </tr>
+    <tr>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/VOC/RyanVariations/2.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/RyanVariations/2a.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/RyanVariations/2b.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OFND/RyanVariations/2a.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OFND/RyanVariations/2b.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OFZT/RyanVariations/2a.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OFZT/RyanVariations/2b.wav" type="audio/wav">
+      </audio>
+    </td>
+  </tr>
+    <tr>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/VOC/RyanVariations/3.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/RyanVariations/3a.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/RyanVariations/3b.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OFND/RyanVariations/3a.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OFND/RyanVariations/3b.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OFZT/RyanVariations/3a.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OFZT/RyanVariations/3b.wav" type="audio/wav">
+      </audio>
+    </td>
+  </tr>
+    <tr>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/VOC/RyanVariations/4.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/RyanVariations/4a.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/RyanVariations/4b.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OFND/RyanVariations/4a.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OFND/RyanVariations/4b.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OFZT/RyanVariations/4a.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OFZT/RyanVariations/4b.wav" type="audio/wav">
+      </audio>
+    </td>
+  </tr>
+    <tr>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/VOC/RyanVariations/5.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/RyanVariations/5a.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/RyanVariations/5b.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OFND/RyanVariations/5a.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OFND/RyanVariations/5b.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OFZT/RyanVariations/5a.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OFZT/RyanVariations/5b.wav" type="audio/wav">
+      </audio>
+    </td>
+  </tr>
+</tbody>
+</table>

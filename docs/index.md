@@ -11,6 +11,11 @@
 [gustav_profile]: https://people.kth.se/~ghe/
 [HiFi_GAN_LJ_FT_V1_link]: https://github.com/jik876/hifi-gan#pretrained-model
 [Neural_HMM_link]: https://shivammehta25.github.io/Neural-HMM/
+[RyanSpeech_link]: https://arxiv.org/abs/2106.08468
+[L2_arctic_link]: https://psi.engr.tamu.edu/l2-arctic-corpus/
+[Indic-TTS_link]: https://www.iitm.ac.in/donlab/tts/index.php
+[SLR70_link]: https://www.openslr.org/70/
+[LibriTTS_British_link]: https://github.com/OscarVanL/LibriTTS-British-Accents
 
 <head>
 <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
@@ -42,6 +47,8 @@
     word-break: normal;
     font-weight: bold;
     vertical-align: middle;
+    horizontal-align: center;
+    white-space: nowrap;
   }
 
   .tg th {
@@ -58,7 +65,10 @@
     word-break: normal;
     font-weight: bold;
     vertical-align: middle;
-
+    horizontal-align: center;
+    white-space: nowrap;
+    padding: 10px;
+    margin: auto;
   }
 
   .tg .tg-0pky {
@@ -902,6 +912,227 @@ function playAudio(url) {
     <td class="tg-0pky">
       <audio id="audio-small" controls>
               <source src="./audio/OFZT/RyanVariations/5b.wav" type="audio/wav">
+      </audio>
+    </td>
+  </tr>
+</tbody>
+</table>
+
+
+## Faster finetuning to different voices
+
+We finetuned our model with RyanSpeech's 100k checkpoint with different datasets. The model adapted the speaker style and accent specific pronunciations within 5000 updates. This shows that the finetuning with the low resource datasets is a good way to finetune the model to different speakers.
+
+
+<table class="tg">
+<thead>
+  <tr>
+    <th class="tg-fymr">Dataset</th>
+    <td class="tg-0pky"><a href="https://www.iitm.ac.in/donlab/tts/index.php">Indic TTS</a></td>
+    <td class="tg-0pky"><a href="https://psi.engr.tamu.edu/l2-arctic-corpus/">L2 Arctic</a></td>
+    <td class="tg-0pky"><a href="https://psi.engr.tamu.edu/l2-arctic-corpus/">L2 Arctic</a></td>
+    <td class="tg-0pky"><a href="https://github.com/OscarVanL/LibriTTS-British-Accents">LibriTTS-British</a></td>
+    <td class="tg-0pky"><a href="https://www.openslr.org/70/">SLR70</a></td>
+  </tr>
+    <tr>
+    <th class="tg-fymr">Duration (hours)</th>
+    <td class="tg-0pky">~6.97</td>
+    <td class="tg-0pky">~1.20</td>
+    <td class="tg-0pky">~1.08</td>
+    <td class="tg-0pky">0.44</td>
+    <td class="tg-0pky">0.45</td>
+  </tr>
+  <tr>
+    <th class="tg-fymr">Speaker / ID</th>
+    <td class="tg-0pky">Male</td>
+    <td class="tg-0pky">L1 Arabic (YBAA)</td>
+    <td class="tg-0pky">L1 Mandarin (TXHC)</td>
+    <td class="tg-0pky">7700</td>
+    <td class="tg-0pky">07508</td>
+  </tr>
+  <tr>
+    <th class="tg-fymr"># of finetuning iterations</th>
+    <td class="tg-0pky">5000</td>
+    <td class="tg-0pky">5000</td>
+    <td class="tg-0pky">5000</td>
+    <td class="tg-0pky">5000</td>
+    <td class="tg-0pky">5000</td>
+  </tr>
+  <!-- <tr>
+    <th class="tg-fymr">Harvard Sentence #</th>
+    <td class="tg-0pky"></td>
+    <td class="tg-0pky"></td>
+    <td class="tg-0pky"></td>
+    <td class="tg-0pky"></td>
+    <td class="tg-0pky"></td>
+  </tr> -->
+</thead>
+<tbody>
+  <tr>
+    <th class="tg-fymr">Sentence 1</th>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/DifferentSpeakers/Indian_1.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/DifferentSpeakers/Arab_1.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/DifferentSpeakers/Mandarin_1.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/DifferentSpeakers/British_1.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/DifferentSpeakers/Nigerian_1.wav" type="audio/wav">
+      </audio>
+    </td>
+  </tr>
+  <tr>
+    <th class="tg-fymr">Sentence 2</th>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/DifferentSpeakers/Indian_2.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/DifferentSpeakers/Arab_2.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/DifferentSpeakers/Mandarin_2.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/DifferentSpeakers/British_2.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/DifferentSpeakers/Nigerian_2.wav" type="audio/wav">
+      </audio>
+    </td>
+  </tr>
+  <tr>
+    <th class="tg-fymr">Sentence 3</th>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/DifferentSpeakers/Indian_3.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/DifferentSpeakers/Arab_3.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/DifferentSpeakers/Mandarin_3.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/DifferentSpeakers/British_3.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/DifferentSpeakers/Nigerian_3.wav" type="audio/wav">
+      </audio>
+    </td>
+  </tr>
+  <tr>
+    <th class="tg-fymr">Sentence 4</th>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/DifferentSpeakers/Indian_4.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/DifferentSpeakers/Arab_4.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/DifferentSpeakers/Mandarin_4.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/DifferentSpeakers/British_4.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/DifferentSpeakers/Nigerian_4.wav" type="audio/wav">
+      </audio>
+    </td>
+  </tr>
+  <tr>
+    <th class="tg-fymr">Sentence 5</th>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/DifferentSpeakers/Indian_5.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/DifferentSpeakers/Arab_5.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/DifferentSpeakers/Mandarin_5.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/DifferentSpeakers/British_5.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/DifferentSpeakers/Nigerian_5.wav" type="audio/wav">
+      </audio>
+    </td>
+  </tr>
+  <tr>
+    <th class="tg-fymr">Sentence 6</th>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/DifferentSpeakers/Indian_6.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/DifferentSpeakers/Arab_6.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/DifferentSpeakers/Mandarin_6.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/DifferentSpeakers/British_6.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/DifferentSpeakers/Nigerian_6.wav" type="audio/wav">
       </audio>
     </td>
   </tr>

@@ -710,13 +710,13 @@ function playAudio(url) {
     <th class="tg-0pky" colspan="2">OFZT</th>
   </tr>
   <tr>
-    <th class="tg-0pky"></td>
-    <th class="tg-0pky">Realisation 1</td>
-    <th class="tg-0pky">Realisation 2</td>
-    <th class="tg-0pky">Realisation 1</td>
-    <th class="tg-0pky">Realisation 2</td>
-    <th class="tg-0pky">Realisation 1</td>
-    <th class="tg-0pky">Realisation 2</td>
+    <th class="tg-0pky" nowrap></td>
+    <th class="tg-0pky" nowrap>Realisation 1</td>
+    <th class="tg-0pky" nowrap>Realisation 2</td>
+    <th class="tg-0pky" nowrap>Realisation 1</td>
+    <th class="tg-0pky" nowrap>Realisation 2</td>
+    <th class="tg-0pky" nowrap>Realisation 1</td>
+    <th class="tg-0pky" nowrap>Realisation 2</td>
   </tr>
 </thead>
 <tbody>

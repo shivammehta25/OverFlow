@@ -921,7 +921,7 @@ function playAudio(url) {
 
 ## Faster finetuning to different voices
 
-We finetuned our model with RyanSpeech's 100k checkpoint with different datasets. The model adapted the speaker style and accent specific pronunciations within 5000 updates. This shows that the finetuning with the low resource datasets is a good way to finetune the model to different speakers.
+We finetuned our model with RyanSpeech's 100k checkpoint with different datasets. The model adapted the speaker style and accent-specific pronunciations within 5000 updates. This shows that finetuning with low-resource datasets is a nice way to finetune the model for different speakers.
 
 
 <table class="tg">

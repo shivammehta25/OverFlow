@@ -49,7 +49,7 @@ def create_hparams(generate_parameters=False):
         ################################
         # Experiment Parameters        #
         ################################
-        run_name="FixingDecoderSize",
+        run_name="OverFlow",
         gpus=[0],
         max_epochs=50000,
         val_check_interval=100,
@@ -139,7 +139,7 @@ def create_hparams(generate_parameters=False):
         ################################
         # Decoder Flow Parameters      #
         ################################
-        flow_hidden_channels=192,
+        flow_hidden_channels=150,
         kernel_size_dec=5,
         dilation_rate=1,
         n_blocks_dec=12,

@@ -166,7 +166,7 @@ data/LJSpeech-1.1/wavs/LJ047-0075.wav|Hosty had inquired earlier and found no ev
 data/LJSpeech-1.1/wavs/LJ008-0098.wav|One was the "yeoman of the halter," a Newgate official, the executioner's assistant, whom Mr. J. T. Smith, who was present at the execution,
 data/LJSpeech-1.1/wavs/LJ017-0102.wav|The second attack was fatal, and ended in Cook's death from tetanus.
 data/LJSpeech-1.1/wavs/LJ046-0105.wav|Second, the adequacy of other advance preparations for the security of the President, during his visit to Dallas,
-data/LJSpeech-1.1/wavs/LJ018-0206.wav|He was a tall, slender man, with a long face and iron-gray hair.
+data/LJSpeech-1.1/wavs/LJ018-0206.wav|He was a tall, slender man, with a long face and iron gray hair.
 data/LJSpeech-1.1/wavs/LJ012-0271.wav|Whether it was greed or a quarrel that drove Greenacre to the desperate deed remains obscure.
 data/LJSpeech-1.1/wavs/LJ005-0086.wav|with such further separation as the justices should deem conducive to good order and discipline.
 data/LJSpeech-1.1/wavs/LJ042-0097.wav|and considerably better living quarters than those accorded to Soviet citizens of equal age and station.

@@ -37,7 +37,7 @@ data/LJSpeech-1.1/wavs/LJ009-0076.wav|We come to the sermon.
 data/LJSpeech-1.1/wavs/LJ017-0131.wav|even when the high sheriff had told him there was no possibility of a reprieve, and within a few hours of execution.
 data/LJSpeech-1.1/wavs/LJ046-0184.wav|but there is a system for the immediate notification of the Secret Service by the confining institution when a subject is released or escapes.
 data/LJSpeech-1.1/wavs/LJ014-0263.wav|When other pleasures palled he took a theatre, and posed as a munificent patron of the dramatic art.
-data/LJSpeech-1.1/wavs/LJ042-0096.wav|(old exchange rate) in addition to his factory salary of approximately equal amount
+data/LJSpeech-1.1/wavs/LJ042-0096.wav|old exchange rate in addition to his factory salary of approximately equal amount
 data/LJSpeech-1.1/wavs/LJ049-0050.wav|Hill had both feet on the car and was climbing aboard to assist President and Mrs. Kennedy.
 data/LJSpeech-1.1/wavs/LJ019-0186.wav|seeing that since the establishment of the Central Criminal Court, Newgate received prisoners for trial from several counties,
 data/LJSpeech-1.1/wavs/LJ028-0307.wav|then let twenty days pass, and at the end of that time station near the Chaldasan gates a body of four thousand.
@@ -57,7 +57,7 @@ data/LJSpeech-1.1/wavs/LJ027-0141.wav|is closely reproduced in the life-history 
 data/LJSpeech-1.1/wavs/LJ028-0335.wav|accordingly they committed to him the command of their whole army, and put the keys of their city into his hands.
 data/LJSpeech-1.1/wavs/LJ031-0202.wav|Mrs. Kennedy chose the hospital in Bethesda for the autopsy because the President had served in the Navy.
 data/LJSpeech-1.1/wavs/LJ021-0145.wav|From those willing to join in establishing this hoped-for period of peace,
-data/LJSpeech-1.1/wavs/LJ016-0288.wav|"Müller, Müller, He's the man," till a diversion was created by the appearance of the gallows, which was received with continuous yells.
+data/LJSpeech-1.1/wavs/LJ016-0288.wav|"Muller, Muller, He's the man," till a diversion was created by the appearance of the gallows, which was received with continuous yells.
 data/LJSpeech-1.1/wavs/LJ028-0081.wav|Years later, when the archaeologists could readily distinguish the false from the true,
 data/LJSpeech-1.1/wavs/LJ018-0081.wav|his defense being that he had intended to commit suicide, but that, on the appearance of this officer who had wronged him,
 data/LJSpeech-1.1/wavs/LJ021-0066.wav|together with a great increase in the payrolls, there has come a substantial rise in the total of industrial profits

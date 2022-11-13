@@ -63,7 +63,7 @@ class FlowSpecDecoder(nn.Module):
             input should be (batch_dim, n_mel_channels, T_max) but received {x.shape}"
         x, x_lengths, x_max_length = self.preprocess(x, x_lengths, x_lengths.max())
 
-        x_mask = get_mask_from_len(x_lengths, x_max_length, device=x_lengths.device).float().unsqueeze(1)
+        x_mask = get_mask_from_len(x_lengths, x_max_length, device=x.device, dtype=x.dtype).unsqueeze(1)
 
         if not reverse:
             flows = self.flows

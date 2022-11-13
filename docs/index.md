@@ -1,6 +1,21 @@
-# Neural HMMs are all you need (for high-quality attention-free TTS)
-##### [Shivam Mehta][shivam_profile], [Éva Székely][eva_profile], [Jonas Beskow][jonas_profile], and [Gustav Eje Henter][gustav_profile]
+# OverFlow: Putting flows on top of neural transducers for better TTS
+##### [Shivam Mehta][shivam_profile], [Ambika Kirkland][ambika_profile], [Harm Lameris][harm_profile], [Jonas Beskow][jonas_profile], [Éva Székely][eva_profile], and [Gustav Eje Henter][gustav_profile]
 
+[arxiv_link]: https://arxiv.org/abs/2108.13320
+[github_link]: https://github.com/shivammehta25/OverFlow
+[shivam_profile]: https://www.kth.se/profile/smehta
+[ambika_profile]: https://www.kth.se/profile/kirkland
+[harm_profile]: https://www.kth.se/profile/lameris
+[eva_profile]: https://www.kth.se/profile/szekely
+[jonas_profile]: https://www.kth.se/profile/beskow
+[gustav_profile]: https://people.kth.se/~ghe/
+[HiFi_GAN_LJ_FT_V1_link]: https://github.com/jik876/hifi-gan#pretrained-model
+[Neural_HMM_link]: https://shivammehta25.github.io/Neural-HMM/
+[RyanSpeech_link]: https://arxiv.org/abs/2106.08468
+[L2_arctic_link]: https://psi.engr.tamu.edu/l2-arctic-corpus/
+[Indic-TTS_link]: https://www.iitm.ac.in/donlab/tts/index.php
+[SLR70_link]: https://www.openslr.org/70/
+[LibriTTS_British_link]: https://github.com/OscarVanL/LibriTTS-British-Accents
 
 <head>
 <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
@@ -10,46 +25,9 @@
 <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
 <meta name="msapplication-TileColor" content="#da532c">
 <meta name="theme-color" content="#ffffff">
+<meta name="description" content="This page presents listening examples for our new TTS model OverFlow, links to code, pretrained models, and our paper.">
+
 </head>
-<!-- This page presents audio examples of neural TTS using neural hidden Markov models instead of attention, as published at ICASSP 2022. -->
-
-[arxiv_link]: https://arxiv.org/abs/2108.13320
-[github_link]: https://github.com/shivammehta007/Neural-HMM
-[shivam_profile]: https://www.kth.se/profile/smehta
-[eva_profile]: https://www.kth.se/profile/szekely
-[jonas_profile]: https://www.kth.se/profile/beskow
-[gustav_profile]: https://people.kth.se/~ghe/
-[HiFi_GAN_LJ_FT_V1_link]: https://github.com/jik876/hifi-gan#pretrained-model
-
-## Summary
-
-We show that classic, HMM-based speech synthesis and modern, neural text-to-speech (TTS) can be combined to obtain the best of both worlds. Concretely, our proposal amounts to replacing conventional attention in neural TTS by so-called neural HMMs. We call this new approach “neural HMM TTS”.
-
-To validate our proposal, we describe a modified version of Tacotron 2 that uses neural HMMs instead of attention. The resulting system:
-* Is smaller and simpler than Tacotron 2
-* Learns to speak and align much quicker
-* Does not risk breaking down into gibberish
-* Is fully probabilistic
-* Allows easy control over speaking rate
-* Achieves the same naturalness as Tacotron 2
-
-To our knowledge, this is the first time HMM-based speech synthesis has achieved a speech quality on par with neural TTS.
-
-For more information, please [read our ICASSP 2022 paper here][arxiv_link].
-
-## Architecture
-
-<!-- ![Neural HMM TTS](./images/NeuralHMMTTS.png "Architecture of neural HMM TTS") -->
-![Synthesising from Neural-HMM](images/model_video.gif "Architecture of neural HMM TTS")
-
-<!-- ## Web Example
-<iframe url="http://130.237.67.68:8501/" height="400" width="100%" title="Web Example"> </iframe> -->
-
-## Code
-
-Code is available in our [Github repository][github_link], along with a pre-trained model.
-
-## Listening examples
 
 <style type="text/css">
   .tg {
@@ -71,6 +49,8 @@ Code is available in our [Github repository][github_link], along with a pre-trai
     word-break: normal;
     font-weight: bold;
     vertical-align: middle;
+    horizontal-align: center;
+    white-space: nowrap;
   }
 
   .tg th {
@@ -87,7 +67,10 @@ Code is available in our [Github repository][github_link], along with a pre-trai
     word-break: normal;
     font-weight: bold;
     vertical-align: middle;
-
+    horizontal-align: center;
+    white-space: nowrap;
+    padding: 10px;
+    margin: auto;
   }
 
   .tg .tg-0pky {
@@ -131,1104 +114,1027 @@ Code is available in our [Github repository][github_link], along with a pre-trai
   background: #409cff;
   cursor: pointer;
 }
+
+audio {
+    width: 110px;
+}
 </style>
 
-### Stimuli from listening test
+## Summary
+
+We propose a new approach, **OverFlow**, to address the shortcomings of [neural HMM TTS][Neural_HMM_link] (a type of transducer TTS) by adding flows over them. Having a stronger probabilistic model, we can now describe the highly non-Gaussian distribution of speech acoustics, obtaining better likelihoods and resulting in improvements in pronunciation and naturalness. We show that our model converges to lower word error rate (WER) faster and achieves higher naturalness scores than comparable methods. The resulting system:
+* Learns to speak and align fast
+* Is fully probabilistic
+* Can generate good quality speech at many temperatures
+* Can adapt to new speakers with limited data
+
+For more information, please **[read our paper][github_link]**.
+
+<!-- ## Architecture -->
+
+
+## Code
+
+Code is available in our [GitHub repository][github_link], along with pre-trained models.
+
+<!-- <script >
+function playAudio(url) {
+  new Audio(url).play();
+  audio.play();
+}
+<img src='images/play.png' onclick="playAudio('./audio/VOC/ListeningTest/1.wav')" />
+
+</script> -->
+## Stimuli from the listening tests
+
+<span style="font-weight: bold">Dataset:</span> [LJ Speech](https://keithito.com/LJ-Speech-Dataset/) <br>
+<span style="font-weight: bold">Training data duration:</span> ~22.8 hours
 
 <table class="tg">
   <thead>
     <tr>
-      <th class="tg-0pky">Type</th>
-      <th class="tg-0pky" colspan="2">Proposed neural HMM TTS</th>
-      <th class="tg-0pky" colspan="2">Tacotron 2 baseline</th>
+      <th class="tg-0pky">Sentence</th>
+      <th class="tg-0pky">Vocoded speech</th>
+      <th class="tg-0pky" colspan="3">Proposed (OverFlow)</th>
+      <th class="tg-0pky">Tacotron 2</th>
+      <th class="tg-0pky">Glow-TTS</th>
+      <th class="tg-0pky">Neural HMM TTS</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <th class="tg-fymr">Condition</th>
-      <th class="tg-fymr">2 states per phone (NH2)</th>
-      <th class="tg-fymr">1 state per phone (NH1)</th>
-      <th class="tg-fymr">w/o post-net (T2-P)</th>
-      <th class="tg-fymr">w/ post-net (T2+P)</th>
+      <th class="tg-fymr"></th>
+      <th class="tg-fymr">VOC</th>
+      <th class="tg-fymr">OF</th>
+      <th class="tg-fymr">OFND (No Dropout)</th>
+      <th class="tg-fymr">OFZT (Zero Temperature)</th>
+      <th class="tg-fymr">T2</th>
+      <th class="tg-fymr">GTTS</th>
+      <th class="tg-fymr">NHMM</th>
     </tr>
     <tr>
-      <td nowrap class="tg-0pky"><b>Sentence 1</b></td>
-      <td class="tg-0pky">
-        <audio id="audio-small" controls>
-          <source src="./audio/NeuralHMM/2State/NeuralHMM1AR2State_hvd_001.wav" type="audio/wav">
-        </audio>
-      </td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/NeuralHMM/1State/NeuralHMM1AR1State_hvd_001.wav" type="audio/wav">
-        </audio>
-      </td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/Tacotron/TacotronWOPostnet/Tacotron_hvd_001.wav" type="audio/wav">
-        </audio>
-      </td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/Tacotron/TacotronWPostnet/Tacotron_Postnet_hvd_001.wav" type="audio/wav">
-        </audio>
-      </td>
+        <td nowrap class="tg-0pky">
+            <span style="font-weight:bold">Sentence 1</span>
+        </td>
+        <td class="tg-0pky">
+          <audio id="audio-small" controls>
+            <source src="./audio/VOC/ListeningTest/1.wav" type="audio/wav">
+          </audio>
+        </td>
+        <td class="tg-0pky">
+          <audio id="audio-small" controls>
+            <source src="./audio/OF/ListeningTest/1.wav" type="audio/wav">
+          </audio>
+        </td>
+        <td class="tg-0pky">
+          <audio id="audio-small" controls>
+            <source src="./audio/OFND/ListeningTest/1.wav" type="audio/wav">
+          </audio>
+        </td>
+        <td class="tg-0pky">
+          <audio id="audio-small" controls>
+            <source src="./audio/OFZT/ListeningTest/1.wav" type="audio/wav">
+          </audio>
+        </td>
+        <td class="tg-0pky">
+          <audio id="audio-small" controls>
+            <source src="./audio/T2/ListeningTest/1.wav" type="audio/wav">
+          </audio>
+        </td>
+        <td class="tg-0pky">
+          <audio id="audio-small" controls>
+            <source src="./audio/GTTS/ListeningTest/1.wav" type="audio/wav">
+          </audio>
+        </td>
+        <td class="tg-0pky">
+          <audio id="audio-small" controls>
+            <source src="./audio/NHMM/ListeningTest/1.wav" type="audio/wav">
+          </audio>
+        </td>
     </tr>
     <tr>
-      <td nowrap class="tg-0pky"><b>Sentence 2</b></td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/NeuralHMM/2State/NeuralHMM1AR2State_hvd_002.wav" type="audio/wav">
-        </audio>
-      </td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/NeuralHMM/1State/NeuralHMM1AR1State_hvd_002.wav" type="audio/wav">
-        </audio>
-      </td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/Tacotron/TacotronWOPostnet/Tacotron_hvd_002.wav" type="audio/wav">
-        </audio>
-      </td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/Tacotron/TacotronWPostnet/Tacotron_Postnet_hvd_002.wav" type="audio/wav">
-        </audio>
-      </td>
+        <td nowrap class="tg-0pky">
+            <span style="font-weight:bold">Sentence 2</span>
+        </td>
+        <td class="tg-0pky">
+          <audio id="audio-small" controls>
+            <source src="./audio/VOC/ListeningTest/2.wav" type="audio/wav">
+          </audio>
+        </td>
+        <td class="tg-0pky">
+          <audio id="audio-small" controls>
+            <source src="./audio/OF/ListeningTest/2.wav" type="audio/wav">
+          </audio>
+        </td>
+        <td class="tg-0pky">
+          <audio id="audio-small" controls>
+            <source src="./audio/OFND/ListeningTest/2.wav" type="audio/wav">
+          </audio>
+        </td>
+        <td class="tg-0pky">
+          <audio id="audio-small" controls>
+            <source src="./audio/OFZT/ListeningTest/2.wav" type="audio/wav">
+          </audio>
+        </td>
+        <td class="tg-0pky">
+          <audio id="audio-small" controls>
+            <source src="./audio/T2/ListeningTest/2.wav" type="audio/wav">
+          </audio>
+        </td>
+        <td class="tg-0pky">
+          <audio id="audio-small" controls>
+            <source src="./audio/GTTS/ListeningTest/2.wav" type="audio/wav">
+          </audio>
+        </td>
+        <td class="tg-0pky">
+          <audio id="audio-small" controls>
+            <source src="./audio/NHMM/ListeningTest/2.wav" type="audio/wav">
+          </audio>
+        </td>
     </tr>
     <tr>
-      <td nowrap class="tg-0pky"><b>Sentence 3</b></td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/NeuralHMM/2State/NeuralHMM1AR2State_hvd_003.wav" type="audio/wav">
-        </audio>
-      </td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/NeuralHMM/1State/NeuralHMM1AR1State_hvd_003.wav" type="audio/wav">
-        </audio>
-      </td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/Tacotron/TacotronWOPostnet/Tacotron_hvd_003.wav" type="audio/wav">
-        </audio>
-      </td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/Tacotron/TacotronWPostnet/Tacotron_Postnet_hvd_003.wav" type="audio/wav">
-        </audio>
-      </td>
+        <td nowrap class="tg-0pky">
+            <span style="font-weight:bold">Sentence 3</span>
+        </td>
+        <td class="tg-0pky">
+          <audio id="audio-small" controls>
+            <source src="./audio/VOC/ListeningTest/3.wav" type="audio/wav">
+          </audio>
+        </td>
+        <td class="tg-0pky">
+          <audio id="audio-small" controls>
+            <source src="./audio/OF/ListeningTest/3.wav" type="audio/wav">
+          </audio>
+        </td>
+        <td class="tg-0pky">
+          <audio id="audio-small" controls>
+            <source src="./audio/OFND/ListeningTest/3.wav" type="audio/wav">
+          </audio>
+        </td>
+        <td class="tg-0pky">
+          <audio id="audio-small" controls>
+            <source src="./audio/OFZT/ListeningTest/3.wav" type="audio/wav">
+          </audio>
+        </td>
+        <td class="tg-0pky">
+          <audio id="audio-small" controls>
+            <source src="./audio/T2/ListeningTest/3.wav" type="audio/wav">
+          </audio>
+        </td>
+        <td class="tg-0pky">
+          <audio id="audio-small" controls>
+            <source src="./audio/GTTS/ListeningTest/3.wav" type="audio/wav">
+          </audio>
+        </td>
+        <td class="tg-0pky">
+          <audio id="audio-small" controls>
+            <source src="./audio/NHMM/ListeningTest/3.wav" type="audio/wav">
+          </audio>
+        </td>
     </tr>
     <tr>
-      <td nowrap class="tg-0pky"><b>Sentence 4</b></td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/NeuralHMM/2State/NeuralHMM1AR2State_hvd_004.wav" type="audio/wav">
-        </audio>
-      </td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/NeuralHMM/1State/NeuralHMM1AR1State_hvd_004.wav" type="audio/wav">
-        </audio>
-      </td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/Tacotron/TacotronWOPostnet/Tacotron_hvd_004.wav" type="audio/wav">
-        </audio>
-      </td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/Tacotron/TacotronWPostnet/Tacotron_Postnet_hvd_004.wav" type="audio/wav">
-        </audio>
-      </td>
+        <td nowrap class="tg-0pky">
+            <span style="font-weight:bold">Sentence 4</span>
+        </td>
+        <td class="tg-0pky">
+          <audio id="audio-small" controls>
+            <source src="./audio/VOC/ListeningTest/4.wav" type="audio/wav">
+          </audio>
+        </td>
+        <td class="tg-0pky">
+          <audio id="audio-small" controls>
+            <source src="./audio/OF/ListeningTest/4.wav" type="audio/wav">
+          </audio>
+        </td>
+        <td class="tg-0pky">
+          <audio id="audio-small" controls>
+            <source src="./audio/OFND/ListeningTest/4.wav" type="audio/wav">
+          </audio>
+        </td>
+        <td class="tg-0pky">
+          <audio id="audio-small" controls>
+            <source src="./audio/OFZT/ListeningTest/4.wav" type="audio/wav">
+          </audio>
+        </td>
+        <td class="tg-0pky">
+          <audio id="audio-small" controls>
+            <source src="./audio/T2/ListeningTest/4.wav" type="audio/wav">
+          </audio>
+        </td>
+        <td class="tg-0pky">
+          <audio id="audio-small" controls>
+            <source src="./audio/GTTS/ListeningTest/4.wav" type="audio/wav">
+          </audio>
+        </td>
+        <td class="tg-0pky">
+          <audio id="audio-small" controls>
+            <source src="./audio/NHMM/ListeningTest/4.wav" type="audio/wav">
+          </audio>
+        </td>
     </tr>
     <tr>
-      <td nowrap class="tg-0pky"><b>Sentence 5</b></td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/NeuralHMM/2State/NeuralHMM1AR2State_hvd_005.wav" type="audio/wav">
-        </audio>
-      </td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/NeuralHMM/1State/NeuralHMM1AR1State_hvd_005.wav" type="audio/wav">
-        </audio>
-      </td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/Tacotron/TacotronWOPostnet/Tacotron_hvd_005.wav" type="audio/wav">
-        </audio>
-      </td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/Tacotron/TacotronWPostnet/Tacotron_Postnet_hvd_005.wav" type="audio/wav">
-        </audio>
-      </td>
+        <td nowrap class="tg-0pky">
+            <span style="font-weight:bold">Sentence 5</span>
+        </td>
+        <td class="tg-0pky">
+          <audio id="audio-small" controls>
+            <source src="./audio/VOC/ListeningTest/5.wav" type="audio/wav">
+          </audio>
+        </td>
+        <td class="tg-0pky">
+          <audio id="audio-small" controls>
+            <source src="./audio/OF/ListeningTest/5.wav" type="audio/wav">
+          </audio>
+        </td>
+        <td class="tg-0pky">
+          <audio id="audio-small" controls>
+            <source src="./audio/OFND/ListeningTest/5.wav" type="audio/wav">
+          </audio>
+        </td>
+        <td class="tg-0pky">
+          <audio id="audio-small" controls>
+            <source src="./audio/OFZT/ListeningTest/5.wav" type="audio/wav">
+          </audio>
+        </td>
+        <td class="tg-0pky">
+          <audio id="audio-small" controls>
+            <source src="./audio/T2/ListeningTest/5.wav" type="audio/wav">
+          </audio>
+        </td>
+        <td class="tg-0pky">
+          <audio id="audio-small" controls>
+            <source src="./audio/GTTS/ListeningTest/5.wav" type="audio/wav">
+          </audio>
+        </td>
+        <td class="tg-0pky">
+          <audio id="audio-small" controls>
+            <source src="./audio/NHMM/ListeningTest/5.wav" type="audio/wav">
+          </audio>
+        </td>
     </tr>
     <tr>
-      <td nowrap class="tg-0pky"><b>Sentence 6</b></td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/NeuralHMM/2State/NeuralHMM1AR2State_hvd_006.wav" type="audio/wav">
-        </audio>
-      </td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/NeuralHMM/1State/NeuralHMM1AR1State_hvd_006.wav" type="audio/wav">
-        </audio>
-      </td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/Tacotron/TacotronWOPostnet/Tacotron_hvd_006.wav" type="audio/wav">
-        </audio>
-      </td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/Tacotron/TacotronWPostnet/Tacotron_Postnet_hvd_006.wav" type="audio/wav">
-        </audio>
-      </td>
+        <td nowrap class="tg-0pky">
+            <span style="font-weight:bold">Sentence 6</span>
+        </td>
+        <td class="tg-0pky">
+          <audio id="audio-small" controls>
+            <source src="./audio/VOC/ListeningTest/6.wav" type="audio/wav">
+          </audio>
+        </td>
+        <td class="tg-0pky">
+          <audio id="audio-small" controls>
+            <source src="./audio/OF/ListeningTest/6.wav" type="audio/wav">
+          </audio>
+        </td>
+        <td class="tg-0pky">
+          <audio id="audio-small" controls>
+            <source src="./audio/OFND/ListeningTest/6.wav" type="audio/wav">
+          </audio>
+        </td>
+        <td class="tg-0pky">
+          <audio id="audio-small" controls>
+            <source src="./audio/OFZT/ListeningTest/6.wav" type="audio/wav">
+          </audio>
+        </td>
+        <td class="tg-0pky">
+          <audio id="audio-small" controls>
+            <source src="./audio/T2/ListeningTest/6.wav" type="audio/wav">
+          </audio>
+        </td>
+        <td class="tg-0pky">
+          <audio id="audio-small" controls>
+            <source src="./audio/GTTS/ListeningTest/6.wav" type="audio/wav">
+          </audio>
+        </td>
+        <td class="tg-0pky">
+          <audio id="audio-small" controls>
+            <source src="./audio/NHMM/ListeningTest/6.wav" type="audio/wav">
+          </audio>
+        </td>
+    </tr>
+    <tr>
+        <td nowrap class="tg-0pky">
+            <span style="font-weight:bold">Sentence 7</span>
+        </td>
+        <td class="tg-0pky">
+          <audio id="audio-small" controls>
+            <source src="./audio/VOC/ListeningTest/7.wav" type="audio/wav">
+          </audio>
+        </td>
+        <td class="tg-0pky">
+          <audio id="audio-small" controls>
+            <source src="./audio/OF/ListeningTest/7.wav" type="audio/wav">
+          </audio>
+        </td>
+        <td class="tg-0pky">
+          <audio id="audio-small" controls>
+            <source src="./audio/OFND/ListeningTest/7.wav" type="audio/wav">
+          </audio>
+        </td>
+        <td class="tg-0pky">
+          <audio id="audio-small" controls>
+            <source src="./audio/OFZT/ListeningTest/7.wav" type="audio/wav">
+          </audio>
+        </td>
+        <td class="tg-0pky">
+          <audio id="audio-small" controls>
+            <source src="./audio/T2/ListeningTest/7.wav" type="audio/wav">
+          </audio>
+        </td>
+        <td class="tg-0pky">
+          <audio id="audio-small" controls>
+            <source src="./audio/GTTS/ListeningTest/7.wav" type="audio/wav">
+          </audio>
+        </td>
+        <td class="tg-0pky">
+          <audio id="audio-small" controls>
+            <source src="./audio/NHMM/ListeningTest/7.wav" type="audio/wav">
+          </audio>
+        </td>
     </tr>
   </tbody>
 </table>
 
-### Learning to speak and align quickly
+
+## Sampling at different temperatures
+
+<span style="font-weight: bold">Dataset:</span> [LJ-Speech](https://keithito.com/LJ-Speech-Dataset/) <br>
+<span style="font-weight: bold">Training data duration:</span> ~22.8 hours
 
 
 <div class="slidecontainer">
-  <label for="itr_slider"><span style="font-weight:bold"> 0.5k </span></label>
-  <input type="range" min="0" max="15" value="15" class="slider" id="itr_slider">
-  <label for="itr_slider"><span style="font-weight:bold"> 30k </span> </label>
-  <p><span style="font-weight:bold">Number of training iterations:</span> <span class="itr_val"></span>
-  </p>
-</div>
-<table class="tg">
-  <thead>
-    <tr>
-      <th class="tg-0pky">Model</th>
-      <th class="tg-0pky">Utterance at iteration: <span class="itr_val"></span> </th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td class="tg-0pky">
-        <span style="font-weight:bold">NH2</span>
-      </td>
-      <td class="tg-0pky">
-        <audio controls id="control_chckpt_itr_nh2">
-          <source id="nh2_checkpt_itr" src="./audio/NeuralHMM/2State/TrainingIterations/NeuralHMM1AR2State_update_30000.wav" type="audio/wav">
-        </audio>
-      </td>
-    </tr>
-    <tr>
-      <td class="tg-0pky">
-        <span style="font-weight:bold">T2-P</span>
-      </td>
-      <td class="tg-0pky">
-        <audio controls id="control_chckpt_itr_t2_p">
-          <source id="t2_p_checkpt_itr" src="./audio/Tacotron/TacotronWOPostnet/TrainingIterations/Tacotron_utterance_update_30000.wav" type="audio/wav">
-        </audio>
-      </td>
-    </tr>
-    <tr>
-      <td class="tg-0pky">
-        <span style="font-weight:bold">NH2 (500 utterances)</span>
-      </td>
-      <td class="tg-0pky">
-        <audio controls id="control_chckpt_itr_nh2_500">
-          <source id="nh2_500_checkpt_itr" src="./audio/NeuralHMM/2State/TrainingIterations/NeuralHMM1AR2State_500_utterance_update_30000.wav" type="audio/wav">
-        </audio>
-      </td>
-    </tr>
-    <tr>
-      <td class="tg-0pky">
-        <span style="font-weight:bold">T2-P (500 utterances)</span>
-      </td>
-      <td class="tg-0pky">
-        <audio controls id="control_chckpt_itr_t2_p_500">
-          <source id="t2_p_500_checkpt_itr" src="./audio/Tacotron/TacotronWOPostnet/TrainingIterations/Tacotron_500_utterance_update_30000.wav" type="audio/wav">
-        </audio>
-      </td>
-    </tr>
-  </tbody>
-</table>
-<script>
-  var itr_slider = document.getElementById("itr_slider");
-  var itr_vals = document.getElementsByClassName("itr_val");
-  // Sentences
-  //NH2
-  var nh2_chckpt_itr = document.getElementById("nh2_checkpt_itr");
-  var control_chckpt_itr_nh2 = document.getElementById('control_chckpt_itr_nh2');
-  //T2-P
-  var t2_p_checkpt_itr = document.getElementById('t2_p_checkpt_itr');
-  var control_chckpt_itr_t2_p = document.getElementById("control_chckpt_itr_t2_p");
-  //NH2 (500 utterances)
-  var nh2_500_checkpt_itr = document.getElementById("nh2_500_checkpt_itr");
-  var control_chckpt_itr_nh2_500 = document.getElementById('control_chckpt_itr_nh2_500');
-  //T2-P (500 utterances)
-  var t2_p_500_checkpt_itr = document.getElementById("t2_p_500_checkpt_itr");
-  var control_chckpt_itr_t2_p_500 = document.getElementById('control_chckpt_itr_t2_p_500');
-  // Functions to update values
-  var iterations = {
-                     0: ['0.5k', 500],
-                     1: ['1k', 1000],
-                     2: ['1.5k', 1500],
-                     3: ['2k', 2000],
-                     4: ['2.5k', 2500],
-                     5: ['5k', 5000],
-                     6: ['7.5k', 7500],
-                     7: ['10k', 10000],
-                     8: ['12.5k', 12500],
-                     9: ['15k', 15000],
-                     10: ['17.5k', 17500],
-                     11: ['20k', 20000],
-                     12: ['22.5k', 22500],
-                     13: ['25k', 25000],
-                     14: ['27.5k', 27500],
-                     15: ['30k', 30000]
-  };
-  function updateVals(classes, value){
-    for(var i=0; i < classes.length; i++) {
-        classes[i].innerHTML= iterations[parseInt(value)][0];
-    }
-  }
-  updateVals(itr_vals, 15);
-  itr_slider.oninput = function() {
-    updateVals(itr_vals, this.value);
-    let iteration = iterations[parseInt(this.value)][1];
-    // Update sources
-    nh2_chckpt_itr.src = "./audio/NeuralHMM/2State/TrainingIterations/NeuralHMM1AR2State_update_" + iteration + ".wav"
-    t2_p_checkpt_itr.src = "./audio/Tacotron/TacotronWOPostnet/TrainingIterations/Tacotron_utterance_update_" + iteration + ".wav"
-    nh2_500_checkpt_itr.src = "./audio/NeuralHMM/2State/TrainingIterations/NeuralHMM1AR2State_500_utterance_update_" + iteration + ".wav"
-    t2_p_500_checkpt_itr.src = "./audio/Tacotron/TacotronWOPostnet/TrainingIterations/Tacotron_500_utterance_update_" + iteration + ".wav"
-    // Reload audio
-    control_chckpt_itr_nh2.load();
-    control_chckpt_itr_t2_p.load();
-    control_chckpt_itr_nh2_500.load();
-    control_chckpt_itr_t2_p_500.load();
-  }
-</script>
-
-
-### Speaking sentences Tacotron 2 cannot speak
-
-<table class="tg">
-<thead>
-  <tr>
-    <th class="tg-0pky"></th>
-    <th class="tg-0pky"><span style="font-weight:600;font-style:normal">Neural HMM (NH2)</span></th>
-    <th class="tg-0pky"><span style="font-weight:600;font-style:normal">Tacotron 2 (T2-P)</span></th>
-    <th class="tg-0pky"><span style="font-weight:600;font-style:normal"> <a href="https://github.com/NVIDIA/tacotron2" style="color:white;font-weight:bold">Pre-trained NVIDIA Tacotron 2</a> </span></th>
-  </tr>
-</thead>
-<tbody>
-  <tr>
-    <td nowrap class="tg-0pky"><b>Example 1</b></td>
-    <td class="tg-0pky">
-        <audio controls>
-            <source src="./audio/NeuralHMM/2State/ComplexSentences/NeuralHMM1AR2State_example_1.wav" type="audio/wav">
-        </audio>
-    </td>
-    <td class="tg-0pky">
-        <audio controls>
-            <source src="./audio/NeuralHMM/2State/ComplexSentences/Tacotron_example_1.wav" type="audio/wav">
-        </audio>
-    </td>
-    <td class="tg-0pky">
-        <audio controls>
-            <source src="./audio/NeuralHMM/2State/ComplexSentences/NVIDIATacotron_example_1.wav" type="audio/wav">
-        </audio>
-    </td>
-  </tr>
-    <tr>
-    <td class="tg-0pky"><b>Example 2</b></td>
-    <td class="tg-0pky">
-        <audio controls>
-            <source src="./audio/NeuralHMM/2State/ComplexSentences/NeuralHMM1AR2State_example_2.wav" type="audio/wav">
-        </audio>
-    </td>
-    <td class="tg-0pky">
-        <audio controls>
-            <source src="./audio/NeuralHMM/2State/ComplexSentences/Tacotron_example_2.wav" type="audio/wav">
-        </audio>
-    </td>
-    <td class="tg-0pky">
-        <audio controls>
-            <source src="./audio/NeuralHMM/2State/ComplexSentences/NVIDIATacotron_example_2.wav" type="audio/wav">
-        </audio>
-    </td>
-  </tr>
-    <tr>
-    <td class="tg-0pky"><b>Example 3</b></td>
-    <td class="tg-0pky">
-        <audio controls>
-            <source src="./audio/NeuralHMM/2State/ComplexSentences/NeuralHMM1AR2State_example_3.wav" type="audio/wav">
-        </audio>
-    </td>
-    <td class="tg-0pky">
-        <audio controls>
-            <source src="./audio/NeuralHMM/2State/ComplexSentences/Tacotron_example_3.wav" type="audio/wav">
-        </audio>
-    </td>
-    <td class="tg-0pky">
-        <audio controls>
-            <source src="./audio/NeuralHMM/2State/ComplexSentences/NVIDIATacotron_example_3.wav" type="audio/wav">
-        </audio>
-    </td>
-  </tr>
-    <tr>
-    <td class="tg-0pky"><b>Example 4</b></td>
-    <td class="tg-0pky">
-        <audio controls>
-            <source src="./audio/NeuralHMM/2State/ComplexSentences/NeuralHMM1AR2State_example_4.wav" type="audio/wav">
-        </audio>
-    </td>
-    <td class="tg-0pky">
-        <audio controls>
-            <source src="./audio/NeuralHMM/2State/ComplexSentences/Tacotron_example_4.wav" type="audio/wav">
-        </audio>
-    </td>
-    <td class="tg-0pky">
-        <audio controls>
-            <source src="./audio/NeuralHMM/2State/ComplexSentences/NVIDIATacotron_example_4.wav" type="audio/wav">
-        </audio>
-    </td>
-  </tr>
-</tbody>
-</table>
-
-### Effect of different output-generation methods
-
-
-<table class="tg">
-  <thead>
-    <tr>
-      <th class="tg-0pky"></th>
-      <th class="tg-0pky" colspan="4">Neural HMM TTS (model NH2)</th>
-    </tr>
-    <tr>
-      <th class="tg-0pky">Durations</th>
-      <th class="tg-0pky">Quantile</th>
-      <th class="tg-0pky">Sampled</th>
-      <th class="tg-0pky">Quantile</th>
-      <th class="tg-0pky">Sampled</th>
-    </tr>
-    <tr>
-      <th class="tg-0pky">Acoustics </th>
-      <th class="tg-0pky">Mean </th>
-      <th class="tg-0pky">Mean </th>
-      <th class="tg-0pky">Sampled </th>
-      <th class="tg-0pky">Sampled </th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td nowrap class="tg-0pky">
-        <b>Sentence 1</b>
-      </td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/NeuralHMM/2State/DifferentSettings/NeuralHMM1AR2State_QY_SN_hvd_001.wav" type="audio/wav">
-        </audio>
-      </td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/NeuralHMM/2State/DifferentSettings/NeuralHMM1AR2State_QN_SN_hvd_001.wav" type="audio/wav">
-        </audio>
-      </td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/NeuralHMM/2State/DifferentSettings/NeuralHMM1AR2State_QY_SY_hvd_001.wav" type="audio/wav">
-        </audio>
-      </td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/NeuralHMM/2State/DifferentSettings/NeuralHMM1AR2State_QN_SY_hvd_001.wav" type="audio/wav">
-        </audio>
-      </td>
-    </tr>
-    <tr>
-      <td nowrap class="tg-0pky">
-        <b> Sentence 2</b>
-      </td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/NeuralHMM/2State/DifferentSettings/NeuralHMM1AR2State_QY_SN_hvd_002.wav" type="audio/wav">
-        </audio>
-      </td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/NeuralHMM/2State/DifferentSettings/NeuralHMM1AR2State_QN_SN_hvd_002.wav" type="audio/wav">
-        </audio>
-      </td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/NeuralHMM/2State/DifferentSettings/NeuralHMM1AR2State_QY_SY_hvd_002.wav" type="audio/wav">
-        </audio>
-      </td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/NeuralHMM/2State/DifferentSettings/NeuralHMM1AR2State_QN_SY_hvd_002.wav" type="audio/wav">
-        </audio>
-      </td>
-    </tr>
-    <tr>
-      <td nowrap class="tg-0pky">
-        <b> Sentence 3</b>
-      </td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/NeuralHMM/2State/DifferentSettings/NeuralHMM1AR2State_QY_SN_hvd_003.wav" type="audio/wav">
-        </audio>
-      </td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/NeuralHMM/2State/DifferentSettings/NeuralHMM1AR2State_QN_SN_hvd_003.wav" type="audio/wav">
-        </audio>
-      </td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/NeuralHMM/2State/DifferentSettings/NeuralHMM1AR2State_QY_SY_hvd_003.wav" type="audio/wav">
-        </audio>
-      </td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/NeuralHMM/2State/DifferentSettings/NeuralHMM1AR2State_QN_SY_hvd_003.wav" type="audio/wav">
-        </audio>
-      </td>
-    </tr>
-    <tr>
-      <td nowrap class="tg-0pky">
-        <b> Sentence 4</b>
-      </td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/NeuralHMM/2State/DifferentSettings/NeuralHMM1AR2State_QY_SN_hvd_004.wav" type="audio/wav">
-        </audio>
-      </td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/NeuralHMM/2State/DifferentSettings/NeuralHMM1AR2State_QN_SN_hvd_004.wav" type="audio/wav">
-        </audio>
-      </td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/NeuralHMM/2State/DifferentSettings/NeuralHMM1AR2State_QY_SY_hvd_004.wav" type="audio/wav">
-        </audio>
-      </td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/NeuralHMM/2State/DifferentSettings/NeuralHMM1AR2State_QN_SY_hvd_004.wav" type="audio/wav">
-        </audio>
-      </td>
-    </tr>
-    <tr>
-      <td nowrap class="tg-0pky">
-        <b> Sentence 5</b>
-      </td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/NeuralHMM/2State/DifferentSettings/NeuralHMM1AR2State_QY_SN_hvd_005.wav" type="audio/wav">
-        </audio>
-      </td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/NeuralHMM/2State/DifferentSettings/NeuralHMM1AR2State_QN_SN_hvd_005.wav" type="audio/wav">
-        </audio>
-      </td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/NeuralHMM/2State/DifferentSettings/NeuralHMM1AR2State_QY_SY_hvd_005.wav" type="audio/wav">
-        </audio>
-      </td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/NeuralHMM/2State/DifferentSettings/NeuralHMM1AR2State_QN_SY_hvd_005.wav" type="audio/wav">
-        </audio>
-      </td>
-    </tr>
-    <tr>
-      <td nowrap class="tg-0pky">
-        <b> Sentence 6</b>
-      </td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/NeuralHMM/2State/DifferentSettings/NeuralHMM1AR2State_QY_SN_hvd_006.wav" type="audio/wav">
-        </audio>
-      </td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/NeuralHMM/2State/DifferentSettings/NeuralHMM1AR2State_QN_SN_hvd_006.wav" type="audio/wav">
-        </audio>
-      </td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/NeuralHMM/2State/DifferentSettings/NeuralHMM1AR2State_QY_SY_hvd_006.wav" type="audio/wav">
-        </audio>
-      </td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/NeuralHMM/2State/DifferentSettings/NeuralHMM1AR2State_QN_SY_hvd_006.wav" type="audio/wav">
-        </audio>
-      </td>
-    </tr>
-  </tbody>
-</table>
-
-
-
-### Effect of pre-net dropout during synthesis
-
-<table class="tg">
-<thead>
-  <tr>
-    <th class="tg-0pky"></th>
-    <th class="tg-0pky" colspan="4">Neural HMM TTS (model NH2)</th>
-  </tr>
-   <tr>
-    <th class="tg-0pky"><span style="font-weight:bold">Pre-net dropout?</span></th>
-    <th class="tg-0pky">&#x274C;</th>
-    <th class="tg-0pky">&#x2705;</th>
-    <th class="tg-0pky">&#x2705;</th>
-    <th class="tg-0pky">&#x2705;</th>
-  </tr>
-  <tr>
-    <th class="tg-0pky">Output</th>
-    <th class="tg-0pky"><span style="font-weight:bold">Same every time </span></th>
-    <th class="tg-0pky"><span style="font-weight:bold">Example 1</span></th>
-    <th class="tg-0pky"><span style="font-weight:bold">Example 2</span></th>
-    <th class="tg-0pky"><span style="font-weight:bold">Example 3</span></th>
-  </tr>
-</thead>
-<tbody>
-  <tr>
-    <td nowrap class="tg-0pky"><span style="font-weight:bold">Sentence 1</span></td>
-    <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/NeuralHMM/2State/PrenetDropoutSettings/NeuralHMM1AR2State_ND_hvd_001.wav" type="audio/wav">
-        </audio>
-    </td>
-    <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/NeuralHMM/2State/PrenetDropoutSettings/NeuralHMM1AR2State_D_1_hvd_001.wav" type="audio/wav">
-        </audio>
-    </td>
-    <td class="tg-0pky">
-    <audio controls>
-          <source src="./audio/NeuralHMM/2State/PrenetDropoutSettings/NeuralHMM1AR2State_D_2_hvd_001.wav" type="audio/wav">
-    </audio>
-    </td>
-    <td class="tg-0pky">
-    <audio controls>
-          <source src="./audio/NeuralHMM/2State/PrenetDropoutSettings/NeuralHMM1AR2State_D_3_hvd_001.wav" type="audio/wav">
-    </audio>
-    </td>
-  </tr>
-    <tr>
-    <td class="tg-0pky"><span style="font-weight:bold">Sentence 2</span></td>
-    <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/NeuralHMM/2State/PrenetDropoutSettings/NeuralHMM1AR2State_ND_hvd_002.wav" type="audio/wav">
-        </audio>
-    </td>
-    <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/NeuralHMM/2State/PrenetDropoutSettings/NeuralHMM1AR2State_D_1_hvd_002.wav" type="audio/wav">
-        </audio>
-    </td>
-    <td class="tg-0pky">
-    <audio controls>
-          <source src="./audio/NeuralHMM/2State/PrenetDropoutSettings/NeuralHMM1AR2State_D_2_hvd_002.wav" type="audio/wav">
-    </audio>
-    </td>
-    <td class="tg-0pky">
-    <audio controls>
-          <source src="./audio/NeuralHMM/2State/PrenetDropoutSettings/NeuralHMM1AR2State_D_3_hvd_002.wav" type="audio/wav">
-    </audio>
-    </td>
-  </tr>
-    <tr>
-    <td class="tg-0pky"><span style="font-weight:bold">Sentence 3</span></td>
-    <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/NeuralHMM/2State/PrenetDropoutSettings/NeuralHMM1AR2State_ND_hvd_003.wav" type="audio/wav">
-        </audio>
-    </td>
-    <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/NeuralHMM/2State/PrenetDropoutSettings/NeuralHMM1AR2State_D_1_hvd_003.wav" type="audio/wav">
-        </audio>
-    </td>
-    <td class="tg-0pky">
-    <audio controls>
-          <source src="./audio/NeuralHMM/2State/PrenetDropoutSettings/NeuralHMM1AR2State_D_2_hvd_003.wav" type="audio/wav">
-    </audio>
-    </td>
-    <td class="tg-0pky">
-    <audio controls>
-          <source src="./audio/NeuralHMM/2State/PrenetDropoutSettings/NeuralHMM1AR2State_D_3_hvd_003.wav" type="audio/wav">
-    </audio>
-    </td>
-  </tr>
-    <tr>
-    <td class="tg-0pky"><span style="font-weight:bold">Sentence 4</span></td>
-    <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/NeuralHMM/2State/PrenetDropoutSettings/NeuralHMM1AR2State_ND_hvd_004.wav" type="audio/wav">
-        </audio>
-    </td>
-    <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/NeuralHMM/2State/PrenetDropoutSettings/NeuralHMM1AR2State_D_1_hvd_004.wav" type="audio/wav">
-        </audio>
-    </td>
-    <td class="tg-0pky">
-    <audio controls>
-          <source src="./audio/NeuralHMM/2State/PrenetDropoutSettings/NeuralHMM1AR2State_D_2_hvd_004.wav" type="audio/wav">
-    </audio>
-    </td>
-    <td class="tg-0pky">
-    <audio controls>
-          <source src="./audio/NeuralHMM/2State/PrenetDropoutSettings/NeuralHMM1AR2State_D_3_hvd_004.wav" type="audio/wav">
-    </audio>
-    </td>
-  </tr>
-    <tr>
-    <td class="tg-0pky"><span style="font-weight:bold">Sentence 5</span></td>
-    <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/NeuralHMM/2State/PrenetDropoutSettings/NeuralHMM1AR2State_ND_hvd_005.wav" type="audio/wav">
-        </audio>
-    </td>
-    <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/NeuralHMM/2State/PrenetDropoutSettings/NeuralHMM1AR2State_D_1_hvd_005.wav" type="audio/wav">
-        </audio>
-    </td>
-    <td class="tg-0pky">
-    <audio controls>
-          <source src="./audio/NeuralHMM/2State/PrenetDropoutSettings/NeuralHMM1AR2State_D_2_hvd_005.wav" type="audio/wav">
-    </audio>
-    </td>
-    <td class="tg-0pky">
-    <audio controls>
-          <source src="./audio/NeuralHMM/2State/PrenetDropoutSettings/NeuralHMM1AR2State_D_3_hvd_005.wav" type="audio/wav">
-    </audio>
-    </td>
-  </tr>
-    <tr>
-    <td class="tg-0pky"><span style="font-weight:bold">Sentence 6</span></td>
-    <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/NeuralHMM/2State/PrenetDropoutSettings/NeuralHMM1AR2State_ND_hvd_006.wav" type="audio/wav">
-        </audio>
-    </td>
-    <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/NeuralHMM/2State/PrenetDropoutSettings/NeuralHMM1AR2State_D_1_hvd_006.wav" type="audio/wav">
-        </audio>
-    </td>
-    <td class="tg-0pky">
-    <audio controls>
-          <source src="./audio/NeuralHMM/2State/PrenetDropoutSettings/NeuralHMM1AR2State_D_2_hvd_006.wav" type="audio/wav">
-    </audio>
-    </td>
-    <td class="tg-0pky">
-    <audio controls>
-          <source src="./audio/NeuralHMM/2State/PrenetDropoutSettings/NeuralHMM1AR2State_D_3_hvd_006.wav" type="audio/wav">
-    </audio>
-    </td>
-  </tr>
-</tbody>
-</table>
-
-### Control over speaking rate
-
-Drag the slider to change the speaking rate.
-
-<div class="slidecontainer">
-  <label for="myRange"><span style="font-weight:bold"> Slow </span></label>
-  <input type="range" min="1" max="8" value="4" class="slider" id="myRange">
-  <label for="myRange"><span style="font-weight:bold"> Fast </span> </label>
-  <p><span style="font-weight:bold">Duration quantile:</span> <span id="demo"></span>
+  <label for="myRange"><span style="font-weight:bold"> 0 </span></label>
+  <input type="range" min="0" max="3" value="2" step="1" class="slider" id="myRange">
+  <label for="myRange"><span style="font-weight:bold"> 1 </span> </label>
+  <p><span style="font-weight:bold">Sampling temperature:</span> <span id="demo"></span>
   </p>
 </div>
 <table class="tg">
   <thead>
     <tr>
       <th class="tg-0pky">Sentence</th>
-      <th class="tg-0pky">Neural HMM TTS (model NH2)</th>
+      <th class="tg-0pky">VOC</th>
+      <th class="tg-0pky">OF</th>
+      <th class="tg-0pky">OFND</th>
+      <th class="tg-0pky">GTTS</th>
+      <th class="tg-0pky">NHMM</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td class="tg-0pky">
+      <td nowrap class="tg-0pky">
         <span style="font-weight:bold">Sentence 1</span>
       </td>
       <td class="tg-0pky">
-        <audio controls id="audio1_dq">
-          <source id="src_sentence1" src="./audio/NeuralHMM/2State/DurationQuartile/NeuralHMM1AR2State_point4_hvd_001.wav" type="audio/wav">
+        <audio controls>
+          <source src="./audio/VOC/SamplingTemperature/1.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="tg-0pky">
+        <audio controls id="OF_a_1">
+          <source id="OF_s_1" src="./audio/OF/SamplingTemperature/1_667.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="tg-0pky">
+        <audio controls id="OFND_a_1">
+          <source id="OFND_s_1" src="./audio/OFND/SamplingTemperature/1_667.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="tg-0pky">
+        <audio controls id="GTTS_a_1">
+          <source id="GTTS_s_1" src="./audio/GTTS/SamplingTemperature/1_667.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="tg-0pky">
+        <audio controls id="NHMM_a_1">
+          <source id="NHMM_s_1" src="./audio/NHMM/SamplingTemperature/1_667.wav" type="audio/wav">
         </audio>
       </td>
     </tr>
     <tr>
-      <td class="tg-0pky">
+      <td nowrap class="tg-0pky">
         <span style="font-weight:bold">Sentence 2</span>
       </td>
       <td class="tg-0pky">
-        <audio controls id="audio2_dq">
-          <source id="src_sentence2" src="./audio/NeuralHMM/2State/DurationQuartile/NeuralHMM1AR2State_point4_hvd_002.wav" type="audio/wav">
+        <audio controls>
+          <source src="./audio/VOC/SamplingTemperature/2.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="tg-0pky">
+        <audio controls id="OF_a_2">
+          <source id="OF_s_2" src="./audio/OF/SamplingTemperature/2_667.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="tg-0pky">
+        <audio controls id="OFND_a_2">
+          <source id="OFND_s_2" src="./audio/OFND/SamplingTemperature/2_667.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="tg-0pky">
+        <audio controls id="GTTS_a_2">
+          <source id="GTTS_s_2" src="./audio/GTTS/SamplingTemperature/2_667.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="tg-0pky">
+        <audio controls id="NHMM_a_2">
+          <source id="NHMM_s_2" src="./audio/NHMM/SamplingTemperature/2_667.wav" type="audio/wav">
         </audio>
       </td>
     </tr>
     <tr>
-      <td class="tg-0pky">
+      <td nowrap class="tg-0pky">
         <span style="font-weight:bold">Sentence 3</span>
       </td>
       <td class="tg-0pky">
-        <audio controls id="audio3_dq">
-          <source id="src_sentence3" src="./audio/NeuralHMM/2State/DurationQuartile/NeuralHMM1AR2State_point4_hvd_003.wav" type="audio/wav">
+        <audio controls>
+          <source src="./audio/VOC/SamplingTemperature/3.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="tg-0pky">
+        <audio controls id="OF_a_3">
+          <source id="OF_s_3" src="./audio/OF/SamplingTemperature/3_667.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="tg-0pky">
+        <audio controls id="OFND_a_3">
+          <source id="OFND_s_3" src="./audio/OFND/SamplingTemperature/3_667.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="tg-0pky">
+        <audio controls id="GTTS_a_3">
+          <source id="GTTS_s_3" src="./audio/GTTS/SamplingTemperature/3_667.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="tg-0pky">
+        <audio controls id="NHMM_a_3">
+          <source id="NHMM_s_3" src="./audio/NHMM/SamplingTemperature/3_667.wav" type="audio/wav">
         </audio>
       </td>
     </tr>
     <tr>
-      <td class="tg-0pky">
+      <td nowrap class="tg-0pky">
         <span style="font-weight:bold">Sentence 4</span>
       </td>
       <td class="tg-0pky">
-        <audio controls id="audio4_dq">
-          <source id="src_sentence4" src="./audio/NeuralHMM/2State/DurationQuartile/NeuralHMM1AR2State_point4_hvd_004.wav" type="audio/wav">
+        <audio controls>
+          <source src="./audio/VOC/SamplingTemperature/4.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="tg-0pky">
+        <audio controls id="OF_a_4">
+          <source id="OF_s_4" src="./audio/OF/SamplingTemperature/4_667.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="tg-0pky">
+        <audio controls id="OFND_a_4">
+          <source id="OFND_s_4" src="./audio/OFND/SamplingTemperature/4_667.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="tg-0pky">
+        <audio controls id="GTTS_a_4">
+          <source id="GTTS_s_4" src="./audio/GTTS/SamplingTemperature/4_667.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="tg-0pky">
+        <audio controls id="NHMM_a_4">
+          <source id="NHMM_s_4" src="./audio/NHMM/SamplingTemperature/4_667.wav" type="audio/wav">
         </audio>
       </td>
     </tr>
     <tr>
-      <td class="tg-0pky">
+      <td nowrap class="tg-0pky">
         <span style="font-weight:bold">Sentence 5</span>
       </td>
       <td class="tg-0pky">
-        <audio controls id="audio5_dq">
-          <source id="src_sentence5" src="./audio/NeuralHMM/2State/DurationQuartile/NeuralHMM1AR2State_point4_hvd_005.wav" type="audio/wav">
+        <audio controls>
+          <source src="./audio/VOC/SamplingTemperature/5.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="tg-0pky">
+        <audio controls id="OF_a_5">
+          <source id="OF_s_5" src="./audio/OF/SamplingTemperature/5_667.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="tg-0pky">
+        <audio controls id="OFND_a_5">
+          <source id="OFND_s_5" src="./audio/OFND/SamplingTemperature/5_667.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="tg-0pky">
+        <audio controls id="GTTS_a_5">
+          <source id="GTTS_s_5" src="./audio/GTTS/SamplingTemperature/5_667.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="tg-0pky">
+        <audio controls id="NHMM_a_5">
+          <source id="NHMM_s_5" src="./audio/NHMM/SamplingTemperature/5_667.wav" type="audio/wav">
         </audio>
       </td>
     </tr>
     <tr>
-      <td class="tg-0pky">
+      <td nowrap class="tg-0pky">
         <span style="font-weight:bold">Sentence 6</span>
       </td>
       <td class="tg-0pky">
-        <audio controls id="audio6_dq">
-          <source id="src_sentence6" src="./audio/NeuralHMM/2State/DurationQuartile/NeuralHMM1AR2State_point4_hvd_006.wav" type="audio/wav">
+        <audio controls>
+          <source src="./audio/VOC/SamplingTemperature/6.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="tg-0pky">
+        <audio controls id="OF_a_6">
+          <source id="OF_s_6" src="./audio/OF/SamplingTemperature/6_667.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="tg-0pky">
+        <audio controls id="OFND_a_6">
+          <source id="OFND_s_6" src="./audio/OFND/SamplingTemperature/6_667.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="tg-0pky">
+        <audio controls id="GTTS_a_6">
+          <source id="GTTS_s_6" src="./audio/GTTS/SamplingTemperature/6_667.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="tg-0pky">
+        <audio controls id="NHMM_a_6">
+          <source id="NHMM_s_6" src="./audio/NHMM/SamplingTemperature/6_667.wav" type="audio/wav">
         </audio>
       </td>
     </tr>
   </tbody>
 </table>
+
+
 <script>
+  const values = [0, 0.334, 0.667, 1];
+  const n_sent = 6;
+  const file_names = ['0', '334', '667', '1'];
   var slider = document.getElementById("myRange");
   var output = document.getElementById("demo");
-  var src_sentence1 = document.getElementById("src_sentence1");
-  var audio1_dq = document.getElementById('audio1_dq');
-  var src_sentence2 = document.getElementById("src_sentence2");
-  var audio2_dq = document.getElementById('audio2_dq');
-  var src_sentence3 = document.getElementById("src_sentence3");
-  var audio3_dq = document.getElementById('audio3_dq');
-  var src_sentence4 = document.getElementById("src_sentence4");
-  var audio4_dq = document.getElementById('audio4_dq');
-  var src_sentence5 = document.getElementById("src_sentence5");
-  var audio5_dq = document.getElementById('audio5_dq');
-  var src_sentence6 = document.getElementById("src_sentence6");
-  var audio6_dq = document.getElementById('audio6_dq');
-  output.innerHTML = ((10 - slider.value) / 10);
+  const systems = ["OF", "OFND", "GTTS", "NHMM"];
+
+  let audios = [];
+  // initialize audios
+  for(let i=0; i<systems.length; i++){
+    let row = [];
+    for(let j=0; j< n_sent; j++){
+      src_audio = {
+        'src': document.getElementById(`${systems[i]}_s_${j+1}`),
+        'audio': document.getElementById(`${systems[i]}_a_${j+1}`)
+      }
+
+      row.push(src_audio);
+    }
+    audios.push(row);
+  }
+
+  output.innerHTML = values[slider.value];
   slider.oninput = function() {
-    output.innerHTML = ((10 - this.value) / 10);
-    let number = this.value;
-    src_sentence1.src = "./audio/NeuralHMM/2State/DurationQuartile/NeuralHMM1AR2State_point" + number + "_hvd_001.wav"
-    src_sentence2.src = "./audio/NeuralHMM/2State/DurationQuartile/NeuralHMM1AR2State_point" + number + "_hvd_002.wav"
-    src_sentence3.src = "./audio/NeuralHMM/2State/DurationQuartile/NeuralHMM1AR2State_point" + number + "_hvd_003.wav"
-    src_sentence4.src = "./audio/NeuralHMM/2State/DurationQuartile/NeuralHMM1AR2State_point" + number + "_hvd_004.wav"
-    src_sentence5.src = "./audio/NeuralHMM/2State/DurationQuartile/NeuralHMM1AR2State_point" + number + "_hvd_005.wav"
-    src_sentence6.src = "./audio/NeuralHMM/2State/DurationQuartile/NeuralHMM1AR2State_point" + number + "_hvd_006.wav"
-    audio1_dq.load();
-    audio2_dq.load();
-    audio3_dq.load();
-    audio4_dq.load();
-    audio5_dq.load();
-    audio6_dq.load();
+    output.innerHTML = values[this.value];
+
+    for (let i = 0; i < systems.length; i++){
+      let number = this.value;
+
+      for (let j=0; j< n_sent; j++){
+        audios[i][j]['src'].src = `./audio/${systems[i]}/SamplingTemperature/${j+1}_${file_names[number]}.wav`;
+        audios[i][j]['audio'].load();
+      }
+    }
   }
 </script>
 
 
-### Effect of using HiFi-GAN and a post-net
+## Variation in synthesis
 
-These audio samples use a stronger vocoder ([HiFi-GAN version LJ_FT_T2_V1][HiFi_GAN_LJ_FT_V1_link]) and also include a hybrid condition NH2+P that demonstrates the effect of applying the post-net from model T2 to the output of model NH2.
+
+<span style="font-weight: bold">Dataset:</span> [RyanSpeech](https://keithito.com/LJ-Speech-Dataset/) <br>
+<span style="font-weight: bold">Training data duration:</span> ~9 hours
+
 
 <table class="tg">
-  <thead>
+<thead>
+  <tr>
+    <th class="tg-0pky">VOC</th>
+    <th class="tg-0pky" colspan="2">OF</th>
+    <th class="tg-0pky" colspan="2">OFND</th>
+    <th class="tg-0pky" colspan="2">OFZT</th>
+  </tr>
+  <tr>
+    <th class="tg-0pky" nowrap>Held-out utterance</th>
+    <th class="tg-0pky" nowrap>Realisation 1</th>
+    <th class="tg-0pky" nowrap>Realisation 2</th>
+    <th class="tg-0pky" nowrap>Realisation 1</th>
+    <th class="tg-0pky" nowrap>Realisation 2</th>
+    <th class="tg-0pky" nowrap>Realisation 1</th>
+    <th class="tg-0pky" nowrap>Realisation 2</th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/VOC/RyanVariations/1.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/RyanVariations/1a.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/RyanVariations/1b.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OFND/RyanVariations/1a.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OFND/RyanVariations/1b.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OFZT/RyanVariations/1a.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OFZT/RyanVariations/1b.wav" type="audio/wav">
+      </audio>
+    </td>
+  </tr>
     <tr>
-      <th class="tg-0pky">Type</th>
-      <th class="tg-0pky" colspan="2">Proposed neural HMM TTS</th>
-      <th class="tg-0pky" colspan="2">Tacotron 2 baseline</th>
-    </tr>
-  </thead>
-  <tbody>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/VOC/RyanVariations/2.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/RyanVariations/2a.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/RyanVariations/2b.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OFND/RyanVariations/2a.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OFND/RyanVariations/2b.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OFZT/RyanVariations/2a.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OFZT/RyanVariations/2b.wav" type="audio/wav">
+      </audio>
+    </td>
+  </tr>
     <tr>
-      <th class="tg-fymr">Condition</th>
-      <th class="tg-fymr">2 states per phone (NH2)</th>
-      <th class="tg-fymr">NH2 with Tacotron 2's post-net (NH2+P)</th>
-      <th class="tg-fymr">w/o post-net (T2-P)</th>
-      <th class="tg-fymr">w/ post-net (T2+P)</th>
-    </tr>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/VOC/RyanVariations/3.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/RyanVariations/3a.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/RyanVariations/3b.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OFND/RyanVariations/3a.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OFND/RyanVariations/3b.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OFZT/RyanVariations/3a.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OFZT/RyanVariations/3b.wav" type="audio/wav">
+      </audio>
+    </td>
+  </tr>
     <tr>
-      <td nowrap class="tg-0pky"><b>Sentence 1</b></td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/NeuralHMM/2State/HiFiGAN/NeuralHMM1AR2State_HiFiGAN_hvd_001.wav" type="audio/wav">
-        </audio>
-      </td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/NeuralHMM/2State/HiFiGAN/NeuralHMM1AR2State_Postnet_HiFiGAN_hvd_001.wav" type="audio/wav">
-        </audio>
-      </td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/Tacotron/TacotronWOPostnet/HiFiGAN/Tacotron_HiFiGAN_hvd_001.wav">
-        </audio>
-      </td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/Tacotron/TacotronWPostnet/HiFiGAN/Tacotron_Postnet_HiFiGAN_hvd_001.wav" type="audio/wav">
-        </audio>
-      </td>
-    </tr>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/VOC/RyanVariations/4.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/RyanVariations/4a.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/RyanVariations/4b.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OFND/RyanVariations/4a.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OFND/RyanVariations/4b.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OFZT/RyanVariations/4a.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OFZT/RyanVariations/4b.wav" type="audio/wav">
+      </audio>
+    </td>
+  </tr>
     <tr>
-      <td nowrap class="tg-0pky"><b>Sentence 2</b></td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/NeuralHMM/2State/HiFiGAN/NeuralHMM1AR2State_HiFiGAN_hvd_002.wav" type="audio/wav">
-        </audio>
-      </td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/NeuralHMM/2State/HiFiGAN/NeuralHMM1AR2State_Postnet_HiFiGAN_hvd_002.wav" type="audio/wav">
-        </audio>
-      </td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/Tacotron/TacotronWOPostnet/HiFiGAN/Tacotron_HiFiGAN_hvd_002.wav">
-        </audio>
-      </td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/Tacotron/TacotronWPostnet/HiFiGAN/Tacotron_Postnet_HiFiGAN_hvd_002.wav" type="audio/wav">
-        </audio>
-      </td>
-    </tr>
-    <tr>
-      <td nowrap class="tg-0pky"><b>Sentence 3</b></td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/NeuralHMM/2State/HiFiGAN/NeuralHMM1AR2State_HiFiGAN_hvd_003.wav" type="audio/wav">
-        </audio>
-      </td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/NeuralHMM/2State/HiFiGAN/NeuralHMM1AR2State_Postnet_HiFiGAN_hvd_003.wav" type="audio/wav">
-        </audio>
-      </td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/Tacotron/TacotronWOPostnet/HiFiGAN/Tacotron_HiFiGAN_hvd_003.wav">
-        </audio>
-      </td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/Tacotron/TacotronWPostnet/HiFiGAN/Tacotron_Postnet_HiFiGAN_hvd_003.wav" type="audio/wav">
-        </audio>
-      </td>
-    </tr>
-    <tr>
-      <td nowrap class="tg-0pky"><b>Sentence 4</b></td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/NeuralHMM/2State/HiFiGAN/NeuralHMM1AR2State_HiFiGAN_hvd_004.wav" type="audio/wav">
-        </audio>
-      </td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/NeuralHMM/2State/HiFiGAN/NeuralHMM1AR2State_Postnet_HiFiGAN_hvd_004.wav" type="audio/wav">
-        </audio>
-      </td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/Tacotron/TacotronWOPostnet/HiFiGAN/Tacotron_HiFiGAN_hvd_004.wav">
-        </audio>
-      </td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/Tacotron/TacotronWPostnet/HiFiGAN/Tacotron_Postnet_HiFiGAN_hvd_004.wav" type="audio/wav">
-        </audio>
-      </td>
-    </tr>
-    <tr>
-      <td nowrap class="tg-0pky"><b>Sentence 5</b></td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/NeuralHMM/2State/HiFiGAN/NeuralHMM1AR2State_HiFiGAN_hvd_005.wav" type="audio/wav">
-        </audio>
-      </td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/NeuralHMM/2State/HiFiGAN/NeuralHMM1AR2State_Postnet_HiFiGAN_hvd_005.wav" type="audio/wav">
-        </audio>
-      </td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/Tacotron/TacotronWOPostnet/HiFiGAN/Tacotron_HiFiGAN_hvd_005.wav">
-        </audio>
-      </td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/Tacotron/TacotronWPostnet/HiFiGAN/Tacotron_Postnet_HiFiGAN_hvd_005.wav" type="audio/wav">
-        </audio>
-      </td>
-    </tr>
-    <tr>
-      <td nowrap class="tg-0pky"><b>Sentence 6</b></td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/NeuralHMM/2State/HiFiGAN/NeuralHMM1AR2State_HiFiGAN_hvd_006.wav" type="audio/wav">
-        </audio>
-      </td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/NeuralHMM/2State/HiFiGAN/NeuralHMM1AR2State_Postnet_HiFiGAN_hvd_006.wav" type="audio/wav">
-        </audio>
-      </td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/Tacotron/TacotronWOPostnet/HiFiGAN/Tacotron_HiFiGAN_hvd_006.wav">
-        </audio>
-      </td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/Tacotron/TacotronWPostnet/HiFiGAN/Tacotron_Postnet_HiFiGAN_hvd_006.wav" type="audio/wav">
-        </audio>
-      </td>
-    </tr>
-    <tr>
-      <td nowrap class="tg-0pky"><b>Sentence 7</b></td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/NeuralHMM/2State/HiFiGAN/NeuralHMM1AR2State_HiFiGAN_hvd_007.wav" type="audio/wav">
-        </audio>
-      </td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/NeuralHMM/2State/HiFiGAN/NeuralHMM1AR2State_Postnet_HiFiGAN_hvd_007.wav" type="audio/wav">
-        </audio>
-      </td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/Tacotron/TacotronWOPostnet/HiFiGAN/Tacotron_HiFiGAN_hvd_007.wav">
-        </audio>
-      </td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/Tacotron/TacotronWPostnet/HiFiGAN/Tacotron_Postnet_HiFiGAN_hvd_007.wav" type="audio/wav">
-        </audio>
-      </td>
-    </tr>
-    <tr>
-      <td nowrap class="tg-0pky"><b>Sentence 8</b></td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/NeuralHMM/2State/HiFiGAN/NeuralHMM1AR2State_HiFiGAN_hvd_008.wav" type="audio/wav">
-        </audio>
-      </td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/NeuralHMM/2State/HiFiGAN/NeuralHMM1AR2State_Postnet_HiFiGAN_hvd_008.wav" type="audio/wav">
-        </audio>
-      </td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/Tacotron/TacotronWOPostnet/HiFiGAN/Tacotron_HiFiGAN_hvd_008.wav">
-        </audio>
-      </td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/Tacotron/TacotronWPostnet/HiFiGAN/Tacotron_Postnet_HiFiGAN_hvd_008.wav" type="audio/wav">
-        </audio>
-      </td>
-    </tr>
-    <tr>
-      <td nowrap class="tg-0pky"><b>Sentence 9</b></td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/NeuralHMM/2State/HiFiGAN/NeuralHMM1AR2State_HiFiGAN_hvd_009.wav" type="audio/wav">
-        </audio>
-      </td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/NeuralHMM/2State/HiFiGAN/NeuralHMM1AR2State_Postnet_HiFiGAN_hvd_009.wav" type="audio/wav">
-        </audio>
-      </td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/Tacotron/TacotronWOPostnet/HiFiGAN/Tacotron_HiFiGAN_hvd_009.wav">
-        </audio>
-      </td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/Tacotron/TacotronWPostnet/HiFiGAN/Tacotron_Postnet_HiFiGAN_hvd_009.wav" type="audio/wav">
-        </audio>
-      </td>
-    </tr>
-    <tr>
-      <td nowrap class="tg-0pky"><b>Sentence 10</b></td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/NeuralHMM/2State/HiFiGAN/NeuralHMM1AR2State_HiFiGAN_hvd_010.wav" type="audio/wav">
-        </audio>
-      </td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/NeuralHMM/2State/HiFiGAN/NeuralHMM1AR2State_Postnet_HiFiGAN_hvd_010.wav" type="audio/wav">
-        </audio>
-      </td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/Tacotron/TacotronWOPostnet/HiFiGAN/Tacotron_HiFiGAN_hvd_010.wav">
-        </audio>
-      </td>
-      <td class="tg-0pky">
-        <audio controls>
-          <source src="./audio/Tacotron/TacotronWPostnet/HiFiGAN/Tacotron_Postnet_HiFiGAN_hvd_010.wav" type="audio/wav">
-        </audio>
-      </td>
-    </tr>
-
-
-
-  </tbody>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/VOC/RyanVariations/5.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/RyanVariations/5a.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/RyanVariations/5b.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OFND/RyanVariations/5a.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OFND/RyanVariations/5b.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OFZT/RyanVariations/5a.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OFZT/RyanVariations/5b.wav" type="audio/wav">
+      </audio>
+    </td>
+  </tr>
+</tbody>
 </table>
 
 
-## Citation information
+## Faster finetuning to different voices
 
-```
-@inproceedings{mehta2022neural,
-  title={Neural {HMM}s are all you need (for high-quality attention-free {TTS})},
-  author={Mehta, Shivam and Sz{\'e}kely, {\'E}va and Beskow, Jonas and Henter, Gustav Eje},
-  booktitle={Proc. ICASSP},
-  year={2022}
-}
-```
-
-<audio controls>
-    <source src="./audio/NeuralHMM/thank_you.wav" type="audio/wav">
-</audio>
+We finetuned our model from the RyanSpeech 100k checkpoint on several English datasets. The model adapted to the speaker style and accent-specific pronunciations within 5000 updates. This shows that finetuning on low-resource datasets is an effective way to adapt the model to different voices.
 
 
-[![Visits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fshivammehta007.github.io%2FNeural-HMM%2F&count_bg=%23409CFF&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=hits&edge_flat=false)](https://shivammehta007.github.io/Neural-HMM/)
+<table class="tg">
+<thead>
+  <tr>
+    <th class="tg-fymr">Dataset</th>
+    <td class="tg-0pky"><a href="https://www.iitm.ac.in/donlab/tts/index.php">Indic TTS</a></td>
+    <td class="tg-0pky"><a href="https://psi.engr.tamu.edu/l2-arctic-corpus/">L2 Arctic</a></td>
+    <td class="tg-0pky"><a href="https://psi.engr.tamu.edu/l2-arctic-corpus/">L2 Arctic</a></td>
+    <td class="tg-0pky"><a href="https://github.com/OscarVanL/LibriTTS-British-Accents">LibriTTS-British</a></td>
+    <td class="tg-0pky"><a href="https://www.openslr.org/70/">SLR70 (Nigerian English)</a></td>
+  </tr>
+    <tr>
+    <th class="tg-fymr">Duration (hours)</th>
+    <td class="tg-0pky">~6.97</td>
+    <td class="tg-0pky">~1.20</td>
+    <td class="tg-0pky">~1.08</td>
+    <td class="tg-0pky">0.44</td>
+    <td class="tg-0pky">0.45</td>
+  </tr>
+  <tr>
+    <th class="tg-fymr">Speaker / ID</th>
+    <td class="tg-0pky">Male</td>
+    <td class="tg-0pky">L1 Arabic (YBAA)</td>
+    <td class="tg-0pky">L1 Mandarin (TXHC)</td>
+    <td class="tg-0pky">7700</td>
+    <td class="tg-0pky">07508</td>
+  </tr>
+  <tr>
+    <th class="tg-fymr"># of finetuning iterations</th>
+    <td class="tg-0pky">5000</td>
+    <td class="tg-0pky">5000</td>
+    <td class="tg-0pky">5000</td>
+    <td class="tg-0pky">5000</td>
+    <td class="tg-0pky">5000</td>
+  </tr>
+  <!-- <tr>
+    <th class="tg-fymr">Harvard Sentence #</th>
+    <td class="tg-0pky"></td>
+    <td class="tg-0pky"></td>
+    <td class="tg-0pky"></td>
+    <td class="tg-0pky"></td>
+    <td class="tg-0pky"></td>
+  </tr> -->
+</thead>
+<tbody>
+  <tr>
+    <th class="tg-fymr">Harvard Sentence 001</th>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/DifferentSpeakers/Indian_1.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/DifferentSpeakers/Arab_1.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/DifferentSpeakers/Mandarin_1.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/DifferentSpeakers/British_1.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/DifferentSpeakers/Nigerian_1.wav" type="audio/wav">
+      </audio>
+    </td>
+  </tr>
+  <tr>
+    <th class="tg-fymr">Harvard Sentence 002</th>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/DifferentSpeakers/Indian_2.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/DifferentSpeakers/Arab_2.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/DifferentSpeakers/Mandarin_2.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/DifferentSpeakers/British_2.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/DifferentSpeakers/Nigerian_2.wav" type="audio/wav">
+      </audio>
+    </td>
+  </tr>
+  <tr>
+    <th class="tg-fymr">Harvard Sentence 003</th>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/DifferentSpeakers/Indian_3.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/DifferentSpeakers/Arab_3.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/DifferentSpeakers/Mandarin_3.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/DifferentSpeakers/British_3.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/DifferentSpeakers/Nigerian_3.wav" type="audio/wav">
+      </audio>
+    </td>
+  </tr>
+  <tr>
+    <th class="tg-fymr">Harvard Sentence 004</th>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/DifferentSpeakers/Indian_4.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/DifferentSpeakers/Arab_4.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/DifferentSpeakers/Mandarin_4.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/DifferentSpeakers/British_4.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/DifferentSpeakers/Nigerian_4.wav" type="audio/wav">
+      </audio>
+    </td>
+  </tr>
+  <tr>
+    <th class="tg-fymr">Harvard Sentence 005</th>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/DifferentSpeakers/Indian_5.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/DifferentSpeakers/Arab_5.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/DifferentSpeakers/Mandarin_5.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/DifferentSpeakers/British_5.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/DifferentSpeakers/Nigerian_5.wav" type="audio/wav">
+      </audio>
+    </td>
+  </tr>
+  <tr>
+    <th class="tg-fymr">Harvard Sentence 006</th>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/DifferentSpeakers/Indian_6.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/DifferentSpeakers/Arab_6.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/DifferentSpeakers/Mandarin_6.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/DifferentSpeakers/British_6.wav" type="audio/wav">
+      </audio>
+    </td>
+    <td class="tg-0pky">
+      <audio id="audio-small" controls>
+              <source src="./audio/OF/DifferentSpeakers/Nigerian_6.wav" type="audio/wav">
+      </audio>
+    </td>
+  </tr>
+</tbody>
+</table>

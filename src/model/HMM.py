@@ -30,7 +30,7 @@ class HMM(nn.Module):
 
         if self.hparams.n_frames_per_step < 1:
             raise ValueError(
-                "Being an Autoregressive model NeuralHMM requires value > 0 for  \
+                "Being an Autoregressive model OverFlow requires value > 0 for  \
                 n_frames_per_step in hparams the given value is {}".format(
                     hparams.n_frames_per_step
                 )
@@ -351,7 +351,7 @@ class HMM(nn.Module):
         if not T:
             T = self.hparams.max_sampling_time
 
-        self.N = encoder_outputs.shape[1]
+        self.N = encoder_outputs.shape[1] - 1
         if self.hparams.n_frames_per_step > 0:
             ar_mel_inputs = self.go_tokens.unsqueeze(0)
         else:

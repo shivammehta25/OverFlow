@@ -122,7 +122,7 @@ audio {
 
 ## Summary
 
-We propose a new approach, **[OverFlow][github_link]**, to address the shortcomings of [neural HMM TTS][Neural_HMM_link] by adding flows over them. Having a stronger probabilistic model, we can now describe the highly non-Gaussian distribution of speech acoustics, obtaining better likelihoods and resulting in improvements in pronunciation and naturalness. We show that our model converges to lower word error rate (WER) faster and achieves higher naturalness scores than comparable methods. The resulting system:
+We propose a new approach, **[OverFlow][github_link]**, to address the shortcomings of [neural HMM TTS][Neural_HMM_link] (a type of transducer TTS) by adding flows over them. Having a stronger probabilistic model, we can now describe the highly non-Gaussian distribution of speech acoustics, obtaining better likelihoods and resulting in improvements in pronunciation and naturalness. We show that our model converges to lower word error rate (WER) faster and achieves higher naturalness scores than comparable methods. The resulting system:
 * Learns to speak and align fast
 * Is fully probabilistic
 * Can generate good quality speech at many temperatures

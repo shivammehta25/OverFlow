@@ -25,6 +25,8 @@
 <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
 <meta name="msapplication-TileColor" content="#da532c">
 <meta name="theme-color" content="#ffffff">
+<meta name="description" content="This page presents listening examples for our new TTS model OverFlow, links to code, pretrained models, and our paper.">
+
 </head>
 
 <style type="text/css">
@@ -120,22 +122,20 @@ audio {
 
 ## Summary
 
-We propose a new approach **[OverFlow][github_link]** to address the shortcomings of [neural-HMM TTS][Neural_HMM_link] by adding flows over them. We model the distribution of the latent space of the neural-HMM TTS using normalizing flows. Having a stronger probabilistic model, we can now model the highly non-Gaussian distribution of speech acoustics resulting in improvements in pronunciation and naturalness. We showed that our model converges to lower word error rate (WER) faster and achieves higher naturalness scores than comparable methods. The resulting system:
+We propose a new approach, **[OverFlow][github_link]**, to address the shortcomings of [neural HMM TTS][Neural_HMM_link] by adding flows over them. Having a stronger probabilistic model, we can now describe the highly non-Gaussian distribution of speech acoustics, obtaining better likelihoods and resulting in improvements in pronunciation and naturalness. We show that our model converges to lower word error rate (WER) faster and achieves higher naturalness scores than comparable methods. The resulting system:
 * Learns to speak and align fast
-* Is fully probabilistic and compute tighter bounds on the data likelihood
-* Can generate samples at different temperatures
-* Requires small amount of data
-* Can adapt to new speaker with limited data (Should we put it here?)
+* Is fully probabilistic
+* Can generate good quality speech at many temperatures
+* Can adapt to new speakers with limited data
 
-[Neural-HMM TTS][Neural_HMM_link] fuse classical HMM-based statistical speech synthesis and modern neural text-to-speech (TTS) retaining the best of both approaches. They require fewer data and fewer training updates to work while being less prone to gibberish output caused by neural attention failures. However, they could not model the highly non-Gaussian distribution of speech acoustics and despite being probabilistic we could not sample high-quality speech samples. To address these limitations, we propose a new approach **[OverFlow][github_link]** to improve the performance of neural HMMs by putting flows on top of them. This results in a powerful fully probabilistic model of durations and speech acoustics that can be trained using exact maximum likelihood giving more accurate pronunciations and better speech quality than comparable methods with or without sampling from the model.
+For more information, please [read our paper][github_link].
 
-
-## Architecture
+<!-- ## Architecture -->
 
 
 ## Code
 
-Code is available in our [Github repository][github_link], along with a pre-trained models.
+Code is available in our [GitHub repository][github_link], along with pre-trained models.
 
 <!-- <script >
 function playAudio(url) {
@@ -147,7 +147,7 @@ function playAudio(url) {
 </script> -->
 ## Stimuli from the listening tests
 
-<span style="font-weight: bold">Dataset:</span> [LJ-Speech](https://keithito.com/LJ-Speech-Dataset/) <br>
+<span style="font-weight: bold">Dataset:</span> [LJ Speech](https://keithito.com/LJ-Speech-Dataset/) <br>
 <span style="font-weight: bold">Training data duration:</span> ~22.8 hours
 
 <table class="tg">
@@ -473,7 +473,7 @@ function playAudio(url) {
   <thead>
     <tr>
       <th class="tg-0pky">Sentence</th>
-      <th class="tg-0pky">VocodedSpeech</th>
+      <th class="tg-0pky">VOC</th>
       <th class="tg-0pky">OF</th>
       <th class="tg-0pky">OFND</th>
       <th class="tg-0pky">GTTS</th>
@@ -720,7 +720,7 @@ function playAudio(url) {
     <th class="tg-0pky" colspan="2">OFZT</th>
   </tr>
   <tr>
-    <th class="tg-0pky" nowrap></th>
+    <th class="tg-0pky" nowrap>Held-out utterance</th>
     <th class="tg-0pky" nowrap>Realisation 1</th>
     <th class="tg-0pky" nowrap>Realisation 2</th>
     <th class="tg-0pky" nowrap>Realisation 1</th>
@@ -921,7 +921,7 @@ function playAudio(url) {
 
 ## Faster finetuning to different voices
 
-We finetuned our model with RyanSpeech's 100k checkpoint with different datasets. The model adapted the speaker style and accent-specific pronunciations within 5000 updates. This shows that finetuning with low-resource datasets is a nice way to finetune the model for different speakers.
+We finetuned our model from the RyanSpeech 100k checkpoint on several English datasets. The model adapted to the speaker style and accent-specific pronunciations within 5000 updates. This shows that finetuning on low-resource datasets is an effective way to adapt the model to different voices.
 
 
 <table class="tg">
@@ -932,7 +932,7 @@ We finetuned our model with RyanSpeech's 100k checkpoint with different datasets
     <td class="tg-0pky"><a href="https://psi.engr.tamu.edu/l2-arctic-corpus/">L2 Arctic</a></td>
     <td class="tg-0pky"><a href="https://psi.engr.tamu.edu/l2-arctic-corpus/">L2 Arctic</a></td>
     <td class="tg-0pky"><a href="https://github.com/OscarVanL/LibriTTS-British-Accents">LibriTTS-British</a></td>
-    <td class="tg-0pky"><a href="https://www.openslr.org/70/">SLR70</a></td>
+    <td class="tg-0pky"><a href="https://www.openslr.org/70/">SLR70 (Nigerian English)</a></td>
   </tr>
     <tr>
     <th class="tg-fymr">Duration (hours)</th>
@@ -969,7 +969,7 @@ We finetuned our model with RyanSpeech's 100k checkpoint with different datasets
 </thead>
 <tbody>
   <tr>
-    <th class="tg-fymr">Sentence 1</th>
+    <th class="tg-fymr">Harvard Sentence 001</th>
     <td class="tg-0pky">
       <audio id="audio-small" controls>
               <source src="./audio/OF/DifferentSpeakers/Indian_1.wav" type="audio/wav">
@@ -997,7 +997,7 @@ We finetuned our model with RyanSpeech's 100k checkpoint with different datasets
     </td>
   </tr>
   <tr>
-    <th class="tg-fymr">Sentence 2</th>
+    <th class="tg-fymr">Harvard Sentence 002</th>
     <td class="tg-0pky">
       <audio id="audio-small" controls>
               <source src="./audio/OF/DifferentSpeakers/Indian_2.wav" type="audio/wav">
@@ -1025,7 +1025,7 @@ We finetuned our model with RyanSpeech's 100k checkpoint with different datasets
     </td>
   </tr>
   <tr>
-    <th class="tg-fymr">Sentence 3</th>
+    <th class="tg-fymr">Harvard Sentence 003</th>
     <td class="tg-0pky">
       <audio id="audio-small" controls>
               <source src="./audio/OF/DifferentSpeakers/Indian_3.wav" type="audio/wav">
@@ -1053,7 +1053,7 @@ We finetuned our model with RyanSpeech's 100k checkpoint with different datasets
     </td>
   </tr>
   <tr>
-    <th class="tg-fymr">Sentence 4</th>
+    <th class="tg-fymr">Harvard Sentence 004</th>
     <td class="tg-0pky">
       <audio id="audio-small" controls>
               <source src="./audio/OF/DifferentSpeakers/Indian_4.wav" type="audio/wav">
@@ -1081,7 +1081,7 @@ We finetuned our model with RyanSpeech's 100k checkpoint with different datasets
     </td>
   </tr>
   <tr>
-    <th class="tg-fymr">Sentence 5</th>
+    <th class="tg-fymr">Harvard Sentence 005</th>
     <td class="tg-0pky">
       <audio id="audio-small" controls>
               <source src="./audio/OF/DifferentSpeakers/Indian_5.wav" type="audio/wav">
@@ -1109,7 +1109,7 @@ We finetuned our model with RyanSpeech's 100k checkpoint with different datasets
     </td>
   </tr>
   <tr>
-    <th class="tg-fymr">Sentence 6</th>
+    <th class="tg-fymr">Harvard Sentence 006</th>
     <td class="tg-0pky">
       <audio id="audio-small" controls>
               <source src="./audio/OF/DifferentSpeakers/Indian_6.wav" type="audio/wav">

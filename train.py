@@ -97,7 +97,6 @@ if __name__ == "__main__":
         max_epochs=hparams.max_epochs,
         stochastic_weight_avg=hparams.stochastic_weight_avg,
         precision=hparams.precision,
-        # additional trainer arguments here
     )
 
     trainer.fit(model, data_module)

@@ -17,8 +17,8 @@
 [docker_install_link]: https://docs.docker.com/get-docker/
 [tacotron2_link]: https://github.com/NVIDIA/tacotron2
 [glow_tts_link]: https://github.com/jaywalnut310/glow-tts
-[pretrained_model_link_female]: https://github.com/shivammehta25/OverFlow/releases/download/Neural-HMM/OverFlow-Female.ckpt
-[pretrained_model_link_male]: https://github.com/shivammehta25/OverFlow/releases/download/Neural-HMM/OverFlow-Male.ckpt
+[pretrained_model_link_female]: https://github.com/shivammehta25/OverFlow/releases/download/OverFlow/OverFlow-Female.ckpt
+[pretrained_model_link_male]: https://github.com/shivammehta25/OverFlow/releases/download/OverFlow/OverFlow-Male.ckpt
 [hifigan_all]: https://drive.google.com/drive/folders/1-eEYTB5Av9jNql0WGBlRoi-WH2J7bp5Y
 [hifigan_t2]: https://drive.google.com/drive/folders/1dqpUYEYF_hH7T0rII9_VQbps45FvNBqf
 [pytorch_lightning_link]: https://github.com/PyTorchLightning/pytorch-lightning

@@ -2,7 +2,7 @@
 ##### [Shivam Mehta][shivam_profile], [Éva Székely][eva_profile], [Jonas Beskow][jonas_profile], and [Gustav Eje Henter][gustav_profile]
 ---
 
-[paper_link]: https://arxiv.org/abs/2108.13320
+[paper_link]: https://shivammehta25.github.io/OverFlow/
 
 [github_link]: https://github.com/shivammehta25/OverFlow
 [shivam_profile]: https://www.kth.se/profile/smehta

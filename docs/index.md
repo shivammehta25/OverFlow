@@ -919,7 +919,7 @@ function playAudio(url) {
 </table>
 
 
-## Faster finetuning to different voices
+## Fast finetuning to different voices
 
 We finetuned our model from the RyanSpeech 100k checkpoint on several English datasets. The model adapted to the speaker style and accent-specific pronunciations within 5000 updates. This shows that finetuning on low-resource datasets is an effective way to adapt the model to different voices.
 
@@ -1138,3 +1138,7 @@ We finetuned our model from the RyanSpeech 100k checkpoint on several English da
   </tr>
 </tbody>
 </table>
+
+
+
+[![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fshivammehta25.github.io%2FOverFlow&count_bg=%23409CFF&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=hits&edge_flat=false)](https://hits.seeyoufarm.com)

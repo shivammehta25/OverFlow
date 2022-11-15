@@ -123,7 +123,7 @@ audio {
 ## Summary
 
 We propose a new approach, **OverFlow**, to address the shortcomings of [neural HMM TTS][Neural_HMM_link] (a type of transducer TTS) by adding flows over them. Having a stronger probabilistic model, we can now describe the highly non-Gaussian distribution of speech acoustics, obtaining better likelihoods and resulting in improvements in pronunciation and naturalness. We show that our model converges to lower word error rate (WER) faster and achieves higher naturalness scores than comparable methods. The resulting system:
-* Learns to speak and align fast
+* Quickly learns to speak and align
 * Is fully probabilistic
 * Can generate good quality speech at many temperatures
 * Can adapt to new speakers with limited data
@@ -163,7 +163,7 @@ function playAudio(url) {
   </thead>
   <tbody>
     <tr>
-      <th class="tg-fymr"></th>
+      <th class="tg-fymr">Condition</th>
       <th class="tg-fymr">VOC</th>
       <th class="tg-fymr">OF</th>
       <th class="tg-fymr">OFND (No Dropout)</th>

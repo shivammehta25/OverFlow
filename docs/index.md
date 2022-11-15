@@ -1,7 +1,7 @@
 # OverFlow: Putting flows on top of neural transducers for better TTS
 ##### [Shivam Mehta][shivam_profile], [Ambika Kirkland][ambika_profile], [Harm Lameris][harm_profile], [Jonas Beskow][jonas_profile], [Éva Székely][eva_profile], and [Gustav Eje Henter][gustav_profile]
 
-[arxiv_link]: https://arxiv.org/abs/2108.13320
+[arxiv_link]: https://arxiv.org/abs/2211.06892
 [github_link]: https://github.com/shivammehta25/OverFlow
 [shivam_profile]: https://www.kth.se/profile/smehta
 [ambika_profile]: https://www.kth.se/profile/kirkland
@@ -128,7 +128,7 @@ We propose a new approach, **OverFlow**, to address the shortcomings of [neural 
 * Can generate good quality speech at many temperatures
 * Can adapt to new speakers with limited data
 
-For more information, please **[read our paper][github_link]**.
+For more information, please **[read our paper][arxiv_link]**.
 
 <!-- ## Architecture -->
 

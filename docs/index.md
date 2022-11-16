@@ -939,8 +939,8 @@ We finetuned our model from the RyanSpeech 100k checkpoint on several English da
     <td class="tg-0pky">~6.97</td>
     <td class="tg-0pky">~1.20</td>
     <td class="tg-0pky">~1.08</td>
-    <td class="tg-0pky">0.44</td>
-    <td class="tg-0pky">0.45</td>
+    <td class="tg-0pky">~0.44</td>
+    <td class="tg-0pky">~0.45</td>
   </tr>
   <tr>
     <th class="tg-fymr">Speaker / ID</th>

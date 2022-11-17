@@ -79,7 +79,12 @@ If you have any questions or comments, please open an [issue][github_new_issue_l
 ## Citation information
 If you use or build on our method or code for your research, please cite our paper:
 ```
-Coming Soon
+@article{mehta2022overflow,
+  title={OverFlow: Putting flows on top of neural transducers for better {TTS}},
+  author={Mehta, Shivam and Kirkland, Ambika and Lameris, Harm and Beskow, Jonas and Sz{\'e}kely, {\'E}va and Henter, Gustav Eje},
+  journal={arXiv preprint arXiv:2211.06892},
+  year={2022}
+}
 ```
 ## Acknowledgements
 The code implementation is based on [Nvidia's implementation of Tacotron 2][tacotron2_link], [Glow TTS][glow_tts_link] and uses [PyTorch Lightning][pytorch_lightning_link] for boilerplate-free code.

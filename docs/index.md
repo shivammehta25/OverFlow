@@ -1185,5 +1185,5 @@ We finetuned our model from the RyanSpeech 100k checkpoint on several English da
 </table>
 
 
-<!--
-[![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fshivammehta25.github.io%2FOverFlow&count_bg=%23409CFF&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=hits&edge_flat=false)](https://hits.seeyoufarm.com) -->
+
+[![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fshivammehta25.github.io%2FOverFlow&count_bg=%23409CFF&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=hits&edge_flat=false)](https://hits.seeyoufarm.com)

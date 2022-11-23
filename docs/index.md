@@ -128,9 +128,54 @@ We propose a new approach, **OverFlow**, to address the shortcomings of [neural 
 * Can generate good quality speech at many temperatures
 * Can adapt to new speakers with limited data
 
+Find reading boring? Try hearing the summary spoken by:
+
+<table class="tg">
+  <thead>
+    <tr>
+      <th class="tg-fymr"><a href="https://keithito.com/LJ-Speech-Dataset/" style="color:white;">LJ Speech</a></th>
+      <th class="tg-fymr"><a href="https://arxiv.org/abs/2106.08468" style="color:white;">RyanSpeech</a></th>
+      <th class="tg-fymr"><a href="https://www.iitm.ac.in/donlab/tts/index.php" style="color:white;">IndicTTS (Female)</a></th>
+      <th class="tg-fymr"><a href="https://www.iitm.ac.in/donlab/tts/index.php" style="color:white;">IndicTTS (Male)</a></th>
+      <th class="tg-fymr"><a href="https://github.com/OscarVanL/LibriTTS-British-Accents" style="color:white;">L2 Arctic (Mandarin)</a></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <audio id="audio-small" controls>
+              <source src="./audio/OF/Summary/lj_summary.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td>
+        <audio id="audio-small" controls>
+              <source src="./audio/OF/Summary/ryan_summary.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td>
+        <audio id="audio-small" controls>
+              <source src="./audio/OF/Summary/indic_female_summary.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td>
+        <audio id="audio-small" controls>
+              <source src="./audio/OF/Summary/indic_male_summary.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td>
+        <audio id="audio-small" controls>
+              <source src="./audio/OF/Summary/mandarin_summary.wav" type="audio/wav">
+        </audio>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+
 For more information, please **[read our paper][arxiv_link]**.
 
-<!-- ## Architecture -->
+## Architecture
+![OverFlow architecture](images/model_architecture.png "Architecture of OverFlow")
 
 
 ## Code
@@ -707,7 +752,7 @@ function playAudio(url) {
 ## Variation in synthesis
 
 
-<span style="font-weight: bold">Dataset:</span> [RyanSpeech](https://keithito.com/LJ-Speech-Dataset/) <br>
+<span style="font-weight: bold">Dataset:</span> [RyanSpeech](https://arxiv.org/abs/2106.08468) <br>
 <span style="font-weight: bold">Training data duration:</span> ~9 hours
 
 
@@ -1140,5 +1185,5 @@ We finetuned our model from the RyanSpeech 100k checkpoint on several English da
 </table>
 
 
-
-[![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fshivammehta25.github.io%2FOverFlow&count_bg=%23409CFF&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=hits&edge_flat=false)](https://hits.seeyoufarm.com)
+<!--
+[![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fshivammehta25.github.io%2FOverFlow&count_bg=%23409CFF&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=hits&edge_flat=false)](https://hits.seeyoufarm.com) -->

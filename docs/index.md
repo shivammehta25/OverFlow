@@ -128,7 +128,7 @@ We propose a new approach, **OverFlow**, to address the shortcomings of [neural 
 * Can generate good quality speech at many temperatures
 * Can adapt to new speakers with limited data
 
-Find reading boring? Try hearing the summary spoken by:
+Find reading boring? Try listening the summary by different speakers:
 
 <table class="tg">
   <thead>

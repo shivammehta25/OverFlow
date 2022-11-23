@@ -175,7 +175,7 @@ Find reading boring? Try listening the summary by different speakers:
 For more information, please **[read our paper][arxiv_link]**.
 
 ## Architecture
-![OverFlow architecture](images/model_architecture.png "Architecture of OverFlow")
+<img src="images/model_architecture.png" alt="Architecture of OverFlow" width="800"/>
 
 
 ## Code

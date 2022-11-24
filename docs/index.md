@@ -27,6 +27,13 @@
   <meta property="og:image" content="images/social_preview.jpg" />
   <meta property="twitter:image" content="images/social_preview.jpg" />
   <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://shivammehta25.github.io/OverFlow/" />
+  <meta property="og:site_name" content="OverFlow" />
+  <meta name="twitter:card" content="images/social_preview.jpg" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="keywords" content="tts, text to speech, machine learning, deep learning, speech synthesis, research, phd">
+  <meta name="description" content="This page presents listening examples for our new TTS model OverFlow, links to code, pretrained models, and our paper." />
 </head>
 
 <style type="text/css">

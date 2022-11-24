@@ -1,3 +1,16 @@
+<!DOCTYPE html >
+<head>
+<link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
+<link rel="icon" type="image/x-icon" href="favicon/favicon-ico">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+<meta name="msapplication-TileColor" content="#da532c">
+<meta charset="UTF-8">
+<meta name="theme-color" content="#ffffff">
+<meta name="description" content="This page presents listening examples for our new TTS model OverFlow, links to code, pretrained models, and our paper.">
+<meta property="og:image" content="images/social_preview.jpg" />
+</head>
+
 # OverFlow: Putting flows on top of neural transducers for better TTS
 ##### [Shivam Mehta][shivam_profile], [Ambika Kirkland][ambika_profile], [Harm Lameris][harm_profile], [Jonas Beskow][jonas_profile], [Éva Székely][eva_profile], and [Gustav Eje Henter][gustav_profile]
 
@@ -16,18 +29,6 @@
 [Indic-TTS_link]: https://www.iitm.ac.in/donlab/tts/index.php
 [SLR70_link]: https://www.openslr.org/70/
 [LibriTTS_British_link]: https://github.com/OscarVanL/LibriTTS-British-Accents
-
-<head>
-<link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
-<link rel="manifest" href="/site.webmanifest">
-<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
-<meta name="msapplication-TileColor" content="#da532c">
-<meta name="theme-color" content="#ffffff">
-<meta name="description" content="This page presents listening examples for our new TTS model OverFlow, links to code, pretrained models, and our paper.">
-
-</head>
 
 <style type="text/css">
   .tg {
@@ -175,7 +176,7 @@ Find reading boring? Try listening the summary by different speakers:
 For more information, please **[read our paper][arxiv_link]**.
 
 ## Architecture
-<img src="images/model_architecture.png" alt="Architecture of OverFlow" width="800"/>
+<img src="images/model_architecture.png" alt="Architecture of OverFlow" width="650"/>
 
 
 ## Code

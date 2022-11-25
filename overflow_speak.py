@@ -108,8 +108,8 @@ def validate_args(args):
     if args.vocoder == "hifigan":
         assert os.path.isfile(
             args.hifigan_checkpoint_path
-        ), f"[-] Vocoder checkpoint path not found at {args.vocoder_checkpoint_path}"
-        assert os.path.isfile(args.hifigan_config), f"[-] Vocoder config file not found at {args.vocoder_config}"
+        ), f"[-] Vocoder checkpoint path not found at {args.hifigan_checkpoint_path}"
+        assert os.path.isfile(args.hifigan_config), f"[-] Vocoder config file not found at {args.hifigan_config}"
 
 
 def restricted_speaking_rate(x):
@@ -137,7 +137,9 @@ def speak():
     parser.add_argument(
         "-hp", "--hifigan_checkpoint_path", type=str, default="g_02500000", help="hifigan checkpoint path"
     )
-    parser.add_argument("-hc", "--hifigan_config", type=str, default="hifigan/config.json", help="hifigan config file")
+    parser.add_argument(
+        "-hc", "--hifigan_config", type=str, default="hifigan/config_v1.json", help="hifigan config file"
+    )
     parser.add_argument("-d", "--device", type=str, default="cuda", help="device to use", choices=["cuda", "cpu"]),
     parser.add_argument("-sr", "--speaking_rate", type=restricted_speaking_rate, default=0.55, help="speaking rate")
     parser.add_argument("-st", "--sampling_temp", type=restricted_speaking_rate, default=0.667, help="speaking rate")

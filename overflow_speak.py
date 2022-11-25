@@ -69,6 +69,7 @@ def synthesise(model, sequence, vocoder, denoiser, sampling_temp):
 def main(args):
     hparams = create_hparams()
     model = load_model(args.checkpoint_path)
+    configure_model(model, args.speaking_rate)
     if args.vocoder == "hifigan":
         vocoder = load_hifigan(args.hifigan_checkpoint_path, args.hifigan_config)
         denoiser = Denoiser(vocoder, mode="zeros")

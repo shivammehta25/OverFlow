@@ -26,7 +26,10 @@
 
 This is the official code repository for the paper "[OverFlow: Putting flows on top of neural transducers for better TTS][paper_link]". For audio examples, visit our [demo page][demo_page]. [pre-trained model (female)][pretrained_model_link_female] and [pre-trained model (male)][pretrained_model_link_male] are also available.
 
-<!-- ![Synthesising from Neural-HMM](docs/images/model_video.gif) -->
+
+<img src="docs/images/model_architecture.png" alt="Architecture of OverFlow" width="650"/>
+
+
 
 ## Setup and training using LJ Speech
 1. Download and extract the [LJ Speech dataset][ljspeech_link]. Place it in the `data` folder such that the directory becomes `data/LJSpeech-1.1`. Otherwise update the filelists in `data/filelists` accordingly.
@@ -53,8 +56,16 @@ This is the official code repository for the paper "[OverFlow: Putting flows on 
     - Alternatively, you can also use a [pre-trained RyanSpeech model][pretrained_model_link_male].
 2. Download HiFi gan pretrained [HiFiGAN model][hifigan_all].
     - We recommend using [fine tuned][hifigan_t2] on Tacotron2 if you cannot finetune on OverFlow.
-3. Run jupyter notebook and open ```synthesis.ipynb```.
+3. Run jupyter notebook and open ```synthesis.ipynb``` or use the `overflow_speak.py` file.
 
+#### For one sentence
+```bash
+python overflow_speak.py -t "Hello world" --checkpoint_path <CHECKPOINT_PATH> --hifigan_checkpoint_path <HIFIGAN_PATH>  --hifigan_config <HIFIGAN_CONFIG_PATH>
+```
+#### For multiple sentence put them into a file each sentence in a new line
+```bash
+python overflow_speak.py -f <FILENAME> --checkpoint_path <CHECKPOINT_PATH> --hifigan_checkpoint_path <HIFIGAN_PATH>  --hifigan_config <HIFIGAN_CONFIG_PATH>
+```
 
 ## Miscellaneous
 ### Mixed-precision training or full-precision training

@@ -1,7 +1,7 @@
 # OverFlow: Putting flows on top of neural transducers for better TTS
 ##### [Shivam Mehta][shivam_profile], [Ambika Kirkland][ambika_profile], [Harm Lameris][harm_profile], [Jonas Beskow][jonas_profile], [Éva Székely][eva_profile], and [Gustav Eje Henter][gustav_profile]
 
-[arxiv_link]: https://arxiv.org/abs/2108.13320
+[arxiv_link]: https://arxiv.org/abs/2211.06892
 [github_link]: https://github.com/shivammehta25/OverFlow
 [shivam_profile]: https://www.kth.se/profile/smehta
 [ambika_profile]: https://www.kth.se/profile/kirkland
@@ -18,15 +18,22 @@
 [LibriTTS_British_link]: https://github.com/OscarVanL/LibriTTS-British-Accents
 
 <head>
-<link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
-<link rel="manifest" href="/site.webmanifest">
-<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
-<meta name="msapplication-TileColor" content="#da532c">
-<meta name="theme-color" content="#ffffff">
-<meta name="description" content="This page presents listening examples for our new TTS model OverFlow, links to code, pretrained models, and our paper.">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta charset="UTF-8">
+  <meta name="theme-color" content="#ffffff">
+  <meta property="og:title" content="OverFlow: Putting flows on top of neural transducers for better TTS" />
+  <meta name="og:description" content="This page presents listening examples for our new TTS model OverFlow, links to code, pretrained models, and our paper.">
+  <meta property="og:image" content="images/social_preview.jpg" />
+  <meta property="twitter:image" content="images/social_preview.jpg" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://shivammehta25.github.io/OverFlow/" />
+  <meta property="og:site_name" content="OverFlow" />
+  <meta name="twitter:card" content="images/social_preview.jpg" />
 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="keywords" content="tts, text to speech, machine learning, deep learning, speech synthesis, research, phd">
+  <meta name="description" content="This page presents listening examples for our new TTS model OverFlow, links to code, pretrained models, and our paper." />
 </head>
 
 <style type="text/css">
@@ -123,14 +130,59 @@ audio {
 ## Summary
 
 We propose a new approach, **OverFlow**, to address the shortcomings of [neural HMM TTS][Neural_HMM_link] (a type of transducer TTS) by adding flows over them. Having a stronger probabilistic model, we can now describe the highly non-Gaussian distribution of speech acoustics, obtaining better likelihoods and resulting in improvements in pronunciation and naturalness. We show that our model converges to lower word error rate (WER) faster and achieves higher naturalness scores than comparable methods. The resulting system:
-* Learns to speak and align fast
+* Quickly learns to speak and align
 * Is fully probabilistic
 * Can generate good quality speech at many temperatures
 * Can adapt to new speakers with limited data
 
-For more information, please **[read our paper][github_link]**.
+Find reading boring? Try listening the summary by different speakers:
 
-<!-- ## Architecture -->
+<table class="tg">
+  <thead>
+    <tr>
+      <th class="tg-fymr"><a href="https://keithito.com/LJ-Speech-Dataset/" style="color:white;">LJ Speech</a></th>
+      <th class="tg-fymr"><a href="https://arxiv.org/abs/2106.08468" style="color:white;">RyanSpeech</a></th>
+      <th class="tg-fymr"><a href="https://www.iitm.ac.in/donlab/tts/index.php" style="color:white;">IndicTTS (Female)</a></th>
+      <th class="tg-fymr"><a href="https://www.iitm.ac.in/donlab/tts/index.php" style="color:white;">IndicTTS (Male)</a></th>
+      <th class="tg-fymr"><a href="https://github.com/OscarVanL/LibriTTS-British-Accents" style="color:white;">L2 Arctic (Mandarin)</a></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <audio id="audio-small" controls>
+              <source src="./audio/OF/Summary/lj_summary.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td>
+        <audio id="audio-small" controls>
+              <source src="./audio/OF/Summary/ryan_summary.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td>
+        <audio id="audio-small" controls>
+              <source src="./audio/OF/Summary/indic_female_summary.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td>
+        <audio id="audio-small" controls>
+              <source src="./audio/OF/Summary/indic_male_summary.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td>
+        <audio id="audio-small" controls>
+              <source src="./audio/OF/Summary/mandarin_summary.wav" type="audio/wav">
+        </audio>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+
+For more information, please **[read our paper][arxiv_link]**.
+
+## Architecture
+<img src="images/model_architecture.png" alt="Architecture of OverFlow" width="650"/>
 
 
 ## Code
@@ -163,7 +215,7 @@ function playAudio(url) {
   </thead>
   <tbody>
     <tr>
-      <th class="tg-fymr"></th>
+      <th class="tg-fymr">Condition</th>
       <th class="tg-fymr">VOC</th>
       <th class="tg-fymr">OF</th>
       <th class="tg-fymr">OFND (No Dropout)</th>
@@ -458,7 +510,7 @@ function playAudio(url) {
 
 ## Sampling at different temperatures
 
-<span style="font-weight: bold">Dataset:</span> [LJ-Speech](https://keithito.com/LJ-Speech-Dataset/) <br>
+<span style="font-weight: bold">Dataset:</span> [LJ Speech](https://keithito.com/LJ-Speech-Dataset/) <br>
 <span style="font-weight: bold">Training data duration:</span> ~22.8 hours
 
 
@@ -707,7 +759,7 @@ function playAudio(url) {
 ## Variation in synthesis
 
 
-<span style="font-weight: bold">Dataset:</span> [RyanSpeech](https://keithito.com/LJ-Speech-Dataset/) <br>
+<span style="font-weight: bold">Dataset:</span> [RyanSpeech](https://arxiv.org/abs/2106.08468) <br>
 <span style="font-weight: bold">Training data duration:</span> ~9 hours
 
 
@@ -939,8 +991,8 @@ We finetuned our model from the RyanSpeech 100k checkpoint on several English da
     <td class="tg-0pky">~6.97</td>
     <td class="tg-0pky">~1.20</td>
     <td class="tg-0pky">~1.08</td>
-    <td class="tg-0pky">0.44</td>
-    <td class="tg-0pky">0.45</td>
+    <td class="tg-0pky">~0.44</td>
+    <td class="tg-0pky">~0.45</td>
   </tr>
   <tr>
     <th class="tg-fymr">Speaker / ID</th>

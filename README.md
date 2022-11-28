@@ -26,7 +26,10 @@
 
 This is the official code repository for the paper "[OverFlow: Putting flows on top of neural transducers for better TTS][paper_link]". For audio examples, visit our [demo page][demo_page]. [pre-trained model (female)][pretrained_model_link_female] and [pre-trained model (male)][pretrained_model_link_male] are also available.
 
-<!-- ![Synthesising from Neural-HMM](docs/images/model_video.gif) -->
+
+<img src="docs/images/model_architecture.png" alt="Architecture of OverFlow" width="650"/>
+
+
 
 ## Setup and training using LJ Speech
 1. Download and extract the [LJ Speech dataset][ljspeech_link]. Place it in the `data` folder such that the directory becomes `data/LJSpeech-1.1`. Otherwise update the filelists in `data/filelists` accordingly.
@@ -53,8 +56,16 @@ This is the official code repository for the paper "[OverFlow: Putting flows on 
     - Alternatively, you can also use a [pre-trained RyanSpeech model][pretrained_model_link_male].
 2. Download HiFi gan pretrained [HiFiGAN model][hifigan_all].
     - We recommend using [fine tuned][hifigan_t2] on Tacotron2 if you cannot finetune on OverFlow.
-3. Run jupyter notebook and open ```synthesis.ipynb```.
+3. Run jupyter notebook and open ```synthesis.ipynb``` or use the `overflow_speak.py` file.
 
+#### For one sentence
+```bash
+python overflow_speak.py -t "Hello world" --checkpoint_path <CHECKPOINT_PATH> --hifigan_checkpoint_path <HIFIGAN_PATH>  --hifigan_config <HIFIGAN_CONFIG_PATH>
+```
+#### For multiple sentence put them into a file each sentence in a new line
+```bash
+python overflow_speak.py -f <FILENAME> --checkpoint_path <CHECKPOINT_PATH> --hifigan_checkpoint_path <HIFIGAN_PATH>  --hifigan_config <HIFIGAN_CONFIG_PATH>
+```
 
 ## Miscellaneous
 ### Mixed-precision training or full-precision training
@@ -79,7 +90,12 @@ If you have any questions or comments, please open an [issue][github_new_issue_l
 ## Citation information
 If you use or build on our method or code for your research, please cite our paper:
 ```
-Coming Soon
+@article{mehta2022overflow,
+  title={OverFlow: Putting flows on top of neural transducers for better {TTS}},
+  author={Mehta, Shivam and Kirkland, Ambika and Lameris, Harm and Beskow, Jonas and Sz{\'e}kely, {\'E}va and Henter, Gustav Eje},
+  journal={arXiv preprint arXiv:2211.06892},
+  year={2022}
+}
 ```
 ## Acknowledgements
 The code implementation is based on [Nvidia's implementation of Tacotron 2][tacotron2_link], [Glow TTS][glow_tts_link] and uses [PyTorch Lightning][pytorch_lightning_link] for boilerplate-free code.

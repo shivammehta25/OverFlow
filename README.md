@@ -22,10 +22,15 @@
 [hifigan_all]: https://drive.google.com/drive/folders/1-eEYTB5Av9jNql0WGBlRoi-WH2J7bp5Y
 [hifigan_t2]: https://drive.google.com/drive/folders/1dqpUYEYF_hH7T0rII9_VQbps45FvNBqf
 [pytorch_lightning_link]: https://github.com/PyTorchLightning/pytorch-lightning
+[coqui_tts_link]: https://github.com/coqui-ai/TTS
 
 
 This is the official code repository for the paper "[OverFlow: Putting flows on top of neural transducers for better TTS][paper_link]". For audio examples, visit our [demo page][demo_page]. [pre-trained model (female)][pretrained_model_link_female] and [pre-trained model (male)][pretrained_model_link_male] are also available.
 
+
+> ### OverFlow is now also available in [Coqui TTS][coqui_tts_link]! Making it easier for people to use and experiment with OverFlow please find the training recipe under `recipes/ljspeech/overflow` rolling out more recipes soon!
+
+*Current plan is to maintain both the repositories.*
 
 <img src="docs/images/model_architecture.png" alt="Architecture of OverFlow" width="650"/>
 

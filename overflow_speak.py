@@ -10,11 +10,11 @@ from pathlib import Path  # noqa: E402
 import numpy as np  # noqa: E402
 import soundfile as sf  # noqa: E402
 import torch  # noqa: E402
+from hifigan.env import AttrDict  # noqa: E402
+from hifigan.models import Generator  # noqa: E402
 from nltk import word_tokenize  # noqa: E402
 from tqdm.auto import tqdm  # noqa: E402
 
-from hifigan.env import AttrDict  # noqa: E402
-from hifigan.models import Generator  # noqa: E402
 from hifigandenoiser import Denoiser  # noqa: E402
 from src.hparams import create_hparams  # noqa: E402
 from src.training_module import TrainingModule  # noqa: E402

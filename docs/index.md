@@ -16,6 +16,7 @@
 [Indic-TTS_link]: https://www.iitm.ac.in/donlab/tts/index.php
 [SLR70_link]: https://www.openslr.org/70/
 [LibriTTS_British_link]: https://github.com/OscarVanL/LibriTTS-British-Accents
+[coqui_tts_link]: https://github.com/coqui-ai/TTS
 
 <head>
   <link rel="icon" type="image/x-icon" href="favicon.ico">
@@ -188,6 +189,7 @@ For more information, please **[read our paper][arxiv_link]**.
 ## Code
 
 Code is available in our [GitHub repository][github_link], along with pre-trained models.
+It is also available in [Coqui TTS][coqui_tts_link] under text to spectrogram models. Training recipe can be found under `recipes/ljspeech/OverFlow`.
 
 <!-- <script >
 function playAudio(url) {

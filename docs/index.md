@@ -136,7 +136,7 @@ We propose a new approach, **OverFlow**, to address the shortcomings of [neural 
 * Can generate good quality speech at many temperatures
 * Can adapt to new speakers with limited data
 
-Find reading boring? Try listening the summary by different speakers:
+Find reading boring? Try listening to the summary spoken by different voices:
 
 <table class="tg">
   <thead>
@@ -189,7 +189,18 @@ For more information, please **[read our paper][arxiv_link]**.
 ## Code
 
 Code is available in our [GitHub repository][github_link], along with pre-trained models.
-It is also available in [Coqui TTS][coqui_tts_link] under text to spectrogram models. Training recipe can be found under `recipes/ljspeech/OverFlow`.
+
+It is also available in [Coqui TTS][coqui_tts_link] under text to spectrogram models. The training recipe can be found under `recipes/ljspeech/OverFlow`.
+
+To synthesise from OverFlow present in [Coqui TTS][coqui_tts_link], you can use the following command:
+
+```bash
+# Install TTS
+pip install tts
+# Change --text to the desired text prompt
+# Change --out_path to the desired output path
+tts --text "Hello world!" --model_name tts_models/en/ljspeech/overflow --vocoder_name vocoder_models/en/ljspeech/hifigan_v2 --out_path output.wav
+```
 
 <!-- <script >
 function playAudio(url) {

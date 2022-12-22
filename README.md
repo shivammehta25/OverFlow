@@ -30,6 +30,14 @@ This is the official code repository for the paper "[OverFlow: Putting flows on 
 
 > ### OverFlow is now also available in [Coqui TTS][coqui_tts_link]! Making it easier for people to use and experiment with OverFlow please find the training recipe under `recipes/ljspeech/overflow` rolling out more recipes soon!
 
+```bash
+# Install TTS
+pip install tts
+# Change --text to the desired text prompt
+# Change --out_path to the desired output path
+tts --text "Hello world!" --model_name tts_models/en/ljspeech/overflow --vocoder_name vocoder_models/en/ljspeech/hifigan_v2 --out_path output.wav
+```
+
 *Current plan is to maintain both the repositories.*
 
 <img src="docs/images/model_architecture.png" alt="Architecture of OverFlow" width="650"/>

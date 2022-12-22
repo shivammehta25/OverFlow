@@ -2,7 +2,7 @@
 set -e
 
 # Docker image name for this project
-export DOCKER_IMAGE_NAME="neural-fhmm"
+export DOCKER_IMAGE_NAME="overflow"
 
 # Path to where in the docker container the project root will be mounted
 export DOCKER_WORKSPACE_PATH="/workspace"
@@ -61,7 +61,5 @@ docker run --rm -it \
   $MOUNT \
   $USER_MAP \
   --gpus all \
-  -p 8888:8888 \
-  -p 6006:6006 \
   $DETACH \
   $DOCKER_IMAGE_NAME bash

@@ -36,6 +36,7 @@ pip install tts
 # Change --out_path to the desired output path
 tts --text "Hello world!" --model_name tts_models/en/ljspeech/overflow --vocoder_name vocoder_models/en/ljspeech/hifigan_v2 --out_path output.wav
 ```
+
 *Current plan is to maintain both the repositories.*
 
 <img src="docs/images/model_architecture.png" alt="Architecture of OverFlow" width="650"/>

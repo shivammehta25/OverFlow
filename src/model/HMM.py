@@ -92,7 +92,10 @@ class HMM(nn.Module):
 
             # Get mean, std and transition vector from decoder for this timestep
             # with gradient checkpointing
-            mean, std, transition_vector = checkpoint(self.decoder, h_post_prenet, text_embeddings)
+            if self.hparams.gradient_checkpoint:
+                mean, std, transition_vector = checkpoint(self.decoder, h_post_prenet, text_embeddings)
+            else:
+                mean, std, transition_vector = self.decoder(h_post_prenet, text_embeddings)
 
             # Forward algorithm for this timestep
             if t == 0:

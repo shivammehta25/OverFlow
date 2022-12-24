@@ -54,6 +54,7 @@ def create_hparams(generate_parameters=False):
         max_epochs=50000,
         val_check_interval=100,
         save_model_checkpoint=500,
+        gradient_checkpoint=True,
         seed=1234,
         checkpoint_dir="checkpoints",
         tensorboard_log_dir="tb_logs",

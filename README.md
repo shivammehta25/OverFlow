@@ -46,8 +46,7 @@ tts --text "Hello world!" --model_name tts_models/en/ljspeech/overflow --vocoder
 ## Setup and training using LJ Speech
 1. Download and extract the [LJ Speech dataset][ljspeech_link]. Place it in the `data` folder such that the directory becomes `data/LJSpeech-1.1`. Otherwise update the filelists in `data/filelists` accordingly.
 2. Clone this repository ```git clone https://github.com/shivammehta25/OverFlow.git```
-   * If using single GPU checkout the branch ```gradient_checkpointing``` it will help to fit bigger batch size during training.
-   * Use `git clone --single-branch -b gradient_checkpointing https://github.com/shivammehta25/OverFlow.git` for that.
+   * If using multiple GPUs change the flag in `src/hparams.gradient_checkpoint=False`
 3. Initalise the submodules ```git submodule init; git submodule update```
 4. Make sure you have [docker installed][docker_install_link] and running.
     * It is recommended to use Docker (it manages the CUDA runtime libraries and Python dependencies itself specified in Dockerfile)

@@ -55,11 +55,10 @@ class OverFlow(nn.Module):
         text_lengths, mel_lengths = text_lengths.data, mel_lengths.data
         embedded_inputs = self.embedding(text_inputs).transpose(1, 2)
         encoder_outputs, text_lengths = self.encoder(embedded_inputs, text_lengths)
-
         z, z_lengths, logdet = self.decoder(mels, mel_lengths)
-
         log_probs = self.hmm(encoder_outputs, text_lengths, z, z_lengths)
-        return log_probs + logdet
+        loss = (log_probs + logdet) / (text_lengths.sum() + mel_lengths.sum())
+        return loss
 
     @torch.inference_mode()
     def sample(self, text_inputs, text_lengths=None, sampling_temp=1.0):

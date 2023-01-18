@@ -11,6 +11,7 @@
 [gustav_profile]: https://people.kth.se/~ghe/
 [HiFi_GAN_LJ_FT_V1_link]: https://github.com/jik876/hifi-gan#pretrained-model
 [Neural_HMM_link]: https://shivammehta25.github.io/Neural-HMM/
+[LJ_Speech_link]: https://keithito.com/LJ-Speech-Dataset/
 [RyanSpeech_link]: https://arxiv.org/abs/2106.08468
 [L2_arctic_link]: https://psi.engr.tamu.edu/l2-arctic-corpus/
 [Indic-TTS_link]: https://www.iitm.ac.in/donlab/tts/index.php
@@ -212,7 +213,7 @@ function playAudio(url) {
 </script> -->
 ## Stimuli from the listening tests
 
-<span style="font-weight: bold">Dataset:</span> [LJ Speech](https://keithito.com/LJ-Speech-Dataset/) <br>
+<span style="font-weight: bold">Dataset:</span> [LJ Speech][LJ_Speech_link] <br>
 <span style="font-weight: bold">Training data duration:</span> ~22.8 hours
 
 <table class="tg">
@@ -1205,5 +1206,132 @@ We finetuned our model from the RyanSpeech 100k checkpoint on several English da
 </table>
 
 
+## Comparison between [Pretrained Glow (PT-GTTS)][coqui_tts_link] vs GTTS
+The checkpoint available in [Coqui-TTS][coqui_tts_link] is trained on [LJSpeech][LJ_Speech_link] dataset. The model is trained for `330,000` steps with a batch size of 32. The model is trained with the following hyperparameters. To synthesise from pre-trained glow-tts model run the following command.
 
-[![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fshivammehta25.github.io%2FOverFlow&count_bg=%23409CFF&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=hits&edge_flat=false)](https://hits.seeyoufarm.com)
+```bash
+pip install tts
+tts --model_name tts_models/en/ljspeech/glow-tts --out_path output.wav --text "The sentence to be synthesised"
+```
+
+<table class="tg">
+  <thead>
+    <tr>
+      <th class="tg-0pky">Sentence</th>
+      <th class="tg-0pky">PT-GTTS</th>
+      <th class="tg-0pky">GTTS</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td nowrap class="tg-0pky">
+        <span style="font-weight:bold">Sentence 1</span>
+      </td>
+      <td class="tg-0pky">
+        <audio id="audio-small" controls>
+          <source src="./audio/PT-GTTS/Comparison/1.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="tg-0pky">
+        <audio id="audio-small" controls>
+          <source src="./audio/GTTS/ListeningTest/1.wav" type="audio/wav">
+        </audio>
+      </td>
+    </tr>
+    <tr>
+      <td nowrap class="tg-0pky">
+        <span style="font-weight:bold">Sentence 2</span>
+      </td>
+      <td class="tg-0pky">
+        <audio id="audio-small" controls>
+          <source src="./audio/PT-GTTS/Comparison/2.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="tg-0pky">
+        <audio id="audio-small" controls>
+          <source src="./audio/GTTS/ListeningTest/2.wav" type="audio/wav">
+        </audio>
+      </td>
+    </tr>
+    <tr>
+      <td nowrap class="tg-0pky">
+        <span style="font-weight:bold">Sentence 3</span>
+      </td>
+      <td class="tg-0pky">
+        <audio id="audio-small" controls>
+          <source src="./audio/PT-GTTS/Comparison/3.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="tg-0pky">
+        <audio id="audio-small" controls>
+          <source src="./audio/GTTS/ListeningTest/3.wav" type="audio/wav">
+        </audio>
+      </td>
+    </tr>
+    <tr>
+      <td nowrap class="tg-0pky">
+        <span style="font-weight:bold">Sentence 4</span>
+      </td>
+      <td class="tg-0pky">
+        <audio id="audio-small" controls>
+          <source src="./audio/PT-GTTS/Comparison/4.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="tg-0pky">
+        <audio id="audio-small" controls>
+          <source src="./audio/GTTS/ListeningTest/4.wav" type="audio/wav">
+        </audio>
+      </td>
+    </tr>
+    <tr>
+      <td nowrap class="tg-0pky">
+        <span style="font-weight:bold">Sentence 5</span>
+      </td>
+      <td class="tg-0pky">
+        <audio id="audio-small" controls>
+          <source src="./audio/PT-GTTS/Comparison/5.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="tg-0pky">
+        <audio id="audio-small" controls>
+          <source src="./audio/GTTS/ListeningTest/5.wav" type="audio/wav">
+        </audio>
+      </td>
+    </tr>
+    <tr>
+      <td nowrap class="tg-0pky">
+        <span style="font-weight:bold">Sentence 6</span>
+      </td>
+      <td class="tg-0pky">
+        <audio id="audio-small" controls>
+          <source src="./audio/PT-GTTS/Comparison/6.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="tg-0pky">
+        <audio id="audio-small" controls>
+          <source src="./audio/GTTS/ListeningTest/6.wav" type="audio/wav">
+        </audio>
+      </td>
+    </tr>
+        <tr>
+      <td nowrap class="tg-0pky">
+        <span style="font-weight:bold">Sentence 7</span>
+      </td>
+      <td class="tg-0pky">
+        <audio id="audio-small" controls>
+          <source src="./audio/PT-GTTS/Comparison/7.wav" type="audio/wav">
+        </audio>
+      </td>
+      <td class="tg-0pky">
+        <audio id="audio-small" controls>
+          <source src="./audio/GTTS/ListeningTest/7.wav" type="audio/wav">
+        </audio>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+
+
+<!--
+[![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fshivammehta25.github.io%2FOverFlow&count_bg=%23409CFF&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=hits&edge_flat=false)](https://hits.seeyoufarm.com) -->

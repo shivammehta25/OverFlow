@@ -1368,7 +1368,7 @@ We additionally trained VITS and FastPitch models using the recipes and code pro
 
 ## Comparing GTTS to [pre-trained Glow-TTS (PT-GTTS)][coqui_tts_link]
 
-To compare the quality of our GTTS baseline to a reference Glow-TTS system, we have synthesised a number of utterances from a pre-trained Glow-TTS model, specifically the checkpoint available in [Coqui-TTS][coqui_tts_link] trained on [LJ Speech][LJ_Speech_link]. That model was trained with 300k updates using a batch size of 32.
+To compare the quality of our GTTS baseline to a reference Glow-TTS system, we have synthesised a number of utterances from a pre-trained Glow-TTS model, specifically the checkpoint available in [Coqui-TTS][coqui_tts_link] trained on [LJ Speech][LJ_Speech_link]. That model was trained with 330k updates using a batch size of 32.
 
 
 <table class="tg">

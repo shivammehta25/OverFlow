@@ -23,7 +23,12 @@ def test_forward(hparams, dummy_data, test_batch_size):
 def test_sample(hparams, dummy_data_uncollated, send_len):
     neural_hmm = OverFlow(hparams)
     text = dummy_data_uncollated[0][0]
-    (mel_output, states_travelled, input_parameters, output_parameters,) = (
+    (
+        mel_output,
+        states_travelled,
+        input_parameters,
+        output_parameters,
+    ) = (
         neural_hmm.sample(text, torch.tensor(len(text))) if send_len else neural_hmm.sample(text)
     )
     assert mel_output.shape[2] == hparams.n_mel_channels

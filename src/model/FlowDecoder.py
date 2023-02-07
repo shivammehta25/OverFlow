@@ -10,7 +10,6 @@ from src.utilities.functions import get_mask_from_len, squeeze, unsqueeze
 
 class FlowSpecDecoder(nn.Module):
     def __init__(self, hparams):
-
         super().__init__()
         self.in_channels = hparams.n_mel_channels
         self.hidden_channels = hparams.flow_hidden_channels

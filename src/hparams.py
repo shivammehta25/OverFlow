@@ -23,6 +23,9 @@ def create_hparams(generate_parameters=False):
     Returns:
         hparams (Namespace)
     """
+
+    # root_folder = pathlib.Path(__file__).parent.parent.resolve()
+    # data_parameters_filename =  / "data_parameters.pt"
     data_parameters_filename = "data_parameters.pt"
 
     if not generate_parameters:
@@ -49,8 +52,8 @@ def create_hparams(generate_parameters=False):
         ################################
         # Experiment Parameters        #
         ################################
-        run_name="OverFlow",
-        gpus=[0],
+        run_name="OverFlow_scaled",
+        gpus=[4],
         max_epochs=50000,
         val_check_interval=100,
         save_model_checkpoint=500,
@@ -101,13 +104,13 @@ def create_hparams(generate_parameters=False):
         # Model Parameters             #
         ################################
         n_symbols=len(symbols),
-        symbols_embedding_dim=512,
+        symbols_embedding_dim=384,
         ################################
         # Encoder parameters           #
         ################################
         encoder_kernel_size=5,
         encoder_n_convolutions=3,
-        encoder_embedding_dim=512,
+        encoder_embedding_dim=384,
         state_per_phone=2,
         ################################
         # HMM Parameters               #
@@ -155,7 +158,7 @@ def create_hparams(generate_parameters=False):
         ################################
         learning_rate=1e-3,
         weight_decay=1e-6,
-        grad_clip_thresh=40000.0,
+        grad_clip_thresh=5.0,
         stochastic_weight_avg=False,
     )
 

@@ -2,9 +2,10 @@ from torch import nn
 from torch.nn import functional as F
 
 from src.model.layers import ConvNorm
+from src.model.transformer import FFTransformer
 
 
-class Encoder(nn.Module):
+class Tacotron2Encoder(nn.Module):
     """Encoder module:
 
     - Three 1-d convolution banks
@@ -76,3 +77,27 @@ class Encoder(nn.Module):
         input_lengths = input_lengths * self.state_per_phone
 
         return outputs, input_lengths  # (32, 139, 519)
+
+
+class FPEncoder(nn.Module):
+    def __init__(self):
+        super().__init__()
+
+        self.encoder = FFTransformer(
+            n_layer=6,
+            n_head=1,
+            d_model=384,
+            d_head=64,
+            d_inner=1024,
+            kernel_size=3,
+            dropout=0.1,
+            dropatt=0.1,
+            dropemb=0.0,
+            embed_input=False,
+            n_embed=384,
+            pre_lnorm=True,
+        )
+
+    def forward(self, x, input_lengths):
+        x, enc_mask = self.encoder(x, seq_lens=input_lengths)
+        return x, input_lengths

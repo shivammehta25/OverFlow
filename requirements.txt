@@ -12,3 +12,4 @@ scipy==1.7.1
 inflect==5.3.0
 pytest==7.1.2
 ipywidgets
+conformer=0.2.5

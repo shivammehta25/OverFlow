@@ -4,15 +4,23 @@ data.py
 Utilities for processing of Data
 """
 import random
+from functools import partial
+from multiprocessing import Pool, cpu_count
+from pathlib import Path
 
 import numpy as np
 import torch
-from nltk import word_tokenize
 from scipy.io.wavfile import read
 from torch.utils.data.dataset import Dataset
+from tqdm.auto import tqdm
 
 from src.model.layers import TacotronSTFT
-from src.utilities.text import phonetise_text, text_to_sequence
+from src.utilities.text import (
+    _clean_text,
+    cleaned_text_to_sequence,
+    intersperse,
+    text_to_sequence,
+)
 
 
 def load_wav_to_torch(full_path):
@@ -32,6 +40,13 @@ def load_filepaths_and_text(filename, split="|"):
     with open(filename, encoding="utf-8") as f:
         filepaths_and_text = [line.strip().split(split) for line in f]
     return filepaths_and_text
+
+
+def cache_text(data_item, text_cleaners):
+    loc, original_text = data_item
+    cleaned_text = _clean_text(original_text, text_cleaners)
+    output = f"{loc}|{cleaned_text}\n"
+    return output
 
 
 class TextMelCollate:
@@ -95,6 +110,7 @@ class TextMelLoader(Dataset):
             hparams:
             transform (list): list of transformation
         """
+        self.file_loc = Path(audiopaths_and_text)
         self.audiopaths_and_text = load_filepaths_and_text(audiopaths_and_text)
         self.transform = transform
         self.text_cleaners = hparams.text_cleaners
@@ -103,6 +119,7 @@ class TextMelLoader(Dataset):
         self.phonetise = hparams.phonetise
         self.cmu_phonetiser = hparams.cmu_phonetiser
         self.load_mel_from_disk = hparams.load_mel_from_disk
+        self.add_blank = hparams.add_blank
         self.stft = TacotronSTFT(
             hparams.filter_length,
             hparams.hop_length,
@@ -114,6 +131,35 @@ class TextMelLoader(Dataset):
         )
         random.seed(hparams.seed)
         random.shuffle(self.audiopaths_and_text)
+        self.cleaned_text = False
+        self.preprocess()
+
+    def preprocess(self):
+        out_filename = self.file_loc.with_suffix(f"{self.file_loc.suffix}.cleaned")
+        if not out_filename.exists():
+            print(f"Cache not found caching the dataset: {self.file_loc}")
+            output = []
+
+            pbar = tqdm(self.audiopaths_and_text)
+            pbar.set_description("Caching data with cpu count: " + str(cpu_count()))
+            with Pool(cpu_count()) as p:
+                for _, data_item in enumerate(
+                    p.imap(
+                        partial(cache_text, text_cleaners=self.text_cleaners), self.audiopaths_and_text, chunksize=10
+                    )
+                ):
+                    if data_item is not None:
+                        output.append(data_item)
+                    pbar.update(1)
+
+            with open(out_filename, "w", encoding="utf-8") as f:
+                f.writelines(output)
+
+            print("Done caching the dataset")
+        else:
+            print(f"Data cache found at : {out_filename}! Loading cache...")
+        self.audiopaths_and_text = load_filepaths_and_text(out_filename)
+        self.cleaned_text = True
 
     def get_mel_text_pair(self, audiopath_and_text):
         r"""
@@ -157,11 +203,21 @@ class TextMelLoader(Dataset):
         return melspec
 
     def get_text(self, text):
-        if self.phonetise:
-            text = phonetise_text(self.cmu_phonetiser, text, word_tokenize)
-
-        text_norm = torch.IntTensor(text_to_sequence(text, self.text_cleaners))
+        if self.cleaned_text:
+            text_norm = cleaned_text_to_sequence(text)
+        else:
+            text_norm = text_to_sequence(text, self.text_cleaners)
+        if self.add_blank:
+            text_norm = intersperse(text_norm, 0)
+        text_norm = torch.LongTensor(text_norm)
         return text_norm
+
+    # def get_text(self, text):
+    #     if self.phonetise:
+    #         text = phonetise_text(self.cmu_phonetiser, text, word_tokenize)
+
+    #     text_norm = torch.IntTensor(text_to_sequence(text, self.text_cleaners))
+    #     return text_norm
 
     def __getitem__(self, index):
         return self.get_mel_text_pair(self.audiopaths_and_text[index])

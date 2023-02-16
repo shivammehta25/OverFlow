@@ -52,7 +52,7 @@ def create_hparams(generate_parameters=False):
         ################################
         # Experiment Parameters        #
         ################################
-        run_name="OverFlow_scaled",
+        run_name="Rel_Attention_TestNoPos",
         gpus=[4],
         max_epochs=50000,
         val_check_interval=100,
@@ -73,6 +73,10 @@ def create_hparams(generate_parameters=False):
         ################################
         batch_size=28,
         load_mel_from_disk=False,
+        # training_files="data/cormac/metadata/train.txt",
+        # validation_files="data/cormac/metadata/valid.txt",
+        # text_cleaners=["english_cleaners"],
+        # phonetise=False,
         training_files="data/filelists/ljs_audio_text_train_filelist.txt",
         validation_files="data/filelists/ljs_audio_text_val_filelist.txt",
         text_cleaners=["english_cleaners"],
@@ -108,6 +112,7 @@ def create_hparams(generate_parameters=False):
         ################################
         # Encoder parameters           #
         ################################
+        rel_attention=True,
         encoder_kernel_size=5,
         encoder_n_convolutions=3,
         encoder_embedding_dim=384,

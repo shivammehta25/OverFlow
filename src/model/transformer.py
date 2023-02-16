@@ -15,6 +15,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from conformer.conformer import Attention as RelAttention
 
 from src.utilities.functions import get_mask_from_len
 
@@ -78,7 +79,7 @@ class PositionwiseConvFF(nn.Module):
 
 
 class MultiHeadAttn(nn.Module):
-    def __init__(self, n_head, d_model, d_head, dropout, dropatt=0.1, pre_lnorm=False):
+    def __init__(self, n_head, d_model, d_head, dropout, rel_attention, dropatt=0.1, pre_lnorm=False):
         super().__init__()
 
         self.n_head = n_head
@@ -86,11 +87,15 @@ class MultiHeadAttn(nn.Module):
         self.d_head = d_head
         self.scale = 1 / (d_head**0.5)
         self.pre_lnorm = pre_lnorm
+        self.rel_attention = rel_attention
+        if rel_attention:
+            self.attn = RelAttention(d_model, n_head, d_head, dropout, max_pos_emb=4)
+        else:
+            self.qkv_net = nn.Linear(d_model, 3 * n_head * d_head)
+            self.drop = nn.Dropout(dropout)
+            self.dropatt = nn.Dropout(dropatt)
+            self.o_net = nn.Linear(n_head * d_head, d_model, bias=False)
 
-        self.qkv_net = nn.Linear(d_model, 3 * n_head * d_head)
-        self.drop = nn.Dropout(dropout)
-        self.dropatt = nn.Dropout(dropatt)
-        self.o_net = nn.Linear(n_head * d_head, d_model, bias=False)
         self.layer_norm = nn.LayerNorm(d_model)
 
     def forward(self, inp, attn_mask=None):
@@ -103,35 +108,38 @@ class MultiHeadAttn(nn.Module):
             # layer normalization
             inp = self.layer_norm(inp)
 
-        n_head, d_head = self.n_head, self.d_head
+        if not self.rel_attention:
+            n_head, d_head = self.n_head, self.d_head
 
-        head_q, head_k, head_v = torch.chunk(self.qkv_net(inp), 3, dim=2)
-        head_q = head_q.view(inp.size(0), inp.size(1), n_head, d_head)
-        head_k = head_k.view(inp.size(0), inp.size(1), n_head, d_head)
-        head_v = head_v.view(inp.size(0), inp.size(1), n_head, d_head)
+            head_q, head_k, head_v = torch.chunk(self.qkv_net(inp), 3, dim=2)
+            head_q = head_q.view(inp.size(0), inp.size(1), n_head, d_head)
+            head_k = head_k.view(inp.size(0), inp.size(1), n_head, d_head)
+            head_v = head_v.view(inp.size(0), inp.size(1), n_head, d_head)
 
-        q = head_q.permute(2, 0, 1, 3).reshape(-1, inp.size(1), d_head)
-        k = head_k.permute(2, 0, 1, 3).reshape(-1, inp.size(1), d_head)
-        v = head_v.permute(2, 0, 1, 3).reshape(-1, inp.size(1), d_head)
+            q = head_q.permute(2, 0, 1, 3).reshape(-1, inp.size(1), d_head)
+            k = head_k.permute(2, 0, 1, 3).reshape(-1, inp.size(1), d_head)
+            v = head_v.permute(2, 0, 1, 3).reshape(-1, inp.size(1), d_head)
 
-        attn_score = torch.bmm(q, k.transpose(1, 2))
-        attn_score.mul_(self.scale)
+            attn_score = torch.bmm(q, k.transpose(1, 2))
+            attn_score.mul_(self.scale)
 
-        if attn_mask is not None:
-            attn_mask = attn_mask.unsqueeze(1).to(attn_score.dtype)
-            attn_mask = attn_mask.repeat(n_head, attn_mask.size(2), 1)
-            attn_score.masked_fill_(attn_mask.to(torch.bool), -float("inf"))
+            if attn_mask is not None:
+                attn_mask = attn_mask.unsqueeze(1).to(attn_score.dtype)
+                attn_mask = attn_mask.repeat(n_head, attn_mask.size(2), 1)
+                attn_score.masked_fill_(attn_mask.to(torch.bool), -float("inf"))
 
-        attn_prob = F.softmax(attn_score, dim=2)
-        attn_prob = self.dropatt(attn_prob)
-        attn_vec = torch.bmm(attn_prob, v)
+            attn_prob = F.softmax(attn_score, dim=2)
+            attn_prob = self.dropatt(attn_prob)
+            attn_vec = torch.bmm(attn_prob, v)
 
-        attn_vec = attn_vec.view(n_head, inp.size(0), inp.size(1), d_head)
-        attn_vec = attn_vec.permute(1, 2, 0, 3).contiguous().view(inp.size(0), inp.size(1), n_head * d_head)
+            attn_vec = attn_vec.view(n_head, inp.size(0), inp.size(1), d_head)
+            attn_vec = attn_vec.permute(1, 2, 0, 3).contiguous().view(inp.size(0), inp.size(1), n_head * d_head)
 
-        # linear projection
-        attn_out = self.o_net(attn_vec)
-        attn_out = self.drop(attn_out)
+            # linear projection
+            attn_out = self.o_net(attn_vec)
+            attn_out = self.drop(attn_out)
+        else:
+            attn_out = self.attn(inp, mask=attn_mask)
 
         if self.pre_lnorm:
             # residual connection
@@ -177,6 +185,7 @@ class FFTransformer(nn.Module):
         d_embed=None,
         padding_idx=0,
         pre_lnorm=True,
+        rel_attention=True,
     ):
         super().__init__()
         self.d_model = d_model
@@ -189,14 +198,25 @@ class FFTransformer(nn.Module):
         else:
             self.word_emb = None
 
-        self.pos_emb = PositionalEmbedding(self.d_model)
+        self.rel_attention = rel_attention
+        if not rel_attention:
+            self.pos_emb = PositionalEmbedding(self.d_model)
+
         self.drop = nn.Dropout(dropemb)
         self.layers = nn.ModuleList()
 
         for _ in range(n_layer):
             self.layers.append(
                 TransformerLayer(
-                    n_head, d_model, d_head, d_inner, kernel_size, dropout, dropatt=dropatt, pre_lnorm=pre_lnorm
+                    n_head,
+                    d_model,
+                    d_head,
+                    d_inner,
+                    kernel_size,
+                    dropout,
+                    dropatt=dropatt,
+                    pre_lnorm=pre_lnorm,
+                    rel_attention=rel_attention,
                 )
             )
 
@@ -210,8 +230,11 @@ class FFTransformer(nn.Module):
             # [bsz x L x 1]
             mask = (dec_inp != self.padding_idx).unsqueeze(2)
 
-        pos_seq = torch.arange(inp.size(1), device=inp.device).to(inp.dtype)
-        pos_emb = self.pos_emb(pos_seq) * mask
+        if not self.rel_attention:
+            pos_seq = torch.arange(inp.size(1), device=inp.device).to(inp.dtype)
+            pos_emb = self.pos_emb(pos_seq) * mask
+        else:
+            pos_emb = 0
 
         out = self.drop(inp + pos_emb + conditioning)
 

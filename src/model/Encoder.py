@@ -80,7 +80,7 @@ class Tacotron2Encoder(nn.Module):
 
 
 class FPEncoder(nn.Module):
-    def __init__(self):
+    def __init__(self, rel_attention):
         super().__init__()
 
         self.encoder = FFTransformer(
@@ -96,6 +96,7 @@ class FPEncoder(nn.Module):
             embed_input=False,
             n_embed=384,
             pre_lnorm=True,
+            rel_attention=rel_attention,
         )
 
     def forward(self, x, input_lengths):

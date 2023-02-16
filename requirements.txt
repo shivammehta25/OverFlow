@@ -11,3 +11,4 @@ librosa==0.8.1
 scipy==1.7.1
 inflect==5.3.0
 pytest==7.1.2
+ipywidgets

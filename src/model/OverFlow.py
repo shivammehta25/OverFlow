@@ -16,7 +16,7 @@ class OverFlow(nn.Module):
         # Data Properties
         self.normaliser = hparams.normaliser
 
-        self.encoder = FPEncoder()
+        self.encoder = FPEncoder(hparams.rel_attention)
         # self.encoder = Tacotron2Encoder(hparams)
         self.hmm = HMM(hparams)
         self.decoder = FlowSpecDecoder(hparams)

@@ -1,3 +1,6 @@
+from typing import Tuple
+
+import torch
 from torch import nn
 from torch.nn import functional as F
 
@@ -12,32 +15,32 @@ class Tacotron2Encoder(nn.Module):
     - Bidirectional LSTM
     """
 
-    def __init__(self, hparams):
+    def __init__(self, hparams, name="conv"):
         super().__init__()
-
-        self.encoder_embedding_dim = hparams.encoder_embedding_dim
-        self.state_per_phone = hparams.state_per_phone
+        encoder_params = hparams.encoder_params[name]
+        self.encoder_embedding_dim = encoder_params["hidden_channels"]
+        self.state_per_phone = encoder_params["state_per_phone"]
 
         convolutions = []
-        for _ in range(hparams.encoder_n_convolutions):
+        for _ in range(encoder_params["n_convolutions"]):
             conv_layer = nn.Sequential(
                 ConvNorm(
-                    hparams.encoder_embedding_dim,
-                    hparams.encoder_embedding_dim,
-                    kernel_size=hparams.encoder_kernel_size,
+                    encoder_params["hidden_channels"],
+                    encoder_params["hidden_channels"],
+                    kernel_size=encoder_params["kernel_size"],
                     stride=1,
-                    padding=int((hparams.encoder_kernel_size - 1) / 2),
+                    padding=int((encoder_params["kernel_size"] - 1) / 2),
                     dilation=1,
                     w_init_gain="relu",
                 ),
-                nn.BatchNorm1d(hparams.encoder_embedding_dim),
+                nn.BatchNorm1d(encoder_params["hidden_channels"]),
             )
             convolutions.append(conv_layer)
         self.convolutions = nn.ModuleList(convolutions)
 
         self.lstm = nn.LSTM(
-            hparams.encoder_embedding_dim,
-            int(hparams.encoder_embedding_dim / 2) * hparams.state_per_phone,
+            encoder_params["hidden_channels"],
+            int(encoder_params["hidden_channels"] / 2) * encoder_params["state_per_phone"],
             1,
             batch_first=True,
             bidirectional=True,
@@ -79,26 +82,33 @@ class Tacotron2Encoder(nn.Module):
         return outputs, input_lengths  # (32, 139, 519)
 
 
-class FPEncoder(nn.Module):
-    def __init__(self, rel_attention):
+class TransformerEncoder(nn.Module):
+    def __init__(self, hparams, name="transformer"):
         super().__init__()
 
-        self.encoder = FFTransformer(
-            n_layer=6,
-            n_head=1,
-            d_model=384,
-            d_head=64,
-            d_inner=1024,
-            kernel_size=3,
-            dropout=0.1,
-            dropatt=0.1,
-            dropemb=0.0,
-            embed_input=False,
-            n_embed=384,
-            pre_lnorm=True,
-            rel_attention=rel_attention,
-        )
+        encoder_params = hparams.encoder_params[name]
+
+        self.encoder = FFTransformer(**encoder_params)
 
     def forward(self, x, input_lengths):
         x, enc_mask = self.encoder(x, seq_lens=input_lengths)
         return x, input_lengths
+
+
+class Encoder(nn.Module):
+    """Wrapper for encoders"""
+
+    def __init__(self, hparams) -> None:
+        super().__init__()
+        if hparams.encoder_type == "conv":
+            self.encoder = Tacotron2Encoder(hparams)
+        elif hparams.encoder_type == "transformer":
+            self.encoder = TransformerEncoder(hparams)
+        else:
+            raise ValueError(f"Unknown encoder type: {hparams.encoder_type}")
+
+    def forward(self, x: torch.FloatTensor, x_len: torch.LongTensor) -> Tuple[torch.FloatTensor, torch.LongTensor]:
+        return self.encoder(x, x_len)
+
+    def inference(self, *args, **kwargs):
+        return self.encoder.inference(*args, **kwargs)

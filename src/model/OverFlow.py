@@ -1,7 +1,7 @@
 import torch
 from torch import nn
 
-from src.model.Encoder import FPEncoder
+from src.model.Encoder import Encoder
 from src.model.FlowDecoder import FlowSpecDecoder
 from src.model.HMM import HMM
 
@@ -11,12 +11,14 @@ class OverFlow(nn.Module):
         super().__init__()
         self.n_mel_channels = hparams.n_mel_channels
         self.n_frames_per_step = hparams.n_frames_per_step
-        self.embedding = nn.Embedding(hparams.n_symbols, hparams.symbols_embedding_dim)
+        self.embedding = nn.Embedding(
+            hparams.n_symbols, hparams.encoder_params[hparams.encoder_type]["hidden_channels"]
+        )
 
         # Data Properties
         self.normaliser = hparams.normaliser
 
-        self.encoder = FPEncoder(hparams.rel_attention)
+        self.encoder = Encoder(hparams)
         # self.encoder = Tacotron2Encoder(hparams)
         self.hmm = HMM(hparams)
         self.decoder = FlowSpecDecoder(hparams)

@@ -86,7 +86,7 @@ class Decoder(nn.Module):
         super().__init__()
         self.hparams = hparams
 
-        input_size = hparams.post_prenet_rnn_dim + hparams.encoder_embedding_dim
+        input_size = hparams.post_prenet_rnn_dim + hparams.encoder_params[hparams.encoder_type]["hidden_channels"]
         output_size = 2 * hparams.n_mel_channels + 1
 
         self.validate_parameters()

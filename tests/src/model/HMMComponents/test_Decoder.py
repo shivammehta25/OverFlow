@@ -52,14 +52,14 @@ def test_decoder_flat_start(
     init_std,
 ):
     hparams.post_prenet_rnn_dim = post_prenet_rnn_dim
-    hparams.encoder_embedding_dim = encoder_embedding_dim
+    hparams.encoder_params[hparams.encoder_type]["hidden_channels"] = encoder_embedding_dim
     hparams.n_mel_channels = n_mel_channels
     hparams.init_transition_probability = init_transition_probability
     hparams.init_mean = init_mean
     hparams.init_std = init_std
 
     test_data = torch.randn(test_batch_size, hparams.post_prenet_rnn_dim)
-    test_state = torch.randn(test_batch_size, 10, hparams.encoder_embedding_dim)
+    test_state = torch.randn(test_batch_size, 10, encoder_embedding_dim)
 
     model = Decoder(hparams)
     mean, std, transition_vector = model(test_data, test_state)

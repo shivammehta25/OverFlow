@@ -108,15 +108,27 @@ def create_hparams(generate_parameters=False):
         # Model Parameters             #
         ################################
         n_symbols=len(symbols),
-        symbols_embedding_dim=384,
         ################################
         # Encoder parameters           #
         ################################
-        rel_attention=True,
-        encoder_kernel_size=5,
-        encoder_n_convolutions=3,
-        encoder_embedding_dim=384,
-        state_per_phone=2,
+        encoder_type="transformer",
+        encoder_params={
+            "conv": {"kernel_size": 5, "n_convolutions": 3, "hidden_channels": 512, "state_per_phone": 2},
+            "transformer": {
+                "hidden_channels": 384,
+                "n_layer": 6,
+                "n_head": 1,
+                "d_head": 64,
+                "d_inner": 1024,
+                "kernel_size": 3,
+                "dropout": 0.1,
+                "dropatt": 0.1,
+                "dropemb": 0.0,
+                "embed_input": False,
+                "pre_lnorm": True,
+                "rel_attention": True,
+            },
+        },
         ################################
         # HMM Parameters               #
         ################################

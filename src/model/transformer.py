@@ -173,7 +173,7 @@ class FFTransformer(nn.Module):
         self,
         n_layer,
         n_head,
-        d_model,
+        hidden_channels,
         d_head,
         d_inner,
         kernel_size,
@@ -188,13 +188,13 @@ class FFTransformer(nn.Module):
         rel_attention=True,
     ):
         super().__init__()
-        self.d_model = d_model
+        self.d_model = hidden_channels
         self.n_head = n_head
         self.d_head = d_head
         self.padding_idx = padding_idx
 
         if embed_input:
-            self.word_emb = nn.Embedding(n_embed, d_embed or d_model, padding_idx=self.padding_idx)
+            self.word_emb = nn.Embedding(n_embed, d_embed or hidden_channels, padding_idx=self.padding_idx)
         else:
             self.word_emb = None
 
@@ -209,7 +209,7 @@ class FFTransformer(nn.Module):
             self.layers.append(
                 TransformerLayer(
                     n_head,
-                    d_model,
+                    hidden_channels,
                     d_head,
                     d_inner,
                     kernel_size,

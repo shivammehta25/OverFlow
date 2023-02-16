@@ -39,6 +39,7 @@ def dummy_data(dummy_data_uncollated, hparams):
 
 @pytest.fixture
 def dummy_embedded_data(dummy_data, hparams):
+    emb_dim = hparams.encoder_params[hparams.encoder_type]["hidden_channels"]
     text_padded, input_lengths, mel_padded, gate_padded, output_lengths = dummy_data
-    embedded_input = torch.nn.Embedding(hparams.n_symbols, hparams.symbols_embedding_dim)(text_padded)
+    embedded_input = torch.nn.Embedding(hparams.n_symbols, emb_dim)(text_padded)
     return (embedded_input, input_lengths, mel_padded, gate_padded, output_lengths)

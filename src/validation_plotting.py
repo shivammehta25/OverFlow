@@ -23,6 +23,7 @@ def log_validation(
     input_parameters,
     output_parameters,
     iteration,
+    stft_module,
 ):
     """
     Args:
@@ -35,6 +36,7 @@ def log_validation(
         input_parameters: input parameters to decoder model while sampling
         output_parameters: output parameters from the decoder model while sampling
         iteration: iteration number
+        Stft_fn: stft function to generate waveform using griffin lim
 
     Returns:
         None
@@ -78,6 +80,8 @@ def log_validation(
         iteration,
         dataformats="HWC",
     )
+    audio, sr = stft_module.griffin_lim(mel_output.transpose(1, 2))
+    logger.add_audio("synthesised/waveform_synthesised", audio, iteration, sample_rate=sr)
 
     logger.add_image(
         "synthesised/mel_synthesised_normalised",

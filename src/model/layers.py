@@ -2,6 +2,7 @@
 
 Layer modules used in the model design
 """
+import numpy as np
 import torch
 import torch.nn as nn
 from librosa.filters import mel as librosa_mel_fn
@@ -108,6 +109,7 @@ class TacotronSTFT(torch.nn.Module):
 
         mel_basis = torch.from_numpy(mel_basis).float()
         self.register_buffer("mel_basis", mel_basis)
+        self.register_buffer("inv_mel_basis", torch.linalg.pinv(self.mel_basis))
 
     def spectral_normalize(self, magnitudes):
         output = dynamic_range_compression(magnitudes)
@@ -135,3 +137,43 @@ class TacotronSTFT(torch.nn.Module):
         mel_output = torch.matmul(self.mel_basis, magnitudes)
         mel_output = self.spectral_normalize(mel_output)
         return mel_output
+
+    def mel_to_linear(self, mel_spec):
+        """Project a melspectrogram to a full scale spectrogram.
+
+        Args:
+            mel_spec (Float[torch.Tensor, "B n_mel_channel T_mel"]): Melspectrogram.
+
+        Returns:
+            Float[torch.Tensor, "B n_spec_channel T_mel"]: Full scale spectrogram.
+        """
+        return torch.max(mel_spec.new_tensor(1e-10), torch.matmul(self.inv_mel_basis, mel_spec))
+
+    def griffin_lim(self, mel_spec, n_iters=15):
+        """Applies Griffin-Lim's raw to reconstruct phase.
+
+        Args:
+            audio (Union[Float[torch.Tensor, "B n_mel_channels T_mel"], str]):
+                audio filename or torch tensor of the mel spectrogram
+            mel (bool, optional):
+                True when input is a mel spectrogram otherwise its a linear spectrogram. Defaults to True.
+
+        Returns:
+            waveform: reconstructed waveform
+                -shape (1, T_wav)
+            sampling_rate: sampling rate of the audio file
+        """
+        assert mel_spec.ndim == 3, "input shape must be batch, n_mel_channels, T_mel"
+        mel_spec = mel_spec.cpu()
+        mel_spec = self.spectral_de_normalize(mel_spec)
+        magnitudes = self.mel_to_linear(mel_spec)
+
+        angles = np.angle(np.exp(2j * np.pi * np.random.rand(*magnitudes.size())))
+        angles = angles.astype(np.float32)
+        angles = torch.autograd.Variable(torch.from_numpy(angles))
+        signal = self.stft_fn.inverse(magnitudes, angles).squeeze(1)
+
+        for _ in range(n_iters):
+            _, angles = self.stft_fn.transform(signal)
+            signal = self.stft_fn.inverse(magnitudes, angles).squeeze(1)
+        return signal.cpu().numpy(), self.sampling_rate

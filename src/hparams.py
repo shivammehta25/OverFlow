@@ -10,7 +10,6 @@ import torch
 
 from src.utilities.data import Normalise
 from src.utilities.text import symbols
-from src.utilities.text.cmudict import CMUDict
 
 
 def create_hparams(generate_parameters=False):
@@ -82,7 +81,6 @@ def create_hparams(generate_parameters=False):
         text_cleaners=["english_cleaners"],
         phonetise=True,
         add_blank=True,
-        cmu_phonetiser=CMUDict("src/phonetised_files/cmudict-0.7b.txt"),
         num_workers=40,
         ################################
         # Audio Parameters             #

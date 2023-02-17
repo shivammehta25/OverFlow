@@ -4,3 +4,4 @@ checkpoints/
 hifigan/
 waveglow/
 tb_logs/
+*.ckpt

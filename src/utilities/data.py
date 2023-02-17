@@ -117,7 +117,6 @@ class TextMelLoader(Dataset):
         self.max_wav_value = hparams.max_wav_value
         self.sampling_rate = hparams.sampling_rate
         self.phonetise = hparams.phonetise
-        self.cmu_phonetiser = hparams.cmu_phonetiser
         self.load_mel_from_disk = hparams.load_mel_from_disk
         self.add_blank = hparams.add_blank
         self.stft = TacotronSTFT(

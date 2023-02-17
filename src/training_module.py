@@ -132,7 +132,7 @@ class TrainingModule(pl.LightningModule):
             ) = self.model.sample(text_inputs[0], text_lengths[0])
             mel_output_normalised = self.model.normaliser(mel_output)
 
-            with torch.no_grad():
+            with torch.inference_mode():
                 _ = self.model((text_inputs, text_lengths, mels, max_len, mel_lengths))
 
             log_validation(
@@ -145,6 +145,7 @@ class TrainingModule(pl.LightningModule):
                 input_parameters,
                 output_parameters,
                 self.global_step,
+                self.train_dataloader().dataset.stft,
             )
 
             self.trainer.save_checkpoint(

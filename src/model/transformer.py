@@ -79,7 +79,9 @@ class PositionwiseConvFF(nn.Module):
 
 
 class MultiHeadAttn(nn.Module):
-    def __init__(self, n_head, d_model, d_head, dropout, rel_attention, dropatt=0.1, pre_lnorm=False):
+    def __init__(
+        self, n_head, d_model, d_head, dropout, rel_attention, dropatt=0.1, pre_lnorm=True, rel_window_size=10
+    ):
         super().__init__()
 
         self.n_head = n_head
@@ -89,7 +91,7 @@ class MultiHeadAttn(nn.Module):
         self.pre_lnorm = pre_lnorm
         self.rel_attention = rel_attention
         if rel_attention:
-            self.attn = RelAttention(d_model, n_head, d_head, dropout, max_pos_emb=4)
+            self.attn = RelAttention(d_model, n_head, d_head, dropout, max_pos_emb=rel_window_size)
         else:
             self.qkv_net = nn.Linear(d_model, 3 * n_head * d_head)
             self.drop = nn.Dropout(dropout)
@@ -186,6 +188,7 @@ class FFTransformer(nn.Module):
         padding_idx=0,
         pre_lnorm=True,
         rel_attention=True,
+        rel_window_size=10,
     ):
         super().__init__()
         self.d_model = hidden_channels
@@ -199,6 +202,7 @@ class FFTransformer(nn.Module):
             self.word_emb = None
 
         self.rel_attention = rel_attention
+
         if not rel_attention:
             self.pos_emb = PositionalEmbedding(self.d_model)
 

@@ -10,7 +10,6 @@ import torch
 
 from src.utilities.data import Normalise
 from src.utilities.text import symbols
-from src.utilities.text.cmudict import CMUDict
 
 
 def create_hparams(generate_parameters=False):
@@ -52,8 +51,8 @@ def create_hparams(generate_parameters=False):
         ################################
         # Experiment Parameters        #
         ################################
-        run_name="Rel_Attention_TestNoPos",
-        gpus=[4],
+        run_name="ESpeakPhonemizer",
+        gpus=[0],
         max_epochs=50000,
         val_check_interval=100,
         save_model_checkpoint=500,
@@ -81,8 +80,8 @@ def create_hparams(generate_parameters=False):
         validation_files="data/filelists/ljs_audio_text_val_filelist.txt",
         text_cleaners=["english_cleaners"],
         phonetise=True,
-        cmu_phonetiser=CMUDict("src/phonetised_files/cmudict-0.7b.txt"),
-        num_workers=20,
+        add_blank=True,
+        num_workers=40,
         ################################
         # Audio Parameters             #
         ################################
@@ -127,6 +126,7 @@ def create_hparams(generate_parameters=False):
                 "embed_input": False,
                 "pre_lnorm": True,
                 "rel_attention": True,
+                "rel_window_size": 10,
             },
         },
         ################################

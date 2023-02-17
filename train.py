@@ -71,7 +71,7 @@ if __name__ == "__main__":
 
     elements = {"Encoder": model.model.encoder, "HMM": model.model.hmm, "Decoder": model.model.decoder}
 
-    print(model.model.decoder)
+    print(model.model)
 
     for element_name, element in elements.items():
         print(count_parameters(element, element_name))
@@ -82,7 +82,7 @@ if __name__ == "__main__":
         # We have already loaded the model weights, so we don't want to load optimizer states from checkpoint
 
     logger = TensorBoardLogger(hparams.tensorboard_log_dir, name=hparams.run_name)
-
+    print(f"[+] Run Name: {hparams.run_name}")
     trainer = pl.Trainer(
         resume_from_checkpoint=args.checkpoint_path,
         gpus=hparams.gpus,

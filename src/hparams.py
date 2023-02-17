@@ -126,6 +126,7 @@ def create_hparams(generate_parameters=False):
                 "embed_input": False,
                 "pre_lnorm": True,
                 "rel_attention": True,
+                "rel_window_size": 10,
             },
         },
         ################################

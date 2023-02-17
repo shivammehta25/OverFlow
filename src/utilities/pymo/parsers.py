@@ -104,7 +104,7 @@ class BVHParser:
         time_index = pd.to_timedelta([f[0] for f in self._motions], unit="s")
         frames = [f[1] for f in self._motions]
         channels = np.asarray([[channel[2] for channel in frame] for frame in frames])
-        column_names = ["{}_{}".format(c[0], c[1]) for c in self._motion_channels]
+        column_names = [f"{c[0]}_{c[1]}" for c in self._motion_channels]
 
         return pd.DataFrame(data=channels, index=time_index, columns=column_names)
 

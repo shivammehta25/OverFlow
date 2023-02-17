@@ -125,9 +125,9 @@ class MocapParameterizer(BaseEstimator, TransformerMixin):
                         * np.transpose(
                             np.array(
                                 [
-                                    track.values["{}_{}rotation".format(joint, rot_order[0])],
-                                    track.values["{}_{}rotation".format(joint, rot_order[1])],
-                                    track.values["{}_{}rotation".format(joint, rot_order[2])],
+                                    track.values[f"{joint}_{rot_order[0]}rotation"],
+                                    track.values[f"{joint}_{rot_order[1]}rotation"],
+                                    track.values[f"{joint}_{rot_order[2]}rotation"],
                                 ]
                             )
                         )
@@ -306,9 +306,9 @@ class MocapParameterizer(BaseEstimator, TransformerMixin):
                 # print(joint)
                 r = euler_df[[c for c in rots if joint in c]]  # Get the columns that belong to this joint
                 rot_order = track.skeleton[joint]["order"]
-                r1_col = "{}_{}rotation".format(joint, rot_order[0])
-                r2_col = "{}_{}rotation".format(joint, rot_order[1])
-                r3_col = "{}_{}rotation".format(joint, rot_order[2])
+                r1_col = f"{joint}_{rot_order[0]}rotation"
+                r2_col = f"{joint}_{rot_order[1]}rotation"
+                r3_col = f"{joint}_{rot_order[2]}rotation"
 
                 exp_df.drop([r1_col, r2_col, r3_col], axis=1, inplace=True)
                 euler = [[f[1][r1_col], f[1][r2_col], f[1][r3_col]] for f in r.iterrows()]
@@ -377,13 +377,13 @@ class MocapParameterizer(BaseEstimator, TransformerMixin):
 
                 # Create the corresponding columns in the new DataFrame
 
-                euler_df["{}_{}rotation".format(joint, rot_order[0])] = pd.Series(
+                euler_df[f"{joint}_{rot_order[0]}rotation"] = pd.Series(
                     data=[e[0] for e in euler_rots], index=euler_df.index
                 )
-                euler_df["{}_{}rotation".format(joint, rot_order[1])] = pd.Series(
+                euler_df[f"{joint}_{rot_order[1]}rotation"] = pd.Series(
                     data=[e[1] for e in euler_rots], index=euler_df.index
                 )
-                euler_df["{}_{}rotation".format(joint, rot_order[2])] = pd.Series(
+                euler_df[f"{joint}_{rot_order[2]}rotation"] = pd.Series(
                     data=[e[2] for e in euler_rots], index=euler_df.index
                 )
 
@@ -415,9 +415,9 @@ class MocapParameterizer(BaseEstimator, TransformerMixin):
                 # print(joint)
                 r = euler_df[[c for c in rots if joint in c]]  # Get the columns that belong to this joint
                 rot_order = track.skeleton[joint]["order"]
-                r1_col = "{}_{}rotation".format(joint, rot_order[0])
-                r2_col = "{}_{}rotation".format(joint, rot_order[1])
-                r3_col = "{}_{}rotation".format(joint, rot_order[2])
+                r1_col = f"{joint}_{rot_order[0]}rotation"
+                r2_col = f"{joint}_{rot_order[1]}rotation"
+                r3_col = f"{joint}_{rot_order[2]}rotation"
 
                 vec_df.drop([r1_col, r2_col, r3_col], axis=1, inplace=True)
                 euler = [[f[1][r1_col], f[1][r2_col], f[1][r3_col]] for f in r.iterrows()]
@@ -502,13 +502,13 @@ class MocapParameterizer(BaseEstimator, TransformerMixin):
 
                 # Create the corresponding columns in the new DataFrame
 
-                euler_df["{}_{}rotation".format(joint, rot_order[0])] = pd.Series(
+                euler_df[f"{joint}_{rot_order[0]}rotation"] = pd.Series(
                     data=[e[0] for e in euler_rots], index=euler_df.index
                 )
-                euler_df["{}_{}rotation".format(joint, rot_order[1])] = pd.Series(
+                euler_df[f"{joint}_{rot_order[1]}rotation"] = pd.Series(
                     data=[e[1] for e in euler_rots], index=euler_df.index
                 )
-                euler_df["{}_{}rotation".format(joint, rot_order[2])] = pd.Series(
+                euler_df[f"{joint}_{rot_order[2]}rotation"] = pd.Series(
                     data=[e[2] for e in euler_rots], index=euler_df.index
                 )
 
@@ -677,9 +677,9 @@ class EulerReorder(BaseEstimator, TransformerMixin):
             for joint in joints:
                 r = euler_df[[c for c in rots if joint in c]]  # Get the columns that belong to this joint
                 rot_order = track.skeleton[joint]["order"]
-                r1_col = "{}_{}rotation".format(joint, rot_order[0])
-                r2_col = "{}_{}rotation".format(joint, rot_order[1])
-                r3_col = "{}_{}rotation".format(joint, rot_order[2])
+                r1_col = f"{joint}_{rot_order[0]}rotation"
+                r2_col = f"{joint}_{rot_order[1]}rotation"
+                r3_col = f"{joint}_{rot_order[2]}rotation"
                 euler = [[f[1][r1_col], f[1][r2_col], f[1][r3_col]] for f in r.iterrows()]
 
                 # euler = [[f[1]['%s_Xrotation'%(joint)], f[1]['%s_Yrotation'%(joint)], f[1]['%s_Zrotation'%(joint)]] for f in r.iterrows()]
@@ -687,13 +687,13 @@ class EulerReorder(BaseEstimator, TransformerMixin):
                 # new_euler = euler_reorder2(np.array(euler), rot_order, self.new_order, True)
 
                 # Create the corresponding columns in the new DataFrame
-                new_df["{}_{}rotation".format(joint, self.new_order[0])] = pd.Series(
+                new_df[f"{joint}_{self.new_order[0]}rotation"] = pd.Series(
                     data=[e[0] for e in new_euler], index=new_df.index
                 )
-                new_df["{}_{}rotation".format(joint, self.new_order[1])] = pd.Series(
+                new_df[f"{joint}_{self.new_order[1]}rotation"] = pd.Series(
                     data=[e[1] for e in new_euler], index=new_df.index
                 )
-                new_df["{}_{}rotation".format(joint, self.new_order[2])] = pd.Series(
+                new_df[f"{joint}_{self.new_order[2]}rotation"] = pd.Series(
                     data=[e[2] for e in new_euler], index=new_df.index
                 )
 
@@ -977,9 +977,9 @@ class RootTransformer(BaseEstimator, TransformerMixin):
                 # %(joint, rot_order[0])
 
                 rot_order = track.skeleton[track.root_name]["order"]
-                r1_col = "{}_{}rotation".format(track.root_name, rot_order[0])
-                r2_col = "{}_{}rotation".format(track.root_name, rot_order[1])
-                r3_col = "{}_{}rotation".format(track.root_name, rot_order[2])
+                r1_col = f"{track.root_name}_{rot_order[0]}rotation"
+                r2_col = f"{track.root_name}_{rot_order[1]}rotation"
+                r3_col = f"{track.root_name}_{rot_order[2]}rotation"
 
                 # Delta columns
                 # dxp_col = '%s_dXposition'%track.root_name
@@ -1167,9 +1167,9 @@ class RootTransformer(BaseEstimator, TransformerMixin):
                 xr_col = "%s_Xrotation" % track.root_name
                 yr_col = "%s_Yrotation" % track.root_name
                 zr_col = "%s_Zrotation" % track.root_name
-                r1_col = "{}_{}rotation".format(track.root_name, rot_order[0])
-                r2_col = "{}_{}rotation".format(track.root_name, rot_order[1])
-                r3_col = "{}_{}rotation".format(track.root_name, rot_order[2])
+                r1_col = f"{track.root_name}_{rot_order[0]}rotation"
+                r2_col = f"{track.root_name}_{rot_order[1]}rotation"
+                r3_col = f"{track.root_name}_{rot_order[2]}rotation"
 
                 # Delta columns
                 # dxp_col = '%s_dXposition'%track.root_name

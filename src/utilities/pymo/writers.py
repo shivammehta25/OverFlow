@@ -64,11 +64,11 @@ class BVHWriter:
         if n_channels > 0:
             for ci in range(len(pos)):
                 cn = pos[ci]
-                self.motions_.append(np.asarray(X.values["{}_{}".format(joint, cn)].values))
+                self.motions_.append(np.asarray(X.values[f"{joint}_{cn}"].values))
                 ch_str = ch_str + " " + cn
             for ci in range(len(rot)):
                 cn = "%srotation" % (rot_order[ci])
-                self.motions_.append(np.asarray(X.values["{}_{}".format(joint, cn)].values))
+                self.motions_.append(np.asarray(X.values[f"{joint}_{cn}"].values))
                 ch_str = ch_str + " " + cn
         if len(X.skeleton[joint]["children"]) > 0:
             # ch_str = ''.join(' %s'*n_channels%tuple(channels))

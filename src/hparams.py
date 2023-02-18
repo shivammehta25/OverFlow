@@ -51,8 +51,8 @@ def create_hparams(generate_parameters=False):
         ################################
         # Experiment Parameters        #
         ################################
-        run_name="ESpeakPhonemizer",
-        gpus=[0],
+        run_name="Cormac_espeak_sin_pos",
+        gpus=[2],
         max_epochs=50000,
         val_check_interval=100,
         save_model_checkpoint=500,
@@ -70,15 +70,15 @@ def create_hparams(generate_parameters=False):
         ################################
         # Data Parameters             #
         ################################
-        batch_size=28,
+        batch_size=16,
         load_mel_from_disk=False,
-        # training_files="data/cormac/metadata/train.txt",
-        # validation_files="data/cormac/metadata/valid.txt",
-        # text_cleaners=["english_cleaners"],
-        # phonetise=False,
-        training_files="data/filelists/ljs_audio_text_train_filelist.txt",
-        validation_files="data/filelists/ljs_audio_text_val_filelist.txt",
+        training_files="data/filelists/cormac_train.txt",
+        validation_files="data/filelists/cormac_val.txt",
         text_cleaners=["english_cleaners"],
+        # phonetise=False,
+        # training_files="data/filelists/ljs_audio_text_train_filelist.txt",
+        # validation_files="data/filelists/ljs_audio_text_val_filelist.txt",
+        # text_cleaners=["english_cleaners"],
         phonetise=True,
         add_blank=True,
         num_workers=40,
@@ -125,7 +125,7 @@ def create_hparams(generate_parameters=False):
                 "dropemb": 0.0,
                 "embed_input": False,
                 "pre_lnorm": True,
-                "rel_attention": True,
+                "rel_attention": False,
                 "rel_window_size": 10,
             },
         },

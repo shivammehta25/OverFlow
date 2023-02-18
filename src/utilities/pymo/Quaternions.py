@@ -51,13 +51,13 @@ class Quaternions:
         os = np.array(oqs.shape)
 
         if len(ss) != len(os):
-            raise TypeError(f"Quaternions cannot broadcast together shapes {sqs.shape} and {oqs.shape}")
+            raise TypeError("Quaternions cannot broadcast together shapes {} and {}".format(sqs.shape, oqs.shape))
 
         if np.all(ss == os):
             return sqs, oqs
 
         if not np.all((ss == os) | (os == np.ones(len(os))) | (ss == np.ones(len(ss)))):
-            raise TypeError(f"Quaternions cannot broadcast together shapes {sqs.shape} and {oqs.shape}")
+            raise TypeError("Quaternions cannot broadcast together shapes {} and {}".format(sqs.shape, oqs.shape))
 
         sqsn, oqsn = sqs.copy(), oqs.copy()
 

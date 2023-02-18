@@ -238,7 +238,7 @@ def print_skel(X):
     while stack:
         joint = stack.pop()
         tab = len(stack)
-        print("{}- {} ({})".format("| " * tab, joint, X.skeleton[joint]["parent"]))
+        print("%s- %s (%s)" % ("| " * tab, joint, X.skeleton[joint]["parent"]))
         for c in X.skeleton[joint]["children"]:
             stack.append(c)
 

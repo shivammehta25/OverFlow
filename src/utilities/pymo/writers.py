@@ -37,7 +37,7 @@ class BVHWriter:
         if X.skeleton[joint]["parent"] == None:
             ofile.write("ROOT %s\n" % joint)
         elif len(X.skeleton[joint]["children"]) > 0:
-            ofile.write("{}JOINT {}\n".format("\t" * (tab), joint))
+            ofile.write("%sJOINT %s\n" % ("\t" * (tab), joint))
         else:
             ofile.write("%sEnd site\n" % ("\t" * (tab)))
 
@@ -64,11 +64,11 @@ class BVHWriter:
         if n_channels > 0:
             for ci in range(len(pos)):
                 cn = pos[ci]
-                self.motions_.append(np.asarray(X.values[f"{joint}_{cn}"].values))
+                self.motions_.append(np.asarray(X.values["%s_%s" % (joint, cn)].values))
                 ch_str = ch_str + " " + cn
             for ci in range(len(rot)):
                 cn = "%srotation" % (rot_order[ci])
-                self.motions_.append(np.asarray(X.values[f"{joint}_{cn}"].values))
+                self.motions_.append(np.asarray(X.values["%s_%s" % (joint, cn)].values))
                 ch_str = ch_str + " " + cn
         if len(X.skeleton[joint]["children"]) > 0:
             # ch_str = ''.join(' %s'*n_channels%tuple(channels))

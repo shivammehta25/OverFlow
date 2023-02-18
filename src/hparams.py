@@ -51,7 +51,7 @@ def create_hparams(generate_parameters=False):
         ################################
         # Experiment Parameters        #
         ################################
-        run_name="Cormac_espeak_sin_pos",
+        run_name="Cormac",
         gpus=[2],
         max_epochs=50000,
         val_check_interval=100,

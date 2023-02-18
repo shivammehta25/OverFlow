@@ -49,6 +49,15 @@ def cache_text(data_item, text_cleaners):
     return output
 
 
+def cache_mel(data_item, mel_function, ext=".npy"):
+    loc, _ = data_item
+    if Path(loc).with_suffix(ext).exists():
+        return 0  # Already cached
+    mel = mel_function(loc).numpy()
+    np.save(Path(loc).with_suffix(ext), mel)
+    return 1
+
+
 class TextMelCollate:
     r"""
     Zero-pads model inputs and targets based on number of frames per setep
@@ -131,9 +140,10 @@ class TextMelLoader(Dataset):
         random.seed(hparams.seed)
         random.shuffle(self.audiopaths_and_text)
         self.cleaned_text = False
-        self.preprocess()
+        self.preprocess_text()
+        self.preprocess_mels()
 
-    def preprocess(self):
+    def preprocess_text(self):
         out_filename = self.file_loc.with_suffix(f"{self.file_loc.suffix}.cleaned")
         if not out_filename.exists():
             print(f"Cache not found caching the dataset: {self.file_loc}")
@@ -150,6 +160,7 @@ class TextMelLoader(Dataset):
                     if data_item is not None:
                         output.append(data_item)
                     pbar.update(1)
+                    p.close()
 
             with open(out_filename, "w", encoding="utf-8") as f:
                 f.writelines(output)
@@ -159,6 +170,17 @@ class TextMelLoader(Dataset):
             print(f"Data cache found at : {out_filename}! Loading cache...")
         self.audiopaths_and_text = load_filepaths_and_text(out_filename)
         self.cleaned_text = True
+
+    def preprocess_mels(self):
+        pbar = tqdm(self.audiopaths_and_text, leave=False)
+        total = 0
+
+        for i, data_item in enumerate(pbar):
+            cached = cache_mel(data_item, mel_function=self.get_mel)
+            total += cached
+
+        self.load_mel_from_disk = True
+        print("Done caching mels! New mels cached: " + str(total))
 
     def get_mel_text_pair(self, audiopath_and_text):
         r"""
@@ -194,11 +216,10 @@ class TextMelLoader(Dataset):
             melspec = self.stft.mel_spectrogram(audio_norm)
             melspec = torch.squeeze(melspec, 0)
         else:
-            melspec = torch.from_numpy(np.load(filename))
+            melspec = torch.from_numpy(np.load(Path(filename).with_suffix(".npy")))
             assert melspec.size(0) == self.stft.n_mel_channels, "Mel dimension mismatch: given {}, expected {}".format(
                 melspec.size(0), self.stft.n_mel_channels
             )
-
         return melspec
 
     def get_text(self, text):

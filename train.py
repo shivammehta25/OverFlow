@@ -97,6 +97,7 @@ if __name__ == "__main__":
         stochastic_weight_avg=hparams.stochastic_weight_avg,
         precision=hparams.precision,
         track_grad_norm=2,
+        limit_val_batches=10,
     )
 
     trainer.fit(model, data_module)

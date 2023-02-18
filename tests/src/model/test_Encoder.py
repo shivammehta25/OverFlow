@@ -21,8 +21,10 @@ def test_Encoder_forward(
     assert (text_lengths_post_enc == (input_lengths * state_per_phone)).all()
 
 
-def test_FPEncoder(hparams, dummy_data):
+@pytest.mark.parametrize("rel_attention", [True, False])
+def test_FPEncoder(hparams, dummy_data, rel_attention):
     hparams.encoder_type = "transformer"
+    hparams.encoder_params["transformer"]["rel_attention"] = rel_attention
     encoder = Encoder(hparams)
     text_padded, input_lengths, _, _, _ = dummy_data
     emb_dim = hparams.encoder_params[hparams.encoder_type]["hidden_channels"]

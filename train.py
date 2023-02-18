@@ -93,10 +93,10 @@ if __name__ == "__main__":
         accelerator="ddp" if len(hparams.gpus) > 1 else None,
         val_check_interval=hparams.val_check_interval,
         gradient_clip_val=hparams.grad_clip_thresh,
-        track_grad_norm=2,
         max_epochs=hparams.max_epochs,
         stochastic_weight_avg=hparams.stochastic_weight_avg,
         precision=hparams.precision,
+        track_grad_norm=2,
     )
 
     trainer.fit(model, data_module)

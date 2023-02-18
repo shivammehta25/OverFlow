@@ -222,4 +222,5 @@ class TrainingModule(pl.LightningModule):
             grad_norm_dict: Dictionary containing current grad norm metrics
 
         """
-        self.log_dict(grad_norm_dict, on_step=True, on_epoch=True, prog_bar=False, logger=True)
+        norm_dict = {"grad_norm/" + k: v for k, v in grad_norm_dict.items()}
+        self.log_dict(norm_dict, on_step=True, on_epoch=True, prog_bar=False, logger=True)

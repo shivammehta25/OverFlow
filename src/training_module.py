@@ -82,15 +82,17 @@ class TrainingModule(pl.LightningModule):
             sync_dist=True,
             logger=False,
         )
-        self._get_gpu_stats(loss)
+        self.set_gpu_stats(loss)
+        return loss
+
+    def set_gpu_stats(self, some_tensor):
+        free, total = (x / (1024 * 1024) for x in torch.cuda.mem_get_info(some_tensor.device.index))
+        current = free - total
+        self.max_gpu_usage = max(self.max_gpu_usage, current)
         self.log(
             "trainer_stats/MaxGPUMemory", self.max_gpu_usage, logger=True, prog_bar=True, on_step=True, sync_dist=True
         )
-        return loss
-
-    def _get_gpu_stats(self, some_tensor):
-        free, total = (x / (1024 * 1024) for x in torch.cuda.mem_get_info(some_tensor.device.index))
-        self.max_gpu_usage = max(self.max_gpu_usage, total - free)
+        self.log("trainer_stats/CurrentGPUMemory", current, logger=True, prog_bar=True, on_step=True, sync_dist=True)
 
     def validation_step(self, val_batch, batch_idx):
         r"""

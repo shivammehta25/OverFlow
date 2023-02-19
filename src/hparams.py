@@ -34,25 +34,29 @@ def create_hparams(generate_parameters=False):
             )
 
         data_properties = torch.load(data_parameters_filename)
-        mean = data_properties["data_mean"].item()
-        std = data_properties["data_std"].item()
+        mel_mean = data_properties["mel_mean"].item()
+        mel_std = data_properties["mel_std"].item()
+
+        motion_mean = data_properties["motion_mean"].item()
+        motion_std = data_properties["motion_std"].item()
+
         init_transition_prob = data_properties["init_transition_prob"]
         go_token_init_value = data_properties["go_token_init_value"]
-        normaliser = Normalise(mean, std)
+        mel_normaliser = Normalise(mel_mean, mel_std)
+        motion_normaliser = Normalise(motion_mean, motion_std)
     else:
         # Must be while generating data properties
-        normaliser = None
+        mel_normaliser = None
+        motion_normaliser = None
         init_transition_prob = None
         go_token_init_value = None
-        mean = None
-        std = None
 
     hparams = Namespace(
         ################################
         # Experiment Parameters        #
         ################################
-        run_name="Cormac",
-        gpus=[2],
+        run_name="Test",
+        gpus=[0],
         max_epochs=50000,
         val_check_interval=100,
         save_model_checkpoint=500,
@@ -70,11 +74,12 @@ def create_hparams(generate_parameters=False):
         ################################
         # Data Parameters             #
         ################################
-        batch_size=16,
+        batch_size=10,
         load_mel_from_disk=False,
         training_files="data/filelists/cormac_train.txt",
         validation_files="data/filelists/cormac_val.txt",
         text_cleaners=["english_cleaners"],
+        motion_fileloc="data/cormac/processed_sm0_0_86fps",
         # phonetise=False,
         # training_files="data/filelists/ljs_audio_text_train_filelist.txt",
         # validation_files="data/filelists/ljs_audio_text_val_filelist.txt",
@@ -94,9 +99,14 @@ def create_hparams(generate_parameters=False):
         mel_fmin=0.0,
         mel_fmax=8000.0,
         ################################
+        # Motion Parameters            #
+        ################################
+        n_motion_joints=48,
+        ################################
         # Data Properties              #
         ################################
-        normaliser=normaliser,
+        mel_normaliser=mel_normaliser,
+        motion_normaliser=motion_normaliser,
         go_token_init_value=go_token_init_value,
         init_transition_probability=init_transition_prob,
         init_mean=0.0,
@@ -133,7 +143,7 @@ def create_hparams(generate_parameters=False):
         # HMM Parameters               #
         ################################
         n_frames_per_step=1,  # AR Order
-        train_go=True,
+        train_go=False,
         variance_floor=0.001,
         data_dropout=0,
         data_dropout_while_eval=True,

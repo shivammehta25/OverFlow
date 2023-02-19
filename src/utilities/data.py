@@ -9,6 +9,7 @@ from multiprocessing import Pool, cpu_count
 from pathlib import Path
 
 import numpy as np
+import pandas as pd
 import torch
 from scipy.io.wavfile import read
 from torch.utils.data.dataset import Dataset
@@ -58,7 +59,7 @@ def cache_mel(data_item, mel_function, ext=".npy"):
     return 1
 
 
-class TextMelCollate:
+class TextMelMotionCollate:
     r"""
     Zero-pads model inputs and targets based on number of frames per setep
     """
@@ -93,14 +94,21 @@ class TextMelCollate:
         mel_padded = torch.FloatTensor(len(batch), num_mels, max_target_len)
         mel_padded.zero_()
         output_lengths = torch.LongTensor(len(batch))
+
+        # include motion padded
+        num_motion = batch[0][2].size(0)
+        motion_padded = torch.FloatTensor(len(batch), num_motion, max_target_len)
+        motion_padded.zero_()
         for i in range(len(ids_sorted_decreasing)):
             mel = batch[ids_sorted_decreasing[i]][1]
             mel_padded[i, :, : mel.size(1)] = mel
+
+            motion = batch[ids_sorted_decreasing[i]][2]
+            motion_padded[i, :, : motion.size(1)] = motion
+
             output_lengths[i] = mel.size(1)
 
-        # torch.empty is a substite for gate_padded, will be removed later when more
-        # test ensures there is no regression
-        return text_padded, input_lengths, mel_padded, torch.empty([1]), output_lengths
+        return text_padded, input_lengths, mel_padded, motion_padded, output_lengths
 
 
 class TextMelLoader(Dataset):
@@ -112,7 +120,7 @@ class TextMelLoader(Dataset):
     3) computes mel-spectrograms from audio files.
     """
 
-    def __init__(self, audiopaths_and_text, hparams, transform=None):
+    def __init__(self, audiopaths_and_text, hparams, mel_transform=None, motion_transform=None):
         r"""
         Args:
             audiopaths_and_text:
@@ -121,13 +129,16 @@ class TextMelLoader(Dataset):
         """
         self.file_loc = Path(audiopaths_and_text)
         self.audiopaths_and_text = load_filepaths_and_text(audiopaths_and_text)
-        self.transform = transform
+        self.motion_fileloc = Path(hparams.motion_fileloc)
+        self.mel_transform = mel_transform
+        self.motion_transform = motion_transform
         self.text_cleaners = hparams.text_cleaners
         self.max_wav_value = hparams.max_wav_value
         self.sampling_rate = hparams.sampling_rate
         self.phonetise = hparams.phonetise
         self.load_mel_from_disk = hparams.load_mel_from_disk
         self.add_blank = hparams.add_blank
+        self.n_motion_joints = hparams.n_motion_joints
         self.stft = TacotronSTFT(
             hparams.filter_length,
             hparams.hop_length,
@@ -182,7 +193,7 @@ class TextMelLoader(Dataset):
         self.load_mel_from_disk = True
         print("Done caching mels! New mels cached: " + str(total))
 
-    def get_mel_text_pair(self, audiopath_and_text):
+    def get_mel_text_motion_tuple(self, audiopath_and_text):
         r"""
         Takes audiopath_text list input where list[0] is location for wav file
             and list[1] is the text
@@ -194,11 +205,29 @@ class TextMelLoader(Dataset):
         # This text is int tensor of the input representation
         text = self.get_text(text)
         mel = self.get_mel(audiopath)
-        if self.transform:
-            for t in self.transform:
+
+        if self.mel_transform:
+            for t in self.mel_transform:
                 mel = t(mel)
 
-        return (text, mel)
+        motion = self.get_motion(audiopath)
+        if self.motion_transform:
+            for t in self.motion_transform:
+                motion = t(motion)
+
+        mel, motion = self.resize_mel_motion_to_same_size(mel, motion)
+        return (text, mel, motion)
+
+    def get_motion(self, filename, ext=".expmap_86.1328125fps.pkl"):
+        file_loc = self.motion_fileloc / Path(Path(filename).name).with_suffix(ext)
+        motion = torch.from_numpy(pd.read_pickle(file_loc).to_numpy())
+        motion = torch.concat([motion, torch.zeros(motion.shape[0], 3)], dim=1)
+        return motion
+
+    def resize_mel_motion_to_same_size(self, mel, motion):
+        splitter_idx = min(mel.shape[1], motion.shape[0])
+        mel, motion = mel[:, :splitter_idx], motion[:splitter_idx].T
+        return mel, motion
 
     def get_mel(self, filename):
         r"""
@@ -240,7 +269,7 @@ class TextMelLoader(Dataset):
     #     return text_norm
 
     def __getitem__(self, index):
-        return self.get_mel_text_pair(self.audiopaths_and_text[index])
+        return self.get_mel_text_motion_tuple(self.audiopaths_and_text[index])
 
     def __len__(self):
         return len(self.audiopaths_and_text)

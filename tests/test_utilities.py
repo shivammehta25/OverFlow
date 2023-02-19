@@ -21,8 +21,15 @@ def get_a_mel():
     return torch.rand(80, length).clamp(min=1e-3).log()
 
 
-def get_a_text_mel_pair():
-    return get_a_text(), get_a_mel()
+# TODO: change number of channels
+def get_a_motion(mel_length):
+    return torch.randn(48, mel_length)
+
+
+def get_a_text_mel_motion_pair():
+    text, mel = get_a_text(), get_a_mel()
+    motion = get_a_motion(mel.shape[1])
+    return text, mel, motion
 
 
 def reset_all_weights(model: nn.Module) -> None:

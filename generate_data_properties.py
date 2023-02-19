@@ -14,7 +14,7 @@ from torch.utils.data import DataLoader
 from tqdm import tqdm
 
 from src.hparams import create_hparams
-from src.utilities.data import TextMelCollate, TextMelLoader
+from src.utilities.data import TextMelLoader, TextMelMotionCollate
 
 
 def to_gpu(x):
@@ -31,17 +31,16 @@ def parse_batch(batch):
     Args:
         batch: batch of data
     """
-    text_padded, input_lengths, mel_padded, gate_padded, output_lengths = batch
+    text_padded, input_lengths, mel_padded, motion_padded, output_lengths = batch
     text_padded = to_gpu(text_padded).long()
     input_lengths = to_gpu(input_lengths).long()
-    max_len = torch.max(input_lengths.data).item()
     mel_padded = to_gpu(mel_padded).float()
-    gate_padded = to_gpu(gate_padded).float()
+    motion_padded = to_gpu(motion_padded).float()
     output_lengths = to_gpu(output_lengths).long()
 
     return (
-        (text_padded, input_lengths, mel_padded, max_len, output_lengths),
-        (mel_padded, gate_padded),
+        (text_padded, input_lengths, mel_padded, motion_padded, output_lengths),
+        (mel_padded, motion_padded),
     )
 
 
@@ -67,15 +66,19 @@ def get_data_parameters_for_flat_start(train_loader, hparams):
     total_mel_sum = torch.zeros(1).cuda().type(torch.double)
     total_mel_sq_sum = torch.zeros(1).cuda().type(torch.double)
 
+    # For motion
+    total_motion_sum = torch.zeros(1).cuda().type(torch.double)
+    total_motion_sq_sum = torch.zeros(1).cuda().type(torch.double)
+
     # For go token
-    sum_first_observation = torch.zeros(hparams.n_mel_channels).cuda().type(torch.double)
+    sum_first_observation = torch.zeros(hparams.n_mel_channels + hparams.n_motion_joints).cuda().type(torch.double)
 
     print("For exact calculation we would do it with two loops")
     print("We first get the mean:")
     start = time.perf_counter()
 
     for i, batch in enumerate(tqdm(train_loader)):
-        (text_inputs, text_lengths, mels, max_len, mel_lengths), (
+        (text_inputs, text_lengths, mels, motions, mel_lengths), (
             _,
             gate_padded,
         ) = parse_batch(batch)
@@ -86,58 +89,92 @@ def get_data_parameters_for_flat_start(train_loader, hparams):
         total_mel_sum += torch.sum(mels)
         total_mel_sq_sum += torch.sum(torch.pow(mels, 2))
 
-        sum_first_observation += torch.sum(mels[:, :, 0], dim=0)
+        total_motion_sum += torch.sum(motions)
+        total_motion_sq_sum += torch.sum(torch.pow(motions, 2))
 
-    data_mean = total_mel_sum / (total_mel_len * hparams.n_mel_channels)
-    data_std = torch.sqrt((total_mel_sq_sum / (total_mel_len * hparams.n_mel_channels)) - torch.pow(data_mean, 2))
+        sum_first_observation += torch.sum(torch.concat([mels[:, :, 0], motions[:, :, 0]], dim=1), dim=0)
+
+    mel_mean = total_mel_sum / (total_mel_len * hparams.n_mel_channels)
+    mel_std = torch.sqrt((total_mel_sq_sum / (total_mel_len * hparams.n_mel_channels)) - torch.pow(mel_mean, 2))
+
+    motion_mean = total_motion_sum / (total_mel_len * hparams.n_motion_joints)
+    motion_std = torch.sqrt(
+        (total_motion_sq_sum / (total_mel_len * hparams.n_motion_joints)) - torch.pow(motion_mean, 2)
+    )
+
+    print("Single loop values")
+    print("".join(["-"] * 50))
+    print("Mel mean: ", mel_mean)
+    print("Mel std: ", mel_std)
+    print("Motion mean: ", motion_mean)
+    print("Motion std: ", motion_std)
 
     N_mean = total_state_len / len(train_loader.dataset)
+    if hparams.add_blank or (
+        hparams.encoder_type == "conv" and hparams.encoder_params["conv"]["states_per_phone"] == 2
+    ):
+        N_mean *= 2
 
     average_mel_len = total_mel_len / len(train_loader.dataset)
     average_duration_each_state = average_mel_len / N_mean
     init_transition_prob = 1 / average_duration_each_state
 
     go_token_init_value = sum_first_observation / len(train_loader.dataset)
-    go_token_init_value.sub_(data_mean).div_(data_std)
+    go_token_init_value[: hparams.n_mel_channels].sub_(mel_mean).div_(mel_std)
+    go_token_init_value[hparams.n_mel_channels :].sub_(motion_mean).div_(motion_std)
 
     print("Total Processing Time:", time.perf_counter() - start)
 
     print("Getting standard deviation")
-    sum_of_squared_error_data = torch.zeros(1).cuda().type(torch.double)
+    sum_of_squared_error_mel = torch.zeros(1).cuda().type(torch.double)
+    sum_of_squared_error_motion = torch.zeros(1).cuda().type(torch.double)
+
     start = time.perf_counter()
 
     for i, batch in enumerate(tqdm(train_loader)):
-        (text_inputs, text_lengths, mels, max_len, mel_lengths), (
+        (text_inputs, text_lengths, mels, motions, mel_lengths), (
             _,
             gate_padded,
         ) = parse_batch(batch)
-        x_minus_mean_square = (mels - data_mean).pow(2)
+        x_minus_mean_square_mel = (mels - mel_mean).pow(2)
+        x_minus_mean_square_motion = (motions - motion_mean).pow(2)
+
         T_max_batch = torch.max(mel_lengths)
 
         mask_tensor = mels.new_zeros(T_max_batch)
         mask = (
-            (
-                torch.arange(float(T_max_batch), out=mask_tensor).expand(len(mel_lengths), T_max_batch)
-                < (mel_lengths).unsqueeze(1)
-            )
-            .unsqueeze(1)
-            .expand(len(mel_lengths), hparams.n_mel_channels, T_max_batch)
-        )
+            torch.arange(float(T_max_batch), out=mask_tensor).expand(len(mel_lengths), T_max_batch)
+            < (mel_lengths).unsqueeze(1)
+        ).unsqueeze(1)
 
-        x_minus_mean_square *= mask
+        x_minus_mean_square_mel *= mask.expand(len(mel_lengths), hparams.n_mel_channels, T_max_batch)
+        x_minus_mean_square_motion *= mask.expand(len(mel_lengths), hparams.n_motion_joints, T_max_batch)
 
-        sum_of_squared_error_data += torch.sum(x_minus_mean_square)
+        sum_of_squared_error_mel += torch.sum(x_minus_mean_square_mel)
+        sum_of_squared_error_motion += torch.sum(x_minus_mean_square_motion)
 
-    std = torch.sqrt(sum_of_squared_error_data / (total_mel_len * hparams.n_mel_channels))
+    std_mel = torch.sqrt(sum_of_squared_error_mel / (total_mel_len * hparams.n_mel_channels))
+    std_motion = torch.sqrt(sum_of_squared_error_motion / (total_mel_len * hparams.n_motion_joints))
 
     print("Total Processing Time:", time.perf_counter() - start)
 
-    data_mean = data_mean.type(torch.float).cpu()
-    data_std = std.type(torch.float).cpu()
+    mel_mean = mel_mean.type(torch.float).cpu()
+    mel_std = std_mel.type(torch.float).cpu()
+    motion_mean = motion_mean.type(torch.float).cpu()
+    motion_std = std_motion.type(torch.float).cpu()
     go_token_init_value = go_token_init_value.type(torch.float).cpu()
     init_transition_prob = init_transition_prob.type(torch.float).cpu()
 
-    return data_mean, data_std, go_token_init_value, init_transition_prob
+    output = {
+        "mel_mean": mel_mean,
+        "mel_std": mel_std,
+        "motion_mean": motion_mean,
+        "motion_std": motion_std,
+        "go_token_init_value": go_token_init_value,
+        "init_transition_prob": init_transition_prob,
+    }
+
+    return output
 
 
 def main(args):
@@ -146,7 +183,7 @@ def main(args):
     hparams.batch_size = args.batch_size
 
     trainset = TextMelLoader(hparams.training_files, hparams)
-    collate_fn = TextMelCollate(hparams.n_frames_per_step)
+    collate_fn = TextMelMotionCollate(hparams.n_frames_per_step)
 
     train_loader = DataLoader(
         trainset,
@@ -156,29 +193,12 @@ def main(args):
         collate_fn=collate_fn,
     )
 
-    (
-        data_mean,
-        data_std,
-        go_token_init_value,
-        init_transition_prob,
-    ) = get_data_parameters_for_flat_start(train_loader, hparams)
+    output = get_data_parameters_for_flat_start(train_loader, hparams)
 
-    print(
-        {
-            "data_mean": data_mean.item(),
-            "data_std": data_std.item(),
-            "init_transition_prob": init_transition_prob.item(),
-            "go_token_init_value": go_token_init_value,
-        }
-    )
+    print({k: v.item() if v.numel() == 1 else v for k, v in output.items()})
 
     torch.save(
-        {
-            "data_mean": data_mean,
-            "data_std": data_std,
-            "init_transition_prob": init_transition_prob,
-            "go_token_init_value": go_token_init_value,
-        },
+        output,
         args.output_file,
     )
 

@@ -18,7 +18,7 @@ class HMM(nn.Module):
         self.emission_model = EmissionModel()
 
         self.prenet = Prenet(
-            hparams.n_mel_channels * hparams.n_frames_per_step,
+            (hparams.n_mel_channels + hparams.n_motion_joints) * hparams.n_frames_per_step,
             hparams.prenet_n_layers,
             hparams.prenet_dim,
             hparams.prenet_dropout,
@@ -37,11 +37,13 @@ class HMM(nn.Module):
             )
 
         if hparams.train_go:
-            self.go_tokens = nn.Parameter(torch.stack([hparams.go_token_init_value] * hparams.n_frames_per_step))
+            self.go_tokens = nn.Parameter(
+                torch.stack([hparams.go_token_init_value] * (hparams.n_frames_per_step + hparams.n_motion_joints))
+            )
         else:
             self.register_buffer(
                 "go_tokens",
-                torch.zeros(hparams.n_frames_per_step, hparams.n_mel_channels),
+                torch.zeros(hparams.n_frames_per_step, (hparams.n_mel_channels + hparams.n_motion_joints)),
             )
 
     def forward(self, text_embeddings, text_lengths, mel_inputs, mel_inputs_lengths):
@@ -193,14 +195,14 @@ class HMM(nn.Module):
         """
         batch_size, T, n_mel_channels = mel_inputs.shape
 
-        assert (
-            n_mel_channels == self.hparams.n_mel_channels
+        assert n_mel_channels == (
+            self.hparams.n_mel_channels + self.hparams.n_motion_joints
         ), "Mel channels not configured properly the input: {} and " "configuration: {} are different".format(
-            n_mel_channels, self.hparams.n_mel_channels
+            n_mel_channels, (self.hparams.n_mel_channels + self.hparams.n_motion_joints)
         )
 
         go_tokens = self.go_tokens.unsqueeze(0).expand(
-            batch_size, self.hparams.n_frames_per_step, self.hparams.n_mel_channels
+            batch_size, self.hparams.n_frames_per_step, (self.hparams.n_mel_channels + self.hparams.n_motion_joints)
         )
         ar_inputs = torch.cat((go_tokens, mel_inputs), dim=1)[:, :T]
         return ar_inputs

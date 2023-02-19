@@ -14,7 +14,7 @@ def test_Prenet(dummy_data, in_dim, n_layers, prenet_dim, prenet_dropout, dropou
         text_padded,
         input_lengths,
         mel_padded,
-        gate_padded,
+        motion_padded,
         output_lengths,
     ) = dummy_data
 

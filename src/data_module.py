@@ -7,7 +7,7 @@ import nltk
 import pytorch_lightning as pl
 from torch.utils.data import DataLoader
 
-from src.utilities.data import TextMelCollate, TextMelLoader
+from src.utilities.data import TextMelLoader, TextMelMotionCollate
 
 
 class LightningLoader(pl.LightningDataModule):
@@ -15,7 +15,7 @@ class LightningLoader(pl.LightningDataModule):
         super().__init__()
 
         self.hparams.update(vars(hparams))
-        self.collate_fn = TextMelCollate(self.hparams.n_frames_per_step)
+        self.collate_fn = TextMelMotionCollate(self.hparams.n_frames_per_step)
         self.num_workers = hparams.num_workers
 
     def prepare_data(self):
@@ -26,8 +26,12 @@ class LightningLoader(pl.LightningDataModule):
             nltk.download("punkt")
 
     def setup(self, stage=None):
-        self.trainset = TextMelLoader(self.hparams.training_files, self.hparams, [self.hparams.normaliser])
-        self.valset = TextMelLoader(self.hparams.validation_files, self.hparams, [self.hparams.normaliser])
+        self.trainset = TextMelLoader(
+            self.hparams.training_files, self.hparams, [self.hparams.mel_normaliser], [self.hparams.motion_normaliser]
+        )
+        self.valset = TextMelLoader(
+            self.hparams.validation_files, self.hparams, [self.hparams.mel_normaliser], [self.hparams.motion_normaliser]
+        )
 
     def train_dataloader(self):
         return DataLoader(

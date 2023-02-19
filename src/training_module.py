@@ -121,19 +121,21 @@ class TrainingModule(pl.LightningModule):
                 text_inputs,
                 text_lengths,
                 mels,
-                max_len,
+                motions,
                 mel_lengths,
             ) = self.get_an_element_of_validation_dataset()
             (
                 mel_output,
+                motion_output,
                 state_travelled,
                 input_parameters,
                 output_parameters,
             ) = self.model.sample(text_inputs[0], text_lengths[0])
-            mel_output_normalised = self.model.normaliser(mel_output)
+            mel_output_normalised = self.model.mel_normaliser(mel_output)
+            # motion_output_normalised = self.model.motion_normaliser(motion_output)
 
             with torch.inference_mode():
-                _ = self.model((text_inputs, text_lengths, mels, max_len, mel_lengths))
+                _ = self.model((text_inputs, text_lengths, mels, motions, mel_lengths))
 
             log_validation(
                 self.logger.experiment,
@@ -168,18 +170,19 @@ class TrainingModule(pl.LightningModule):
             mel_lengths (torch.LongTensor): The lengths of the mel spectrogram.
         """
         x, y = self.model.parse_batch(next(iter(self.val_dataloader())))
-        (text_inputs, text_lengths, mels, max_len, mel_lengths) = x
+        (text_inputs, text_lengths, mels, motions, mel_lengths) = x
         text_inputs = text_inputs[0].unsqueeze(0).to(self.device)
         text_lengths = text_lengths[0].unsqueeze(0).to(self.device)
         mels = mels[0].unsqueeze(0).to(self.device)
-        max_len = torch.max(text_lengths).data
+        motions = motions[0].unsqueeze(0).to(self.device)
         mel_lengths = mel_lengths[0].unsqueeze(0).to(self.device)
         # Sometimes in a batch the element which has the maximum mel len
         # is not the same as the element which has the maximum text len.
         # This prevent the model to break down when plotting validation.
         mels = mels[:, :, : mel_lengths.item()]
+        motions = motions[:, :, : mel_lengths.item()]
 
-        return text_inputs, text_lengths, mels, max_len, mel_lengths
+        return text_inputs, text_lengths, mels, motions, mel_lengths
 
     @torch.inference_mode()
     def inference(self, text_inputs, sampling_temp=1.0):

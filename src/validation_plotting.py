@@ -1,6 +1,11 @@
+import warnings
+
 import torch
 from pytorch_lightning.utilities import rank_zero_only
+from torchvision.io import read_video
 
+from pymo.preprocessing import MocapParameterizer
+from pymo.viz_tools import render_mp4
 from src.utilities.plotting import (
     plot_alpha_scaled_to_numpy,
     plot_go_tokens_to_numpy,
@@ -24,6 +29,9 @@ def log_validation(
     output_parameters,
     iteration,
     stft_module,
+    motion_input,
+    motion_output,
+    motion_visualizer_pipeline,
 ):
     """
     Args:
@@ -136,3 +144,19 @@ def log_validation(
         iteration,
         dataformats="HWC",
     )
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        motion_input = motion_input.squeeze(0).cpu().numpy()[:45].T
+        motion_output = motion_output.squeeze(0).cpu().numpy()[:, :45]
+        for text, motion in zip(["input", "output"], [motion_input, motion_output]):
+            bvh_values = motion_visualizer_pipeline.inverse_transform([motion])
+            X_pos = MocapParameterizer("position").fit_transform(bvh_values)
+            # print("Rendering video")
+            render_mp4(X_pos[0], f"{logger.log_dir}/{text}_{iteration}.mp4", axis_scale=200)
+
+        motion_output
+
+    # print("Adding video to tensorboard")
+    # video = read_video(f"{logger.log_dir}/{iteration}.mp4", output_format="TCHW", pts_unit="sec")
+    # logger.add_video("motion_input", video[0].unsqueeze(0), iteration, fps=video[2]['video_fps'])
+    # print("Added video to tensorboard")

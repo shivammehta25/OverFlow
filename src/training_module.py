@@ -19,11 +19,11 @@ class TrainingModule(pl.LightningModule):
         super().__init__()
         if type(hparams) != Namespace:
             hparams = Namespace(**hparams)
-
+        self.motion_visualizer = hparams.motion_visualizer
+        del hparams.motion_visualizer
         self.save_hyperparameters(hparams)
         hparams.logger = self.logger
         self.max_gpu_usage = 0
-
         self.model = OverFlow(hparams)
 
     def forward(self, x):
@@ -150,6 +150,9 @@ class TrainingModule(pl.LightningModule):
                 output_parameters,
                 self.global_step,
                 self.train_dataloader().dataset.stft,
+                motions,
+                motion_output,
+                self.motion_visualizer,
             )
 
             self.trainer.save_checkpoint(

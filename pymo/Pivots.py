@@ -1,4 +1,5 @@
 import numpy as np
+
 from pymo.Quaternions import Quaternions
 
 

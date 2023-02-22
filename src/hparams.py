@@ -6,6 +6,7 @@ Hyper Parameters for the experiment
 import os
 from argparse import Namespace
 
+import joblib as jl
 import torch
 
 from src.utilities.data import Normalise
@@ -55,8 +56,8 @@ def create_hparams(generate_parameters=False):
         ################################
         # Experiment Parameters        #
         ################################
-        run_name="TTSGRun",
-        gpus=[3],
+        run_name="Test_Visualization",
+        gpus=[0],
         max_epochs=50000,
         val_check_interval=100,
         save_model_checkpoint=500,
@@ -85,7 +86,7 @@ def create_hparams(generate_parameters=False):
         # validation_files="data/filelists/ljs_audio_text_val_filelist.txt",
         # text_cleaners=["english_cleaners"],
         phonetise=True,
-        add_blank=True,
+        add_blank=False,
         num_workers=40,
         ################################
         # Audio Parameters             #
@@ -102,6 +103,7 @@ def create_hparams(generate_parameters=False):
         # Motion Parameters            #
         ################################
         n_motion_joints=48,
+        motion_visualizer=jl.load("data/cormac/processed_sm0_0_86fps/data_pipe.expmap_86.1328125fps.sav"),
         ################################
         # Data Properties              #
         ################################

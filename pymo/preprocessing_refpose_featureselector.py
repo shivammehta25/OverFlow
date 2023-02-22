@@ -10,6 +10,9 @@ import numpy as np
 import pandas as pd
 import scipy.ndimage.filters as filters
 import transforms3d as t3d
+from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.pipeline import Pipeline
+
 from pymo.Pivots import Pivots
 from pymo.Quaternions import Quaternions
 from pymo.rotation_tools import (
@@ -22,8 +25,6 @@ from pymo.rotation_tools import (
     unroll,
     vectors2euler,
 )
-from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.pipeline import Pipeline
 
 
 class MocapParameterizer(BaseEstimator, TransformerMixin):

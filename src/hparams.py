@@ -6,6 +6,7 @@ Hyper Parameters for the experiment
 import os
 from argparse import Namespace
 
+import joblib as jl
 import torch
 
 from src.utilities.data import Normalise
@@ -51,8 +52,8 @@ def create_hparams(generate_parameters=False):
         ################################
         # Experiment Parameters        #
         ################################
-        run_name="Cormac",
-        gpus=[2],
+        run_name="Test",
+        gpus=[0],
         max_epochs=50000,
         val_check_interval=100,
         save_model_checkpoint=500,
@@ -70,7 +71,7 @@ def create_hparams(generate_parameters=False):
         ################################
         # Data Parameters             #
         ################################
-        batch_size=16,
+        batch_size=10,
         load_mel_from_disk=False,
         training_files="data/filelists/cormac_train.txt",
         validation_files="data/filelists/cormac_val.txt",
@@ -90,12 +91,19 @@ def create_hparams(generate_parameters=False):
         filter_length=1024,
         hop_length=256,
         win_length=1024,
-        n_mel_channels=80,
+        mel_channels_audio=80,
         mel_fmin=0.0,
         mel_fmax=8000.0,
         ################################
+        # Audio Parameters             #
+        ################################
+        motion_fileloc="data/cormac/processed_sm0_0_86fps",
+        n_motion_vectors=45,
+        motion_visualizer=jl.load("data/cormac/processed_sm0_0_86fps/data_pipe.expmap_86.1328125fps.sav"),
+        ################################
         # Data Properties              #
         ################################
+        n_mel_channels=128,
         normaliser=normaliser,
         go_token_init_value=go_token_init_value,
         init_transition_probability=init_transition_prob,
@@ -133,7 +141,7 @@ def create_hparams(generate_parameters=False):
         # HMM Parameters               #
         ################################
         n_frames_per_step=1,  # AR Order
-        train_go=True,
+        train_go=False,
         variance_floor=0.001,
         data_dropout=0,
         data_dropout_while_eval=True,

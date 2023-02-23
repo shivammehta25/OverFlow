@@ -9,6 +9,7 @@ from multiprocessing import Pool, cpu_count
 from pathlib import Path
 
 import numpy as np
+import pandas as pd
 import torch
 from scipy.io.wavfile import read
 from torch.utils.data.dataset import Dataset
@@ -128,11 +129,15 @@ class TextMelLoader(Dataset):
         self.phonetise = hparams.phonetise
         self.load_mel_from_disk = hparams.load_mel_from_disk
         self.add_blank = hparams.add_blank
+        self.mel_channels_audio = hparams.mel_channels_audio
+        self.n_motion_vectors = hparams.n_motion_vectors
+        self.n_mel_channels = hparams.n_mel_channels
+        self.motion_fileloc = Path(hparams.motion_fileloc)
         self.stft = TacotronSTFT(
             hparams.filter_length,
             hparams.hop_length,
             hparams.win_length,
-            hparams.n_mel_channels,
+            hparams.mel_channels_audio,
             hparams.sampling_rate,
             hparams.mel_fmin,
             hparams.mel_fmax,
@@ -217,10 +222,17 @@ class TextMelLoader(Dataset):
             melspec = torch.squeeze(melspec, 0)
         else:
             melspec = torch.from_numpy(np.load(Path(filename).with_suffix(".npy")))
-            assert melspec.size(0) == self.stft.n_mel_channels, "Mel dimension mismatch: given {}, expected {}".format(
-                melspec.size(0), self.stft.n_mel_channels
-            )
-        return melspec
+            assert (
+                melspec.size(0) == self.stft.mel_channels_audio
+            ), "Mel dimension mismatch: given {}, expected {}".format(melspec.size(0), self.stft.mel_channels_audio)
+        motion = self.get_motion(filename)
+        return self.resize_mel_motion_to_same_size(melspec, motion)
+
+    @staticmethod
+    def resize_mel_motion_to_same_size(mel, motion):
+        splitter_idx = min(mel.shape[1], motion.shape[1])
+        mel, motion = mel[:, :splitter_idx], motion[:, :splitter_idx]
+        return torch.concat([mel, motion], dim=0)
 
     def get_text(self, text):
         if self.cleaned_text:
@@ -231,6 +243,18 @@ class TextMelLoader(Dataset):
             text_norm = intersperse(text_norm, 0)
         text_norm = torch.LongTensor(text_norm)
         return text_norm
+
+    def get_motion(self, filename, ext=".expmap_86.1328125fps.pkl"):
+        file_loc = self.motion_fileloc / Path(Path(filename).name).with_suffix(ext)
+        motion = torch.from_numpy(pd.read_pickle(file_loc).to_numpy())
+        motion = torch.concat(
+            [
+                motion,
+                torch.randn(motion.shape[0], self.n_mel_channels - (self.mel_channels_audio + self.n_motion_vectors)),
+            ],
+            dim=1,
+        )
+        return motion.T
 
     # def get_text(self, text):
     #     if self.phonetise:

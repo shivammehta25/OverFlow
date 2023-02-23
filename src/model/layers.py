@@ -93,18 +93,18 @@ class TacotronSTFT(torch.nn.Module):
         filter_length=1024,
         hop_length=256,
         win_length=1024,
-        n_mel_channels=80,
+        mel_channels_audio=80,
         sampling_rate=22050,
         mel_fmin=0.0,
         mel_fmax=8000.0,
     ):
         super().__init__()
-        self.n_mel_channels = n_mel_channels  # 80
+        self.mel_channels_audio = mel_channels_audio  # 80
         self.sampling_rate = sampling_rate  # 22050
         self.stft_fn = STFT(filter_length, hop_length, win_length)  # default values
         # """This produces a linear transformation matrix to project FFT bins onto Mel-frequency bins."""
         mel_basis = librosa_mel_fn(
-            sampling_rate, filter_length, n_mel_channels, mel_fmin, mel_fmax
+            sampling_rate, filter_length, mel_channels_audio, mel_fmin, mel_fmax
         )  # all default values
 
         mel_basis = torch.from_numpy(mel_basis).float()
@@ -149,7 +149,7 @@ class TacotronSTFT(torch.nn.Module):
         """
         return torch.max(mel_spec.new_tensor(1e-10), torch.matmul(self.inv_mel_basis, mel_spec))
 
-    def griffin_lim(self, mel_spec, n_iters=15):
+    def griffin_lim(self, mel_spec, n_iters=30):
         """Applies Griffin-Lim's raw to reconstruct phase.
 
         Args:

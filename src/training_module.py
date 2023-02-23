@@ -20,6 +20,9 @@ class TrainingModule(pl.LightningModule):
         if type(hparams) != Namespace:
             hparams = Namespace(**hparams)
 
+        self.motion_visualizer = hparams.motion_visualizer
+        del hparams.motion_visualizer
+
         self.save_hyperparameters(hparams)
         hparams.logger = self.logger
         self.max_gpu_usage = 0
@@ -141,11 +144,13 @@ class TrainingModule(pl.LightningModule):
                 mel_output,
                 mel_output_normalised,
                 state_travelled,
-                mels[0],
+                self.hparams.normaliser.inverse_normalise(mels[0]),
                 input_parameters,
                 output_parameters,
                 self.global_step,
                 self.train_dataloader().dataset.stft,
+                self.motion_visualizer,
+                self.hparams,
             )
 
             self.trainer.save_checkpoint(

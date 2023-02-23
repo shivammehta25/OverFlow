@@ -3,7 +3,7 @@ FROM nvcr.io/nvidia/pytorch:21.11-py3
 # We need a named user for ids to map correctly in VS Code
 RUN groupadd -r docker-user && useradd -r -m -s /bin/false -g docker-user docker-user
 
-RUN apt update && apt install -y less nano jq git libsndfile1-dev sudo vim festival espeak-ng
+RUN apt update && apt install -y less nano jq git libsndfile1-dev sudo vim festival espeak-ng ffmpeg
 
 COPY bash.bashrc /etc/bash.bashrc
 

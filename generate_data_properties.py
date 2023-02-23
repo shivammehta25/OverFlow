@@ -110,10 +110,10 @@ def get_data_parameters_for_flat_start(train_loader, hparams):
     print("Motion std: ", motion_std)
 
     N_mean = total_state_len / len(train_loader.dataset)
-    if hparams.add_blank or (
-        hparams.encoder_type == "conv" and hparams.encoder_params["conv"]["states_per_phone"] == 2
-    ):
-        N_mean *= 2
+    # if hparams.add_blank or (
+    #     hparams.encoder_type == "conv" and hparams.encoder_params["conv"]["states_per_phone"] == 2
+    # ):
+    #     N_mean *= 1/2
 
     average_mel_len = total_mel_len / len(train_loader.dataset)
     average_duration_each_state = average_mel_len / N_mean

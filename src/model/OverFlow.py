@@ -48,8 +48,6 @@ class OverFlow(nn.Module):
 
     def forward(self, inputs):
         text_inputs, text_lengths, mels, motions, mel_lengths = inputs
-        with torch.no_grad():
-            motions.fill_(0.95)
         text_lengths, mel_lengths = text_lengths.data, mel_lengths.data
         embedded_inputs = self.embedding(text_inputs).transpose(1, 2)
         encoder_outputs, text_lengths = self.encoder(embedded_inputs, text_lengths)

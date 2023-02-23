@@ -149,7 +149,7 @@ class TacotronSTFT(torch.nn.Module):
         """
         return torch.max(mel_spec.new_tensor(1e-10), torch.matmul(self.inv_mel_basis, mel_spec))
 
-    def griffin_lim(self, mel_spec, n_iters=15):
+    def griffin_lim(self, mel_spec, n_iters=30):
         """Applies Griffin-Lim's raw to reconstruct phase.
 
         Args:

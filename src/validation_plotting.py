@@ -1,11 +1,14 @@
+import subprocess
 import warnings
+from pathlib import Path
 
+import soundfile as sf
 import torch
 from pytorch_lightning.utilities import rank_zero_only
-from torchvision.io import read_video
 
 from pymo.preprocessing import MocapParameterizer
 from pymo.viz_tools import render_mp4
+from pymo.writers import BVHWriter
 from src.utilities.plotting import (
     plot_alpha_scaled_to_numpy,
     plot_go_tokens_to_numpy,
@@ -81,6 +84,7 @@ def log_validation(
         iteration,
         dataformats="HWC",
     )
+    target_audio, sr = stft_module.griffin_lim(mel_targets.unsqueeze(0))
 
     logger.add_image(
         "synthesised/mel_synthesised",
@@ -88,8 +92,8 @@ def log_validation(
         iteration,
         dataformats="HWC",
     )
-    audio, sr = stft_module.griffin_lim(mel_output.transpose(1, 2))
-    logger.add_audio("synthesised/waveform_synthesised", audio, iteration, sample_rate=sr)
+    generated_audio, sr = stft_module.griffin_lim(mel_output.transpose(1, 2))
+    logger.add_audio("synthesised/waveform_synthesised", generated_audio, iteration, sample_rate=sr)
 
     logger.add_image(
         "synthesised/mel_synthesised_normalised",
@@ -144,17 +148,32 @@ def log_validation(
         iteration,
         dataformats="HWC",
     )
+
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
+
+        writer = BVHWriter()
         motion_input = motion_input.squeeze(0).cpu().numpy()[:45].T
         motion_output = motion_output.squeeze(0).cpu().numpy()[:, :45]
-        for text, motion in zip(["input", "output"], [motion_input, motion_output]):
+        for text, (motion, audio) in zip(
+            ["input", "output"], [(motion_input, target_audio), (motion_output, generated_audio)]
+        ):
             bvh_values = motion_visualizer_pipeline.inverse_transform([motion])
+            bvh_filename = f"{logger.log_dir}/{text}_{iteration}.bvh"
+            with open(bvh_filename, "w") as f:
+                writer.write(bvh_values[0], f)
+
             X_pos = MocapParameterizer("position").fit_transform(bvh_values)
             # print("Rendering video")
-            render_mp4(X_pos[0], f"{logger.log_dir}/{text}_{iteration}.mp4", axis_scale=200)
-
-        motion_output
+            bvh_filename = f"{logger.log_dir}/{text}_{iteration}.wav"
+            temp_video_filename = f"{logger.log_dir}/{text}_{iteration}_temp.mp4"
+            sf.write(bvh_filename, audio.flatten(), 22500, "PCM_24")
+            render_mp4(X_pos[0], temp_video_filename, axis_scale=200)
+            final_video_filename = f"{logger.log_dir}/{text}_{iteration}.mp4"
+            command = f"ffmpeg -i {temp_video_filename} -i {bvh_filename} -c:v copy -c:a aac {final_video_filename}"
+            subprocess.check_call(command, shell=True)
+            Path(bvh_filename).unlink()
+            Path(temp_video_filename).unlink()
 
     # print("Adding video to tensorboard")
     # video = read_video(f"{logger.log_dir}/{iteration}.mp4", output_format="TCHW", pts_unit="sec")

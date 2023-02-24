@@ -210,7 +210,7 @@ class TextMelLoader(Dataset):
             for t in self.mel_transform:
                 mel = t(mel)
 
-        motion = self.get_motion(audiopath)
+        motion = self.get_motion(audiopath, mel.shape[1])
         if self.motion_transform:
             for t in self.motion_transform:
                 motion = t(motion)
@@ -218,15 +218,18 @@ class TextMelLoader(Dataset):
         mel, motion = self.resize_mel_motion_to_same_size(mel, motion)
         return (text, mel, motion)
 
-    def get_motion(self, filename, ext=".expmap_86.1328125fps.pkl"):
-        file_loc = self.motion_fileloc / Path(Path(filename).name).with_suffix(ext)
-        motion = torch.from_numpy(pd.read_pickle(file_loc).to_numpy())
-        motion = torch.concat([motion, torch.randn(motion.shape[0], 3)], dim=1)
-        return motion
+    def get_motion(self, filename, mel_shape, ext=".expmap_86.1328125fps.pkl"):
+        try:
+            file_loc = self.motion_fileloc / Path(Path(filename).name).with_suffix(ext)
+            motion = torch.from_numpy(pd.read_pickle(file_loc).to_numpy())
+            motion = torch.concat([motion, torch.randn(motion.shape[0], 3)], dim=1)
+        except FileNotFoundError:
+            motion = torch.randn(mel_shape, self.n_motion_joints + 3)
+        return motion.T
 
     def resize_mel_motion_to_same_size(self, mel, motion):
-        splitter_idx = min(mel.shape[1], motion.shape[0])
-        mel, motion = mel[:, :splitter_idx], motion[:splitter_idx].T
+        splitter_idx = min(mel.shape[1], motion.shape[1])
+        mel, motion = mel[:, :splitter_idx], motion[:, :splitter_idx]
         return mel, motion
 
     def get_mel(self, filename):

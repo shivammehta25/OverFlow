@@ -56,7 +56,7 @@ def create_hparams(generate_parameters=False):
         ################################
         # Experiment Parameters        #
         ################################
-        run_name="TestVisualization",
+        run_name="LJRandnTTSGBranch",
         gpus=[0],
         max_epochs=50000,
         val_check_interval=100,
@@ -77,14 +77,12 @@ def create_hparams(generate_parameters=False):
         ################################
         batch_size=10,
         load_mel_from_disk=False,
-        training_files="data/filelists/cormac_train.txt",
-        validation_files="data/filelists/cormac_val.txt",
+        # training_files="data/filelists/cormac_train.txt",
+        # validation_files="data/filelists/cormac_val.txt",
         text_cleaners=["english_cleaners"],
         motion_fileloc="data/cormac/processed_sm0_0_86fps",
-        # phonetise=False,
-        # training_files="data/filelists/ljs_audio_text_train_filelist.txt",
-        # validation_files="data/filelists/ljs_audio_text_val_filelist.txt",
-        # text_cleaners=["english_cleaners"],
+        training_files="data/filelists/ljs_audio_text_train_filelist.txt",
+        validation_files="data/filelists/ljs_audio_text_val_filelist.txt",
         phonetise=True,
         add_blank=True,
         num_workers=40,

@@ -35,6 +35,7 @@ def log_validation(
     motion_input,
     motion_output,
     motion_visualizer_pipeline,
+    resumed_from_checkpoint,
 ):
     """
     Args:
@@ -84,7 +85,6 @@ def log_validation(
         iteration,
         dataformats="HWC",
     )
-    target_audio, sr = stft_module.griffin_lim(mel_targets.unsqueeze(0))
 
     logger.add_image(
         "synthesised/mel_synthesised",
@@ -152,30 +152,46 @@ def log_validation(
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
 
-        writer = BVHWriter()
-        motion_input = motion_input.squeeze(0).cpu().numpy()[:45].T
-        motion_output = motion_output.squeeze(0).cpu().numpy()[:, :45]
-        for text, (motion, audio) in zip(
-            ["input", "output"], [(motion_input, target_audio), (motion_output, generated_audio)]
-        ):
-            bvh_values = motion_visualizer_pipeline.inverse_transform([motion])
-            bvh_filename = f"{logger.log_dir}/{text}_{iteration}.bvh"
+        if iteration == 0 or resumed_from_checkpoint is not None:
+            # Add target audio
+            target_audio, sr = stft_module.griffin_lim(mel_targets.unsqueeze(0))
+            logger.add_audio("natural_speech/griffin_lim", target_audio, iteration, sample_rate=sr)
+            sf.write(f"{logger.log_dir}/input_{iteration}.wav", target_audio.flatten(), 22500, "PCM_24")
+
+            # Add motion target
+            motion_input = motion_input.squeeze(0).cpu().numpy()[:45].T
+            bvh_values = motion_visualizer_pipeline.inverse_transform([motion_input])
+            bvh_filename = f"{logger.log_dir}/input_{iteration}.bvh"
+
+            # Write input bvh file
+            writer = BVHWriter()
             with open(bvh_filename, "w") as f:
                 writer.write(bvh_values[0], f)
 
+            # To stickfigure
             X_pos = MocapParameterizer("position").fit_transform(bvh_values)
-            # print("Rendering video")
-            bvh_filename = f"{logger.log_dir}/{text}_{iteration}.wav"
-            temp_video_filename = f"{logger.log_dir}/{text}_{iteration}_temp.mp4"
-            sf.write(bvh_filename, audio.flatten(), 22500, "PCM_24")
-            render_mp4(X_pos[0], temp_video_filename, axis_scale=200)
-            final_video_filename = f"{logger.log_dir}/{text}_{iteration}.mp4"
-            command = f"ffmpeg -i {temp_video_filename} -i {bvh_filename} -c:v copy -c:a aac {final_video_filename}"
-            subprocess.check_call(command, shell=True)
-            Path(bvh_filename).unlink()
-            Path(temp_video_filename).unlink()
+            render_mp4(X_pos[0], f"{logger.log_dir}/input_temp_{iteration}.mp4", axis_scale=200)
+            combine_video_audio(
+                f"{logger.log_dir}/input_temp_{iteration}.mp4",
+                f"{logger.log_dir}/input_{iteration}.wav",
+                f"{logger.log_dir}/input_{iteration}.mp4",
+            )
 
-    # print("Adding video to tensorboard")
-    # video = read_video(f"{logger.log_dir}/{iteration}.mp4", output_format="TCHW", pts_unit="sec")
-    # logger.add_video("motion_input", video[0].unsqueeze(0), iteration, fps=video[2]['video_fps'])
-    # print("Added video to tensorboard")
+        # Generate motion output
+        motion_output = motion_output.squeeze(0).cpu().numpy()[:, :45]
+        bvh_values = motion_visualizer_pipeline.inverse_transform([motion_output])
+        X_pos = MocapParameterizer("position").fit_transform(bvh_values)
+        sf.write(f"{logger.log_dir}/output_{iteration}.wav", generated_audio.flatten(), 22500, "PCM_24")
+        render_mp4(X_pos[0], f"{logger.log_dir}/output_temp_{iteration}.mp4", axis_scale=200)
+        combine_video_audio(
+            f"{logger.log_dir}/output_temp_{iteration}.mp4",
+            f"{logger.log_dir}/output_{iteration}.wav",
+            f"{logger.log_dir}/output_{iteration}.mp4",
+        )
+
+
+def combine_video_audio(video_filename, audio_filename, final_filename):
+    command = f"ffmpeg -i {video_filename} -i {audio_filename} -c:v copy -c:a aac {final_filename}"
+    subprocess.check_call(command, shell=True)
+    Path(video_filename).unlink()
+    Path(audio_filename).unlink()

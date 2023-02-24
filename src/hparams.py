@@ -52,8 +52,8 @@ def create_hparams(generate_parameters=False):
         ################################
         # Experiment Parameters        #
         ################################
-        run_name="Test",
-        gpus=[0],
+        run_name="CormacNoise",
+        gpus=[1],
         max_epochs=50000,
         val_check_interval=100,
         save_model_checkpoint=500,

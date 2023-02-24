@@ -224,8 +224,8 @@ class TextMelLoader(Dataset):
             melspec = torch.from_numpy(np.load(Path(filename).with_suffix(".npy")))
             assert (
                 melspec.size(0) == self.stft.mel_channels_audio
-            ), "Mel dimension mismatch: given {}, expected {}".format(melspec.size(0), self.stft.mel_channels_audio)
-        motion = self.get_motion(filename)
+            ), f"Mel dimension mismatch: given {melspec.size(0)}, expected {self.stft.mel_channels_audio}"
+        motion = self.get_motion(filename, melspec.shape[1])
         return self.resize_mel_motion_to_same_size(melspec, motion)
 
     @staticmethod
@@ -244,16 +244,23 @@ class TextMelLoader(Dataset):
         text_norm = torch.LongTensor(text_norm)
         return text_norm
 
-    def get_motion(self, filename, ext=".expmap_86.1328125fps.pkl"):
-        file_loc = self.motion_fileloc / Path(Path(filename).name).with_suffix(ext)
-        motion = torch.from_numpy(pd.read_pickle(file_loc).to_numpy())
-        motion = torch.concat(
-            [
-                motion,
-                torch.randn(motion.shape[0], self.n_mel_channels - (self.mel_channels_audio + self.n_motion_vectors)),
-            ],
-            dim=1,
-        )
+    def get_motion(self, filename, mel_spec_size=None, ext=".expmap_86.1328125fps.pkl"):
+        try:
+            raise FileNotFoundError
+            file_loc = self.motion_fileloc / Path(Path(filename).name).with_suffix(ext)
+            motion = torch.from_numpy(pd.read_pickle(file_loc).to_numpy())
+            motion = torch.concat(
+                [
+                    motion,
+                    torch.randn(
+                        motion.shape[0], self.n_mel_channels - (self.mel_channels_audio + self.n_motion_vectors)
+                    ),
+                ],
+                dim=1,
+            )
+        except FileNotFoundError:
+            motion = torch.randn(mel_spec_size, self.n_mel_channels - self.mel_channels_audio)
+
         return motion.T
 
     # def get_text(self, text):

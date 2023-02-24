@@ -14,3 +14,5 @@ pytest==7.1.2
 ipywidgets
 conformer==0.2.5
 phonemizer==3.2.1
+transforms3d==0.4.1
+scikit-learn==1.2.0

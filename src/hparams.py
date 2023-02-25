@@ -56,7 +56,7 @@ def create_hparams(generate_parameters=False):
         ################################
         # Experiment Parameters        #
         ################################
-        run_name="Test",
+        run_name="LJNoise2PrenetTTSG",
         gpus=[1],
         max_epochs=50000,
         val_check_interval=100,

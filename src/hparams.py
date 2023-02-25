@@ -57,7 +57,7 @@ def create_hparams(generate_parameters=False):
         # Experiment Parameters        #
         ################################
         run_name="LJRandnTTSGBranch",
-        gpus=[0],
+        gpus=[2],
         max_epochs=50000,
         val_check_interval=100,
         save_model_checkpoint=500,
@@ -75,7 +75,7 @@ def create_hparams(generate_parameters=False):
         ################################
         # Data Parameters             #
         ################################
-        batch_size=10,
+        batch_size=18,
         load_mel_from_disk=False,
         # training_files="data/filelists/cormac_train.txt",
         # validation_files="data/filelists/cormac_val.txt",

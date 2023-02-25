@@ -152,7 +152,7 @@ def log_validation(
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
 
-        if iteration == 0 or resumed_from_checkpoint is not None:
+        if iteration == 0:
             # Add target audio
             target_audio, sr = stft_module.griffin_lim(mel_targets.unsqueeze(0))
             logger.add_audio("natural_speech/griffin_lim", target_audio, iteration, sample_rate=sr)

@@ -17,11 +17,18 @@ class HMM(nn.Module):
         self.transition_model = TransitionModel()
         self.emission_model = EmissionModel()
 
-        self.prenet = Prenet(
-            hparams.n_mel_channels * hparams.n_frames_per_step,
+        self.prenet_mel = Prenet(
+            hparams.mel_channels_audio * hparams.n_frames_per_step,
             hparams.prenet_n_layers,
             hparams.prenet_dim,
-            hparams.prenet_dropout,
+            hparams.prenet_dropout_mel,
+        )
+
+        self.prenet_motion = Prenet(
+            (hparams.n_mel_channels - hparams.mel_channels_audio) * hparams.n_frames_per_step,
+            hparams.prenet_n_layers,
+            hparams.prenet_dim,
+            hparams.prenet_dropout_motion,
         )
 
         self.post_prenet_rnn = nn.LSTMCell(input_size=hparams.prenet_dim, hidden_size=hparams.post_prenet_rnn_dim)
@@ -179,7 +186,17 @@ class HMM(nn.Module):
         prenet_input = self.perform_data_dropout_of_ar_mel_inputs(
             ar_inputs[:, t : t + self.hparams.n_frames_per_step], data_dropout_flag
         )
-        ar_inputs_prenet = self.prenet(prenet_input.flatten(1), prenet_dropout_flag)
+        prenet_mel_input = prenet_input[:, :, : self.hparams.mel_channels_audio]
+        prenet_motion_input = prenet_input[
+            :,
+            :,
+            self.hparams.mel_channels_audio : self.hparams.mel_channels_audio
+            + (self.hparams.n_mel_channels - self.hparams.mel_channels_audio),
+        ]
+        ar_inputs_prenet_mel = self.prenet_mel(prenet_mel_input.flatten(1), prenet_dropout_flag)
+        ar_inputs_prenet_motion = self.prenet_motion(prenet_motion_input.flatten(1), prenet_dropout_flag)
+
+        ar_inputs_prenet = ar_inputs_prenet_mel + torch.sigmoid(ar_inputs_prenet_motion)
         h_post_prenet, c_post_prenet = self.post_prenet_rnn(ar_inputs_prenet, (h_post_prenet, c_post_prenet))
 
         return h_post_prenet, c_post_prenet
@@ -384,7 +401,13 @@ class HMM(nn.Module):
                 )
                 ar_mel_inputs = dropout_mask * ar_mel_inputs
 
-            prenet_output = self.prenet(ar_mel_inputs.flatten(1).unsqueeze(0), prenet_dropout_flag)
+            prenet_output_mel = self.prenet_mel(
+                ar_mel_inputs[:, :, : self.hparams.mel_channels_audio].flatten(1).unsqueeze(0), prenet_dropout_flag
+            )
+            prenet_output_motion = self.prenet_motion(
+                ar_mel_inputs[:, :, self.hparams.mel_channels_audio :].flatten(1).unsqueeze(0), prenet_dropout_flag
+            )
+            prenet_output = prenet_output_mel + torch.sigmoid(prenet_output_motion)
             # will be 1 while sampling
             h_post_prenet, c_post_prenet = self.post_prenet_rnn(
                 prenet_output.squeeze(0), (h_post_prenet, c_post_prenet)

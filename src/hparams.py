@@ -52,8 +52,8 @@ def create_hparams(generate_parameters=False):
         ################################
         # Experiment Parameters        #
         ################################
-        run_name="CormacNoise",
-        gpus=[1],
+        run_name="TwoPrenet",
+        gpus=[3],
         max_epochs=50000,
         val_check_interval=100,
         save_model_checkpoint=500,
@@ -95,7 +95,7 @@ def create_hparams(generate_parameters=False):
         mel_fmin=0.0,
         mel_fmax=8000.0,
         ################################
-        # Audio Parameters             #
+        # Motion Parameters             #
         ################################
         motion_fileloc="data/cormac/processed_sm0_0_86fps",
         n_motion_vectors=45,
@@ -155,7 +155,8 @@ def create_hparams(generate_parameters=False):
         ################################
         prenet_n_layers=2,
         prenet_dim=256,
-        prenet_dropout=0.5,
+        prenet_dropout_mel=0.5,
+        prenet_dropout_motion=0.5,
         prenet_dropout_while_eval=True,
         ################################
         # Decoder RNN parameters       #

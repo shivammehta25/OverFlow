@@ -56,8 +56,8 @@ def create_hparams(generate_parameters=False):
         ################################
         # Experiment Parameters        #
         ################################
-        run_name="LJNoise2PrenetTTSG",
-        gpus=[1],
+        run_name="Cormac2PrenetBothDropouts",
+        gpus=[2],
         max_epochs=50000,
         val_check_interval=100,
         save_model_checkpoint=500,
@@ -75,14 +75,14 @@ def create_hparams(generate_parameters=False):
         ################################
         # Data Parameters             #
         ################################
-        batch_size=18,
+        batch_size=10,
         load_mel_from_disk=False,
-        # training_files="data/filelists/cormac_train.txt",
-        # validation_files="data/filelists/cormac_val.txt",
+        training_files="data/filelists/cormac_train.txt",
+        validation_files="data/filelists/cormac_val.txt",
         text_cleaners=["english_cleaners"],
         motion_fileloc="data/cormac/processed_sm0_0_86fps",
-        training_files="data/filelists/ljs_audio_text_train_filelist.txt",
-        validation_files="data/filelists/ljs_audio_text_val_filelist.txt",
+        # training_files="data/filelists/ljs_audio_text_train_filelist.txt",
+        # validation_files="data/filelists/ljs_audio_text_val_filelist.txt",
         phonetise=True,
         add_blank=True,
         num_workers=40,
@@ -146,7 +146,7 @@ def create_hparams(generate_parameters=False):
         train_go=False,
         variance_floor=0.001,
         data_dropout_mel=0,
-        data_dropout_motion=0,
+        data_dropout_motion=0.5,
         data_dropout_while_eval=True,
         data_dropout_while_sampling=False,
         predict_means=True,
@@ -159,7 +159,7 @@ def create_hparams(generate_parameters=False):
         prenet_n_layers=2,
         prenet_dim=256,
         prenet_dropout_mel=0.5,
-        prenet_dropout_motion=0.5,
+        prenet_dropout_motion=0.7,
         prenet_dropout_while_eval=True,
         ################################
         # Decoder RNN parameters       #

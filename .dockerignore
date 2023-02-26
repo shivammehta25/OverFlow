@@ -4,4 +4,7 @@ checkpoints/
 hifigan/
 waveglow/
 tb_logs/
+tb_logs_old/
 *.ckpt
+*.pt
+*.wav

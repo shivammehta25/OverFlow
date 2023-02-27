@@ -50,7 +50,7 @@ def cache_text(data_item, text_cleaners):
 
 
 def cache_mel(data_item, mel_function, ext=".npy"):
-    loc, _ = data_item
+    loc, _, _ = data_item
     if Path(loc).with_suffix(ext).exists():
         return 0  # Already cached
     mel = mel_function(loc).numpy()

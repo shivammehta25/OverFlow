@@ -56,8 +56,8 @@ def create_hparams(generate_parameters=False):
         ################################
         # Experiment Parameters        #
         ################################
-        run_name="Cormac2PrenetBothDropouts",
-        gpus=[2],
+        run_name="Double Decoder",
+        gpus=[1],
         max_epochs=50000,
         val_check_interval=100,
         save_model_checkpoint=500,
@@ -146,9 +146,9 @@ def create_hparams(generate_parameters=False):
         train_go=False,
         variance_floor=0.001,
         data_dropout_mel=0,
-        data_dropout_motion=0.5,
+        data_dropout_motion=0,
         data_dropout_while_eval=True,
-        data_dropout_while_sampling=False,
+        data_dropout_while_sampling=True,
         predict_means=True,
         max_sampling_time=1000,
         deterministic_transition=True,
@@ -159,7 +159,7 @@ def create_hparams(generate_parameters=False):
         prenet_n_layers=2,
         prenet_dim=256,
         prenet_dropout_mel=0.5,
-        prenet_dropout_motion=0.7,
+        prenet_dropout_motion=0.5,
         prenet_dropout_while_eval=True,
         ################################
         # Decoder RNN parameters       #

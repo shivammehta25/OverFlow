@@ -32,7 +32,7 @@ def test_FlowDecoder(
 
     hparams.p_dropout_dec = 0.0  # Turn off dropout to check invertibility
 
-    decoder = FlowSpecDecoder(hparams)
+    decoder = FlowSpecDecoder(hparams, hparams.n_mel_channels + hparams.n_motion_joints)
 
     reset_all_weights(decoder)
 

@@ -69,9 +69,14 @@ if __name__ == "__main__":
         return f"{element_name}  has {sum(p.numel() for p in model.parameters() if p.requires_grad): ,} trainable \
             parameters"
 
-    elements = {"Encoder": model.model.encoder, "HMM": model.model.hmm, "Decoder": model.model.decoder}
+    elements = {
+        "Encoder": model.model.encoder,
+        "HMM": model.model.hmm,
+        "Decoder Mel": model.model.decoder_mel,
+        "Decoder Motion": model.model.decoder_motion,
+    }
 
-    print(model.model)
+    # print(model.model)
 
     for element_name, element in elements.items():
         print(count_parameters(element, element_name))

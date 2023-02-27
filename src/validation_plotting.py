@@ -140,7 +140,9 @@ def log_validation(
     means = torch.gather(means, 1, max_state_numbers).squeeze(1)
 
     # Passing through the decoder
-    mel_mean, _, _ = model.decoder(means.T.unsqueeze(0), means.new_tensor([means.shape[0]]).int(), reverse=True)
+    mel_mean, _, _ = model.decoder_mel(
+        means.T[: model.n_mel_channels].unsqueeze(0), means.new_tensor([means.shape[0]]).int(), reverse=True
+    )
 
     logger.add_image(
         "mel_from_the_means_predicted_by_most_probable_state",

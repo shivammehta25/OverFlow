@@ -22,7 +22,8 @@ class OverFlow(nn.Module):
         self.encoder = Encoder(hparams)
         # self.encoder = Tacotron2Encoder(hparams)
         self.hmm = HMM(hparams)
-        self.decoder = FlowSpecDecoder(hparams)
+        self.decoder_mel = FlowSpecDecoder(hparams, hparams.n_mel_channels)
+        self.decoder_motion = FlowSpecDecoder(hparams, hparams.n_motion_joints)
         self.logger = hparams.logger
 
     def parse_batch(self, batch):
@@ -51,8 +52,10 @@ class OverFlow(nn.Module):
         text_lengths, mel_lengths = text_lengths.data, mel_lengths.data
         embedded_inputs = self.embedding(text_inputs).transpose(1, 2)
         encoder_outputs, text_lengths = self.encoder(embedded_inputs, text_lengths)
-        mel_motion = torch.cat([mels, motions], dim=1)
-        z, z_lengths, logdet = self.decoder(mel_motion, mel_lengths)
+        z_mel, z_lengths, logdet_mel = self.decoder_mel(mels, mel_lengths)
+        z_motion, z_lengths, logdet_motion = self.decoder_motion(motions, mel_lengths)
+        z = torch.concat([z_mel, z_motion], dim=1)
+        logdet = logdet_mel + logdet_motion
         log_probs = self.hmm(encoder_outputs, text_lengths, z, z_lengths)
         loss = (log_probs + logdet) / (text_lengths.sum() + mel_lengths.sum())
         return loss
@@ -83,19 +86,25 @@ class OverFlow(nn.Module):
         encoder_outputs, text_lengths = self.encoder(embedded_inputs, text_lengths)
 
         (
-            mel_latent,
+            mel_motion_latent,
             states_travelled,
             input_parameters,
             output_parameters,
         ) = self.hmm.sample(encoder_outputs, sampling_temp=sampling_temp)
 
-        mel_motion_output, mel_lengths, _ = self.decoder(
+        mel_latent, motion_latent = (
+            mel_motion_latent[:, : self.n_mel_channels],
+            mel_motion_latent[:, self.n_mel_channels :],
+        )
+
+        mel_output, mel_lengths, _ = self.decoder_mel(
             mel_latent.unsqueeze(0).transpose(1, 2), text_lengths.new_tensor([mel_latent.shape[0]]), reverse=True
         )
-        mel_output, motion_output = (
-            mel_motion_output[:, : self.n_mel_channels],
-            mel_motion_output[:, self.n_mel_channels :],
+
+        motion_output, _, _ = self.decoder_motion(
+            motion_latent.unsqueeze(0).transpose(1, 2), text_lengths.new_tensor([motion_latent.shape[0]]), reverse=True
         )
+
         if self.mel_normaliser:
             mel_output = self.mel_normaliser.inverse_normalise(mel_output)
         if self.motion_normaliser:
@@ -110,4 +119,4 @@ class OverFlow(nn.Module):
         )
 
     def store_inverse(self):
-        self.decoder.store_inverse()
+        self.decoder_mel.store_inverse()

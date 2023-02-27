@@ -9,9 +9,10 @@ from src.utilities.functions import get_mask_from_len, squeeze, unsqueeze
 
 
 class FlowSpecDecoder(nn.Module):
-    def __init__(self, hparams):
+    def __init__(self, hparams, in_channels):
         super().__init__()
-        self.in_channels = hparams.n_mel_channels + hparams.n_motion_joints
+        # self.in_channels = hparams.n_mel_channels + hparams.n_motion_joints
+        self.in_channels = in_channels
         self.hidden_channels = hparams.flow_hidden_channels
         self.kernel_size = hparams.kernel_size_dec
         self.dilation_rate = hparams.dilation_rate

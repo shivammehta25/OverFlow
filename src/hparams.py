@@ -56,7 +56,7 @@ def create_hparams(generate_parameters=False):
         ################################
         # Experiment Parameters        #
         ################################
-        run_name="Double Decoder",
+        run_name="DoubleDecoder",
         gpus=[1],
         max_epochs=50000,
         val_check_interval=100,

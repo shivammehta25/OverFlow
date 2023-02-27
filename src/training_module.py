@@ -123,17 +123,18 @@ class TrainingModule(pl.LightningModule):
                 mels,
                 max_len,
                 mel_lengths,
+                ids,
             ) = self.get_an_element_of_validation_dataset()
             (
                 mel_output,
                 state_travelled,
                 input_parameters,
                 output_parameters,
-            ) = self.model.sample(text_inputs[0], text_lengths[0])
+            ) = self.model.sample(text_inputs[0], ids[0], text_lengths[0])
             mel_output_normalised = self.model.normaliser(mel_output)
 
             with torch.inference_mode():
-                _ = self.model((text_inputs, text_lengths, mels, max_len, mel_lengths))
+                _ = self.model((text_inputs, text_lengths, mels, max_len, mel_lengths, ids))
 
             log_validation(
                 self.logger.experiment,
@@ -168,7 +169,7 @@ class TrainingModule(pl.LightningModule):
             mel_lengths (torch.LongTensor): The lengths of the mel spectrogram.
         """
         x, y = self.model.parse_batch(next(iter(self.val_dataloader())))
-        (text_inputs, text_lengths, mels, max_len, mel_lengths) = x
+        (text_inputs, text_lengths, mels, max_len, mel_lengths, ids) = x
         text_inputs = text_inputs[0].unsqueeze(0).to(self.device)
         text_lengths = text_lengths[0].unsqueeze(0).to(self.device)
         mels = mels[0].unsqueeze(0).to(self.device)
@@ -178,11 +179,12 @@ class TrainingModule(pl.LightningModule):
         # is not the same as the element which has the maximum text len.
         # This prevent the model to break down when plotting validation.
         mels = mels[:, :, : mel_lengths.item()]
+        ids = ids[0].unsqueeze(0).to(self.device)
 
-        return text_inputs, text_lengths, mels, max_len, mel_lengths
+        return text_inputs, text_lengths, mels, max_len, mel_lengths, ids
 
     @torch.inference_mode()
-    def inference(self, text_inputs, sampling_temp=1.0):
+    def inference(self, text_inputs, ids, sampling_temp=1.0):
         """
         Similar to sampling but returns only mel outputs and states travelled.
 
@@ -193,11 +195,11 @@ class TrainingModule(pl.LightningModule):
             torch.FloatTensor: mel outputs
             torch.IntTensor: states travelled
         """
-        mel_output, states_travelled, _, _ = self.sample(text_inputs, sampling_temp=sampling_temp)
+        mel_output, states_travelled, _, _ = self.sample(text_inputs, ids, sampling_temp=sampling_temp)
         return mel_output, states_travelled
 
     @torch.inference_mode()
-    def sample(self, text_inputs, text_lengths=None, sampling_temp=1.0):
+    def sample(self, text_inputs, ids, text_lengths=None, sampling_temp=1.0):
         """
         Samples from the model
 
@@ -211,7 +213,7 @@ class TrainingModule(pl.LightningModule):
             List[Tuple[torch.FloatTensor]]: input parameters
             List[Tuple[torch.FloatTensor]]: output parameters
         """
-        return self.model.sample(text_inputs, text_lengths, sampling_temp=sampling_temp)
+        return self.model.sample(text_inputs, ids, text_lengths, sampling_temp=sampling_temp)
 
     def log_grad_norm(self, grad_norm_dict):
         r"""

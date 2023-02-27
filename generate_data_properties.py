@@ -14,7 +14,7 @@ from torch.utils.data import DataLoader
 from tqdm import tqdm
 
 from src.hparams import create_hparams
-from src.utilities.data import TextMelCollate, TextMelLoader
+from src.utilities.data import TextIDMelLoader, TextMelCollate
 
 
 def to_gpu(x):
@@ -75,7 +75,7 @@ def get_data_parameters_for_flat_start(train_loader, hparams):
     start = time.perf_counter()
 
     for i, batch in enumerate(tqdm(train_loader)):
-        (text_inputs, text_lengths, mels, max_len, mel_lengths), (
+        (text_inputs, text_lengths, mels, ids, mel_lengths), (
             _,
             gate_padded,
         ) = parse_batch(batch)
@@ -145,7 +145,7 @@ def main(args):
 
     hparams.batch_size = args.batch_size
 
-    trainset = TextMelLoader(hparams.training_files, hparams)
+    trainset = TextIDMelLoader(hparams.training_files, hparams)
     collate_fn = TextMelCollate(hparams.n_frames_per_step)
 
     train_loader = DataLoader(

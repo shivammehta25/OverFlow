@@ -7,7 +7,7 @@ import nltk
 import pytorch_lightning as pl
 from torch.utils.data import DataLoader
 
-from src.utilities.data import TextMelCollate, TextMelLoader
+from src.utilities.data import TextIDMelLoader, TextMelCollate
 
 
 class LightningLoader(pl.LightningDataModule):
@@ -26,8 +26,8 @@ class LightningLoader(pl.LightningDataModule):
             nltk.download("punkt")
 
     def setup(self, stage=None):
-        self.trainset = TextMelLoader(self.hparams.training_files, self.hparams, [self.hparams.normaliser])
-        self.valset = TextMelLoader(self.hparams.validation_files, self.hparams, [self.hparams.normaliser])
+        self.trainset = TextIDMelLoader(self.hparams.training_files, self.hparams, [self.hparams.normaliser])
+        self.valset = TextIDMelLoader(self.hparams.validation_files, self.hparams, [self.hparams.normaliser])
 
     def train_dataloader(self):
         return DataLoader(

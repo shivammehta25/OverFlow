@@ -1,10 +1,14 @@
 """ from https://github.com/keithito/tacotron """
+import re
+
 from src.utilities.text import cleaners
 from src.utilities.text.symbols import symbols
 
 # Mappings from symbol to numeric ID and vice versa:
+# Mappings from symbol to numeric ID and vice versa:
 _symbol_to_id = {s: i for i, s in enumerate(symbols)}
 _id_to_symbol = {i: s for i, s in enumerate(symbols)}
+_curly_re = re.compile(r"(.*?)\{(.+?)\}(.*)")
 
 
 def text_to_sequence(text, cleaner_names):
@@ -17,10 +21,19 @@ def text_to_sequence(text, cleaner_names):
     """
     sequence = []
 
-    clean_text = _clean_text(text, cleaner_names)
-    for symbol in clean_text:
-        symbol_id = _symbol_to_id[symbol]
-        sequence += [symbol_id]
+    # Check for curly braces and treat their contents as ARPAbet:
+    while len(text):
+        # re.match searches only for the beginning of the string, so it keeps on returning in groups
+        # so each pair of brackets will make this loop iterate
+        m = _curly_re.match(text)
+        if not m:
+            # clean text function preprocesses text converts to lowercase and stuff
+            sequence += _symbols_to_sequence(_clean_text(text, cleaner_names))
+            break
+        sequence += _symbols_to_sequence(_clean_text(m.group(1), cleaner_names))
+        sequence += _arpabet_to_sequence(m.group(2))
+        text = m.group(3)
+
     return sequence
 
 
@@ -57,3 +70,15 @@ def intersperse(lst, item):
     result = [item] * (len(lst) * 2 + 1)
     result[1::2] = lst
     return result
+
+
+def _symbols_to_sequence(symbols):
+    return [_symbol_to_id[s] for s in symbols if _should_keep_symbol(s)]
+
+
+def _arpabet_to_sequence(text):
+    return _symbols_to_sequence(["@" + s for s in text.split()])
+
+
+def _should_keep_symbol(s):
+    return s in _symbol_to_id and s != "_" and s != "~"

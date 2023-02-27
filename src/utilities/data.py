@@ -86,21 +86,23 @@ class TextMelCollate:
             text_padded[i, : text.size(0)] = text
 
         # Right zero-pad mel-spec
-        num_mels = batch[0][1].size(0)
-        max_target_len = max(x[1].size(1) for x in batch)
+        num_mels = batch[0][2].size(0)
+        max_target_len = max(x[2].size(1) for x in batch)
 
         # include mel padded
         mel_padded = torch.FloatTensor(len(batch), num_mels, max_target_len)
         mel_padded.zero_()
         output_lengths = torch.LongTensor(len(batch))
+        ids = []
         for i in range(len(ids_sorted_decreasing)):
-            mel = batch[ids_sorted_decreasing[i]][1]
+            mel = batch[ids_sorted_decreasing[i]][2]
             mel_padded[i, :, : mel.size(1)] = mel
             output_lengths[i] = mel.size(1)
+            ids.append(int(batch[ids_sorted_decreasing[i]][1]))
 
         # torch.empty is a substite for gate_padded, will be removed later when more
         # test ensures there is no regression
-        return text_padded, input_lengths, mel_padded, torch.empty([1]), output_lengths
+        return text_padded, input_lengths, mel_padded, torch.tensor(ids, dtype=text_padded.dtype), output_lengths
 
 
 class TextMelLoader(Dataset):
@@ -241,6 +243,149 @@ class TextMelLoader(Dataset):
 
     def __getitem__(self, index):
         return self.get_mel_text_pair(self.audiopaths_and_text[index])
+
+    def __len__(self):
+        return len(self.audiopaths_and_text)
+
+
+class TextIDMelLoader(Dataset):
+    r"""
+    Taken from Nvidia-Tacotron-2 implementation
+
+    1) loads audio,text pairs
+    2) normalizes text and converts them to sequences of one-hot vectors
+    3) computes mel-spectrograms from audio files.
+    """
+
+    def __init__(self, audiopaths_and_text, hparams, transform=None):
+        r"""
+        Args:
+            audiopaths_and_text:
+            hparams:
+            transform (list): list of transformation
+        """
+        self.file_loc = Path(audiopaths_and_text)
+        self.audiopaths_and_text = load_filepaths_and_text(audiopaths_and_text)
+        self.transform = transform
+        self.text_cleaners = hparams.text_cleaners
+        self.max_wav_value = hparams.max_wav_value
+        self.sampling_rate = hparams.sampling_rate
+        self.phonetise = hparams.phonetise
+        self.load_mel_from_disk = hparams.load_mel_from_disk
+        self.add_blank = hparams.add_blank
+        self.stft = TacotronSTFT(
+            hparams.filter_length,
+            hparams.hop_length,
+            hparams.win_length,
+            hparams.n_mel_channels,
+            hparams.sampling_rate,
+            hparams.mel_fmin,
+            hparams.mel_fmax,
+        )
+        random.seed(hparams.seed)
+        random.shuffle(self.audiopaths_and_text)
+        self.cleaned_text = False
+        # self.preprocess_text()
+        # self.preprocess_mels()
+
+    def preprocess_text(self):
+        out_filename = self.file_loc.with_suffix(f"{self.file_loc.suffix}.cleaned")
+        if not out_filename.exists():
+            print(f"Cache not found caching the dataset: {self.file_loc}")
+            output = []
+
+            pbar = tqdm(self.audiopaths_and_text)
+            pbar.set_description("Caching data with cpu count: " + str(cpu_count()))
+            with Pool(cpu_count()) as p:
+                for _, data_item in enumerate(
+                    p.imap(
+                        partial(cache_text, text_cleaners=self.text_cleaners), self.audiopaths_and_text, chunksize=10
+                    )
+                ):
+                    if data_item is not None:
+                        output.append(data_item)
+                    pbar.update(1)
+                    p.close()
+
+            with open(out_filename, "w", encoding="utf-8") as f:
+                f.writelines(output)
+
+            print("Done caching the dataset")
+        else:
+            print(f"Data cache found at : {out_filename}! Loading cache...")
+        self.audiopaths_and_text = load_filepaths_and_text(out_filename)
+        self.cleaned_text = True
+
+    def preprocess_mels(self):
+        pbar = tqdm(self.audiopaths_and_text, leave=False)
+        total = 0
+
+        for i, data_item in enumerate(pbar):
+            cached = cache_mel(data_item, mel_function=self.get_mel)
+            total += cached
+
+        self.load_mel_from_disk = True
+        print("Done caching mels! New mels cached: " + str(total))
+
+    def get_mel_id_text_pair(self, audiopath_and_text):
+        r"""
+        Takes audiopath_text list input where list[0] is location for wav file
+            and list[1] is the text
+        Args:
+            audiopath_and_text (list): list of size 2
+        """
+        # separate filename and text (string)
+        audiopath, id, text = audiopath_and_text[0], audiopath_and_text[1], audiopath_and_text[2]
+        # This text is int tensor of the input representation
+        text = self.get_text(text)
+        mel = self.get_mel(audiopath)
+        if self.transform:
+            for t in self.transform:
+                mel = t(mel)
+
+        return (text, id, mel)
+
+    def get_mel(self, filename):
+        r"""
+        Takes filename as input and returns its mel spectrogram
+        Args:
+            filename (string): Example: 'LJSpeech-1.1/wavs/LJ039-0212.wav'
+        """
+        if not self.load_mel_from_disk:
+            audio, sampling_rate = load_wav_to_torch(filename)
+            if sampling_rate != self.stft.sampling_rate:
+                raise ValueError(f"{sampling_rate} SR doesn't match target {self.stft.sampling_rate} SR")
+            audio_norm = audio / self.max_wav_value
+            audio_norm = audio_norm.unsqueeze(0)
+            audio_norm = torch.autograd.Variable(audio_norm, requires_grad=False)
+            melspec = self.stft.mel_spectrogram(audio_norm)
+            melspec = torch.squeeze(melspec, 0)
+        else:
+            melspec = torch.from_numpy(np.load(Path(filename).with_suffix(".npy")))
+            assert melspec.size(0) == self.stft.n_mel_channels, "Mel dimension mismatch: given {}, expected {}".format(
+                melspec.size(0), self.stft.n_mel_channels
+            )
+        return melspec
+
+    def get_text(self, text):
+        if self.cleaned_text:
+            text_norm = cleaned_text_to_sequence(text)
+        else:
+            text_norm = text_to_sequence(text, self.text_cleaners)
+        if self.add_blank:
+            text_norm = intersperse(text_norm, 0)
+        text_norm = torch.LongTensor(text_norm)
+        return text_norm
+
+    # def get_text(self, text):
+    #     if self.phonetise:
+    #         text = phonetise_text(self.cmu_phonetiser, text, word_tokenize)
+
+    #     text_norm = torch.IntTensor(text_to_sequence(text, self.text_cleaners))
+    #     return text_norm
+
+    def __getitem__(self, index):
+        return self.get_mel_id_text_pair(self.audiopaths_and_text[index])
 
     def __len__(self):
         return len(self.audiopaths_and_text)

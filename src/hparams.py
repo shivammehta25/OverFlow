@@ -51,8 +51,8 @@ def create_hparams(generate_parameters=False):
         ################################
         # Experiment Parameters        #
         ################################
-        run_name="Cormac",
-        gpus=[2],
+        run_name="HarmyHarm",
+        gpus=[0],
         max_epochs=50000,
         val_check_interval=100,
         save_model_checkpoint=500,
@@ -72,14 +72,14 @@ def create_hparams(generate_parameters=False):
         ################################
         batch_size=16,
         load_mel_from_disk=False,
-        training_files="data/filelists/cormac_train.txt",
-        validation_files="data/filelists/cormac_val.txt",
-        text_cleaners=["english_cleaners"],
+        training_files="data/filelists/labelled_joe_train_no_feats.txt",
+        validation_files="data/filelists/labelled_joe_test_no_feats.txt",
+        text_cleaners=["english_cleaners2"],
         # phonetise=False,
         # training_files="data/filelists/ljs_audio_text_train_filelist.txt",
         # validation_files="data/filelists/ljs_audio_text_val_filelist.txt",
         # text_cleaners=["english_cleaners"],
-        phonetise=True,
+        phonetise=False,
         add_blank=True,
         num_workers=40,
         ################################
@@ -107,6 +107,8 @@ def create_hparams(generate_parameters=False):
         # Model Parameters             #
         ################################
         n_symbols=len(symbols),
+        n_ids=6,
+        gin_channels=384,
         ################################
         # Encoder parameters           #
         ################################
@@ -169,7 +171,6 @@ def create_hparams(generate_parameters=False):
         n_split=4,
         n_sqz=2,
         sigmoid_scale=False,
-        gin_channels=0,
         ################################
         # Optimization Hyperparameters #
         ################################

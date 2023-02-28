@@ -10,6 +10,7 @@ import torch
 
 from src.utilities.data import Normalise
 from src.utilities.text import symbols
+from src.utilities.text.cmudict import CMUDict
 
 
 def create_hparams(generate_parameters=False):
@@ -75,13 +76,14 @@ def create_hparams(generate_parameters=False):
         training_files="data/filelists/labelled_joe_train_no_feats.txt",
         validation_files="data/filelists/labelled_joe_test_no_feats.txt",
         text_cleaners=["english_cleaners2"],
+        cmu_phonetiser=CMUDict("src/phonetised_files/cmudict-0.7b.txt"),
         # phonetise=False,
         # training_files="data/filelists/ljs_audio_text_train_filelist.txt",
         # validation_files="data/filelists/ljs_audio_text_val_filelist.txt",
         # text_cleaners=["english_cleaners"],
         phonetise=False,
         add_blank=True,
-        num_workers=40,
+        num_workers=0,
         ################################
         # Audio Parameters             #
         ################################

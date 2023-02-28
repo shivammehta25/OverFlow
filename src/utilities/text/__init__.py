@@ -82,3 +82,11 @@ def _arpabet_to_sequence(text):
 
 def _should_keep_symbol(s):
     return s in _symbol_to_id and s != "_" and s != "~"
+
+
+def phonetise_text(cmu_phonetiser, text, word_tokenize):
+    text = word_tokenize(text)
+    text = " ".join(
+        ["{" + cmu_phonetiser.lookup(word)[0] + "}" if cmu_phonetiser.lookup(word) else word for word in text]
+    )
+    return text

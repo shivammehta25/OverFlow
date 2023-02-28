@@ -80,8 +80,8 @@ class OverFlow(nn.Module):
         if text_inputs.ndim > 1:
             text_inputs = text_inputs.squeeze(0)
 
-        # if not torch.is_tensor(ids):
-        #     torch.tensor(ids)
+        if not torch.is_tensor(ids):
+            ids = text_inputs.new_tensor(ids).squeeze(0)
 
         if text_lengths is None:
             text_lengths = text_inputs.new_tensor(text_inputs.shape[0])

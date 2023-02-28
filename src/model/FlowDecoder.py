@@ -9,7 +9,7 @@ from src.utilities.functions import get_mask_from_len, squeeze, unsqueeze
 
 
 class FlowSpecDecoder(nn.Module):
-    def __init__(self, hparams, in_channels):
+    def __init__(self, hparams, in_channels, p_dropout=0.05):
         super().__init__()
         # self.in_channels = hparams.n_mel_channels + hparams.n_motion_joints
         self.in_channels = in_channels
@@ -18,7 +18,7 @@ class FlowSpecDecoder(nn.Module):
         self.dilation_rate = hparams.dilation_rate
         self.n_blocks = hparams.n_blocks_dec
         self.n_layers = hparams.n_block_layers
-        self.p_dropout = hparams.p_dropout_dec
+        self.p_dropout = p_dropout
         self.n_split = hparams.n_split
         self.n_sqz = hparams.n_sqz
         self.sigmoid_scale = hparams.sigmoid_scale
@@ -36,7 +36,7 @@ class FlowSpecDecoder(nn.Module):
                     dilation_rate=hparams.dilation_rate,
                     n_layers=hparams.n_block_layers,
                     gin_channels=hparams.gin_channels,
-                    p_dropout=hparams.p_dropout_dec,
+                    p_dropout=self.p_dropout,
                     sigmoid_scale=hparams.sigmoid_scale,
                 )
             )

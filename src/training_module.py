@@ -46,11 +46,30 @@ class TrainingModule(pl.LightningModule):
         Returns:
             (torch.optim.Optimizer)
         """
-        return torch.optim.Adam(
+        optimizer = torch.optim.Adam(
             self.parameters(),
             lr=self.hparams.learning_rate,
             weight_decay=self.hparams.weight_decay,
         )
+
+        if self.hparams.optimizer_params["scheduler"] == "noam":
+            self.warmup = self.hparams.optimizer_params["warmup"]
+
+            def warm_decay(step):
+                if step < self.warmup:
+                    return step / self.warmup
+                return self.warmup**0.5 * step**-0.5
+
+            scheduler = {
+                "scheduler": torch.optim.lr_scheduler.LambdaLR(optimizer, warm_decay),
+                "interval": "step",  # runs per batch rather than per epoch
+                "frequency": 1,
+                "name": "trainer_stats/NoamLR",  # uncomment if using LearningRateMonitor
+            }
+            return [optimizer], [scheduler]
+
+        else:
+            return optimizer
 
     def training_step(self, train_batch, batch_idx):
         r"""

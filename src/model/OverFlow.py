@@ -22,8 +22,8 @@ class OverFlow(nn.Module):
         self.encoder = Encoder(hparams)
         # self.encoder = Tacotron2Encoder(hparams)
         self.hmm = HMM(hparams)
-        self.decoder_mel = FlowSpecDecoder(hparams, hparams.n_mel_channels)
-        self.decoder_motion = FlowSpecDecoder(hparams, hparams.n_motion_joints)
+        self.decoder_mel = FlowSpecDecoder(hparams, hparams.n_mel_channels, hparams.p_dropout_dec_mel)
+        self.decoder_motion = FlowSpecDecoder(hparams, hparams.n_motion_joints, hparams.p_dropout_dec_motion)
         self.logger = hparams.logger
 
     def parse_batch(self, batch):

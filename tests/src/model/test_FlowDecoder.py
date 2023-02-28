@@ -32,7 +32,7 @@ def test_FlowDecoder(
 
     hparams.p_dropout_dec = 0.0  # Turn off dropout to check invertibility
 
-    decoder = FlowSpecDecoder(hparams, hparams.n_mel_channels + hparams.n_motion_joints)
+    decoder = FlowSpecDecoder(hparams, hparams.n_mel_channels + hparams.n_motion_joints, hparams.p_dropout_dec)
 
     reset_all_weights(decoder)
 
@@ -46,5 +46,5 @@ def test_FlowDecoder(
     len_mask = get_mask_from_len(z_lengths, device=z_lengths.device).unsqueeze(1)
     mel_padded = mel_padded[:, :, : z.shape[2]] * len_mask
     motion_padded = motion_padded[:, :, : z.shape[2]] * len_mask
-    assert torch.isclose(torch.concat([mel_padded, motion_padded], dim=1), mel_, atol=1e-5).all(), "Invertible"
+    assert torch.isclose(torch.concat([mel_padded, motion_padded], dim=1), mel_, atol=1e-5).all(), "Not Invertible"
     assert logdet_ is None

@@ -8,6 +8,7 @@ import os
 
 import pytorch_lightning as pl
 import torch
+from pytorch_lightning.callbacks import LearningRateMonitor
 from pytorch_lightning.loggers import TensorBoardLogger
 from pytorch_lightning.plugins import DDPPlugin
 from pytorch_lightning.utilities.seed import seed_everything
@@ -90,6 +91,7 @@ if __name__ == "__main__":
     print(f"[+] Run Name: {hparams.run_name}")
     trainer = pl.Trainer(
         resume_from_checkpoint=args.checkpoint_path,
+        callbacks=[LearningRateMonitor(logging_interval="step")],
         gpus=hparams.gpus,
         logger=logger,
         log_every_n_steps=1,

@@ -191,6 +191,19 @@ def log_validation(
             f"{logger.log_dir}/output_{iteration}.mp4",
         )
 
+        motion_mean = (
+            model.decoder_motion(
+                means.T[model.n_mel_channels :].unsqueeze(0), means.new_tensor([means.shape[0]]).int(), reverse=True
+            )[0]
+            .squeeze(0)
+            .cpu()
+            .numpy()[: model.n_motion_joints - 3]
+            .T
+        )
+        bvh_values = motion_visualizer_pipeline.inverse_transform([motion_mean])
+        X_pos = MocapParameterizer("position").fit_transform(bvh_values)
+        render_mp4(X_pos[0], f"{logger.log_dir}/output_mean_{iteration}.mp4", axis_scale=200)
+
 
 def combine_video_audio(video_filename, audio_filename, final_filename):
     command = f"ffmpeg -i {video_filename} -i {audio_filename} -c:v copy -c:a aac {final_filename}"

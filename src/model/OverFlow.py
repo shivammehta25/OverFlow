@@ -11,6 +11,7 @@ class OverFlow(nn.Module):
         super().__init__()
         self.n_mel_channels = hparams.n_mel_channels
         self.n_frames_per_step = hparams.n_frames_per_step
+        self.n_motion_joints = hparams.n_motion_joints
         self.embedding = nn.Embedding(
             hparams.n_symbols, hparams.encoder_params[hparams.encoder_type]["hidden_channels"]
         )

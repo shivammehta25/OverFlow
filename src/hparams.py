@@ -56,8 +56,8 @@ def create_hparams(generate_parameters=False):
         ################################
         # Experiment Parameters        #
         ################################
-        run_name="NoamWarmupNoAR",
-        gpus=[3],
+        run_name="NoisyMotionPlusAR",
+        gpus=[1],
         max_epochs=50000,
         val_check_interval=100,
         save_model_checkpoint=500,
@@ -149,17 +149,18 @@ def create_hparams(generate_parameters=False):
         data_dropout_motion=0,
         data_dropout_while_eval=True,
         data_dropout_while_sampling=True,
-        predict_means=True,
+        predict_means=False,
+        base_sampling_temperature=0.667,
         max_sampling_time=1000,
         deterministic_transition=True,
-        duration_quantile_threshold=0.5,
+        duration_quantile_threshold=0.3,
         ################################
         # Prenet parameters            #
         ################################
         prenet_n_layers=2,
         prenet_dim=256,
         prenet_dropout_mel=0.5,
-        prenet_dropout_motion=1.0,
+        prenet_dropout_motion=0.5,
         prenet_dropout_while_eval=True,
         ################################
         # Decoder RNN parameters       #
@@ -178,7 +179,7 @@ def create_hparams(generate_parameters=False):
         n_blocks_dec=12,
         n_block_layers=4,
         p_dropout_dec_mel=0.05,
-        p_dropout_dec_motion=0.5,
+        p_dropout_dec_motion=0.05,
         n_split=4,
         n_sqz=2,
         sigmoid_scale=False,
@@ -191,9 +192,10 @@ def create_hparams(generate_parameters=False):
         grad_clip_thresh=5.0,
         stochastic_weight_avg=False,
         optimizer_params={
-            "scheduler": "noam",
+            "scheduler": None,
             "warmup": 2000,
         },
     )
 
+    return hparams
     return hparams

@@ -214,7 +214,6 @@ class TextMelLoader(Dataset):
         if self.motion_transform:
             for t in self.motion_transform:
                 motion = t(motion)
-
         mel, motion = self.resize_mel_motion_to_same_size(mel, motion)
         return (text, mel, motion)
 
@@ -223,7 +222,9 @@ class TextMelLoader(Dataset):
             # raise FileNotFoundError
             file_loc = self.motion_fileloc / Path(Path(filename).name).with_suffix(ext)
             motion = torch.from_numpy(pd.read_pickle(file_loc).to_numpy())
-            motion = torch.concat([motion, torch.randn(motion.shape[0], 3)], dim=1)
+            # motion = torch.concat([motion, torch.randn(motion.shape[0], 3)], dim=1)
+            motion = torch.concat([motion, torch.zeros(motion.shape[0], 3)], dim=1)
+            motion += torch.randn(motion.shape) * 0.01
         except FileNotFoundError:
             motion = torch.randn(mel_shape, self.n_motion_joints)
         return motion.T

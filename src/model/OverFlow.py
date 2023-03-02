@@ -12,6 +12,7 @@ class OverFlow(nn.Module):
         self.n_mel_channels = hparams.n_mel_channels
         self.n_frames_per_step = hparams.n_frames_per_step
         self.n_motion_joints = hparams.n_motion_joints
+        self.base_sampling_temperature = hparams.base_sampling_temperature
         self.embedding = nn.Embedding(
             hparams.n_symbols, hparams.encoder_params[hparams.encoder_type]["hidden_channels"]
         )
@@ -62,7 +63,7 @@ class OverFlow(nn.Module):
         return loss
 
     @torch.inference_mode()
-    def sample(self, text_inputs, text_lengths=None, sampling_temp=1.0):
+    def sample(self, text_inputs, text_lengths=None, sampling_temp=None):
         r"""
         Sampling mel spectrogram based on text inputs
         Args:
@@ -81,6 +82,9 @@ class OverFlow(nn.Module):
 
         if text_lengths is None:
             text_lengths = text_inputs.new_tensor(text_inputs.shape[0])
+
+        if sampling_temp is None:
+            sampling_temp = self.base_sampling_temperature
 
         text_inputs, text_lengths = text_inputs.unsqueeze(0), text_lengths.unsqueeze(0)
         embedded_inputs = self.embedding(text_inputs).transpose(1, 2)

@@ -191,14 +191,11 @@ def log_validation(
             f"{logger.log_dir}/output_{iteration}.mp4",
         )
 
+        motion_mean = model.decoder_motion(
+            means.T[model.n_mel_channels :].unsqueeze(0), means.new_tensor([means.shape[0]]).int(), reverse=True
+        )[0].squeeze(0)
         motion_mean = (
-            model.decoder_motion(
-                means.T[model.n_mel_channels :].unsqueeze(0), means.new_tensor([means.shape[0]]).int(), reverse=True
-            )[0]
-            .squeeze(0)
-            .cpu()
-            .numpy()[: model.n_motion_joints - 3]
-            .T
+            model.motion_normaliser.inverse_normalise(motion_mean).cpu().numpy()[: model.n_motion_joints - 3].T
         )
         bvh_values = motion_visualizer_pipeline.inverse_transform([motion_mean])
         X_pos = MocapParameterizer("position").fit_transform(bvh_values)

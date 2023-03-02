@@ -224,7 +224,8 @@ class TextMelLoader(Dataset):
             motion = torch.from_numpy(pd.read_pickle(file_loc).to_numpy())
             # motion = torch.concat([motion, torch.randn(motion.shape[0], 3)], dim=1)
             motion = torch.concat([motion, torch.zeros(motion.shape[0], 3)], dim=1)
-            motion += torch.randn(motion.shape) * 0.01
+
+            # motion += torch.randn(motion.shape) * 0.01
         except FileNotFoundError:
             motion = torch.randn(mel_shape, self.n_motion_joints)
         return motion.T

@@ -9,7 +9,7 @@ from src.utilities.functions import get_mask_from_len, squeeze, unsqueeze
 
 
 class FlowSpecDecoder(nn.Module):
-    def __init__(self, hparams, in_channels, p_dropout=0.05):
+    def __init__(self, hparams, in_channels, p_dropout=0.05, add_coupling=True):
         super().__init__()
         # self.in_channels = hparams.n_mel_channels + hparams.n_motion_joints
         self.in_channels = in_channels
@@ -28,18 +28,19 @@ class FlowSpecDecoder(nn.Module):
         for b in range(hparams.n_blocks_dec):
             self.flows.append(flows.ActNorm(channels=self.in_channels * hparams.n_sqz))
             self.flows.append(flows.InvConvNear(channels=self.in_channels * hparams.n_sqz, n_split=hparams.n_split))
-            self.flows.append(
-                flows.CouplingBlock(
-                    self.in_channels * hparams.n_sqz,
-                    hparams.flow_hidden_channels,
-                    kernel_size=hparams.kernel_size_dec,
-                    dilation_rate=hparams.dilation_rate,
-                    n_layers=hparams.n_block_layers,
-                    gin_channels=hparams.gin_channels,
-                    p_dropout=self.p_dropout,
-                    sigmoid_scale=hparams.sigmoid_scale,
+            if add_coupling:
+                self.flows.append(
+                    flows.CouplingBlock(
+                        self.in_channels * hparams.n_sqz,
+                        hparams.flow_hidden_channels,
+                        kernel_size=hparams.kernel_size_dec,
+                        dilation_rate=hparams.dilation_rate,
+                        n_layers=hparams.n_block_layers,
+                        gin_channels=hparams.gin_channels,
+                        p_dropout=self.p_dropout,
+                        sigmoid_scale=hparams.sigmoid_scale,
+                    )
                 )
-            )
 
     def forward(self, x, x_lengths, g=None, reverse=False):
         """Calls Glow-TTS decoder
@@ -59,7 +60,7 @@ class FlowSpecDecoder(nn.Module):
             x_lengths.max(),
         ), f"The shape of the  \
             input should be (batch_dim, n_mel_channels, T_max) but received {x.shape}"
-        x, x_lengths, x_max_length = self.preprocess(x, x_lengths, x_lengths.max())
+        x, x_lengths, x_max_length = self.preprocess(x, x_lengths, x_lengths.max(), self.n_sqz)
 
         x_mask = get_mask_from_len(x_lengths, x_max_length, device=x.device, dtype=x.dtype).unsqueeze(1)
 
@@ -86,9 +87,20 @@ class FlowSpecDecoder(nn.Module):
         for f in self.flows:
             f.store_inverse()
 
-    def preprocess(self, y, y_lengths, y_max_length):
+    @staticmethod
+    def preprocess(y, y_lengths, y_max_length, n_sqz):
         if y_max_length is not None:
-            y_max_length = torch.div(y_max_length, self.n_sqz, rounding_mode="floor") * self.n_sqz
+            y_max_length = torch.div(y_max_length, n_sqz, rounding_mode="floor") * n_sqz
             y = y[:, :, :y_max_length]
-        y_lengths = torch.div(y_lengths, self.n_sqz, rounding_mode="floor") * self.n_sqz
+        y_lengths = torch.div(y_lengths, n_sqz, rounding_mode="floor") * n_sqz
         return y, y_lengths, y_max_length
+
+
+class IdentityDecoder(nn.Module):
+    def __init__(self, hparams) -> None:
+        super().__init__()
+        self.n_sqz = hparams.n_sqz
+
+    def forward(self, x, x_lengths, g=None, reverse=False):
+        x, x_lengths, x_max_length = FlowSpecDecoder.preprocess(x, x_lengths, x_lengths.max(), self.n_sqz)
+        return x, x_lengths, 0 if not reverse else None

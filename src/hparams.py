@@ -56,8 +56,8 @@ def create_hparams(generate_parameters=False):
         ################################
         # Experiment Parameters        #
         ################################
-        run_name="NoisyMotionPlusAR",
-        gpus=[1],
+        run_name="NoMotionDecoder",
+        gpus=[2],
         max_epochs=50000,
         val_check_interval=100,
         save_model_checkpoint=500,
@@ -160,7 +160,7 @@ def create_hparams(generate_parameters=False):
         prenet_n_layers=2,
         prenet_dim=256,
         prenet_dropout_mel=0.5,
-        prenet_dropout_motion=0.5,
+        prenet_dropout_motion=1.0,
         prenet_dropout_while_eval=True,
         ################################
         # Decoder RNN parameters       #
@@ -184,6 +184,7 @@ def create_hparams(generate_parameters=False):
         n_sqz=2,
         sigmoid_scale=False,
         gin_channels=0,
+        motion_decoder=False,
         ################################
         # Optimization Hyperparameters #
         ################################

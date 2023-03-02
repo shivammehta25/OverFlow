@@ -2,7 +2,7 @@ import torch
 from torch import nn
 
 from src.model.Encoder import Encoder
-from src.model.FlowDecoder import FlowSpecDecoder
+from src.model.FlowDecoder import FlowSpecDecoder, IdentityDecoder
 from src.model.HMM import HMM
 
 
@@ -13,6 +13,7 @@ class OverFlow(nn.Module):
         self.n_frames_per_step = hparams.n_frames_per_step
         self.n_motion_joints = hparams.n_motion_joints
         self.base_sampling_temperature = hparams.base_sampling_temperature
+        self.motion_decoder: bool = hparams.motion_decoder
         self.embedding = nn.Embedding(
             hparams.n_symbols, hparams.encoder_params[hparams.encoder_type]["hidden_channels"]
         )
@@ -25,7 +26,10 @@ class OverFlow(nn.Module):
         # self.encoder = Tacotron2Encoder(hparams)
         self.hmm = HMM(hparams)
         self.decoder_mel = FlowSpecDecoder(hparams, hparams.n_mel_channels, hparams.p_dropout_dec_mel)
-        self.decoder_motion = FlowSpecDecoder(hparams, hparams.n_motion_joints, hparams.p_dropout_dec_motion)
+        if self.motion_decoder:
+            self.decoder_motion = FlowSpecDecoder(hparams, hparams.n_motion_joints, hparams.p_dropout_dec_motion)
+        else:
+            self.decoder_motion = IdentityDecoder(hparams)
         self.logger = hparams.logger
 
     def parse_batch(self, batch):
@@ -55,7 +59,7 @@ class OverFlow(nn.Module):
         embedded_inputs = self.embedding(text_inputs).transpose(1, 2)
         encoder_outputs, text_lengths = self.encoder(embedded_inputs, text_lengths)
         z_mel, z_lengths, logdet_mel = self.decoder_mel(mels, mel_lengths)
-        z_motion, z_lengths, logdet_motion = self.decoder_motion(motions, mel_lengths)
+        z_motion, _, logdet_motion = self.decoder_motion(motions, mel_lengths)
         z = torch.concat([z_mel, z_motion], dim=1)
         logdet = logdet_mel + logdet_motion
         log_probs = self.hmm(encoder_outputs, text_lengths, z, z_lengths)

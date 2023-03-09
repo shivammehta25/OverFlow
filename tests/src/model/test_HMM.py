@@ -213,8 +213,13 @@ def test_sample(hparams, dummy_embedded_data, test_batch_size):
         _,
         output_lengths,
     ) = dummy_embedded_data
-
-    (mel_output, states_travelled, input_parameters, output_parameters) = model.sample(embedded_input[0:1])
+    sampling_temps = {
+        "audio": hparams.base_sampling_temperature_audio,
+        "motion": hparams.base_sampling_temperature_motion,
+    }
+    (mel_output, states_travelled, input_parameters, output_parameters) = model.sample(
+        embedded_input[0:1], sampling_temps
+    )
     assert len(mel_output[0]) == (hparams.n_mel_channels + hparams.n_motion_joints)
     assert input_parameters[0][0].shape[-1] == (hparams.n_mel_channels + hparams.n_motion_joints)
     assert output_parameters[0][0].shape[-1] == (hparams.n_mel_channels + hparams.n_motion_joints)
@@ -231,16 +236,19 @@ def test_sample_temperature(hparams, dummy_embedded_data, test_batch_size, sampl
         _,
         output_lengths,
     ) = dummy_embedded_data
-
+    sampling_temps = {
+        "audio": sampling_temp,
+        "motion": sampling_temp,
+    }
     # Without sampling
     (mel_output1, states_travelled, input_parameters, output_parameters) = model.sample(
-        embedded_input[0:1], sampling_temp=sampling_temp
+        embedded_input[0:1], sampling_temps=sampling_temps
     )
 
     # Sampling with temperature
     model.hparams.predict_means = False
     (mel_output2, states_travelled, input_parameters, output_parameters) = model.sample(
-        embedded_input[0:1], sampling_temp=sampling_temp
+        embedded_input[0:1], sampling_temps=sampling_temps
     )
 
     if sampling_temp == 0.0:

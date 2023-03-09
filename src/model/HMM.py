@@ -360,12 +360,13 @@ class HMM(nn.Module):
         return sum_final_log_c
 
     @torch.inference_mode()
-    def sample(self, encoder_outputs, sampling_temp=1.0, T=None):
+    def sample(self, encoder_outputs, sampling_temps, T=None):
         r"""
         Samples an output from the parameter models
 
         Args:
             encoder_outputs (float tensor): (batch, text_len, encoder_embedding_dim)
+            sampling_temps (dict): Sampling temperature for each output
             T (int): Max time to sample
 
         Returns:
@@ -433,7 +434,8 @@ class HMM(nn.Module):
             input_parameter_values.append([ar_inputs, current_z_number])
             output_parameter_values.append([mean, std, transition_probability])
 
-            x_t = self.emission_model.sample(mean, std, sampling_temp=sampling_temp)
+            x_t = self.sample_from_emission(mean, std, sampling_temps)
+            # x_t = self.emission_model.sample(mean, std, sampling_temp=sampling_temps)
 
             if self.hparams.predict_means:
                 x_t = mean
@@ -461,6 +463,33 @@ class HMM(nn.Module):
             t += 1
 
         return torch.stack(x), z, input_parameter_values, output_parameter_values
+
+    def sample_from_emission(self, mean: torch.Tensor, std: torch.Tensor, sampling_temps: dict):
+        """Sample both modalities independently.
+
+        Args:
+            mean (torch.Tensor): total mean
+                shape: (1, 1, n_mel_channels + n_motion_channels)
+            std (torch.Tensor): total std
+                shape: (1, 1, n_mel_channels + n_motion_channels)
+            sampling_temps (dict): sampling_temp for each modality having audio and motion as keys
+
+        Returns:
+            torch.Tensor: concatenated audio and motion samples
+                shape: (1, 1, n_mel_channels + n_motion_channels)
+        """
+        x_t_audio = self.emission_model.sample(
+            mean[:, :, : self.hparams.n_mel_channels],
+            std[:, :, : self.hparams.n_mel_channels],
+            sampling_temp=sampling_temps["audio"],
+        )
+        x_t_motion = self.emission_model.sample(
+            mean[:, :, self.hparams.n_mel_channels :],
+            std[:, :, self.hparams.n_mel_channels :],
+            sampling_temp=sampling_temps["motion"],
+        )
+        x_t = torch.cat((x_t_audio, x_t_motion), dim=2)
+        return x_t
 
     def initialize_log_state_priors(self, text_embeddings):
         """Creates the log pi in forward algorithm.

@@ -1,10 +1,12 @@
 """
 Glow-TTS Code from https://github.com/jaywalnut310/glow-tts
 """
+import numpy as np
 import torch
 import torch.nn as nn
 
 import src.model.DecoderComponents.flows as flows
+from src.model.wavegrad import WaveGrad
 from src.utilities.functions import get_mask_from_len, squeeze, unsqueeze
 
 
@@ -62,9 +64,7 @@ class FlowSpecDecoder(nn.Module):
         x, x_lengths, x_max_length = self.preprocess(x, x_lengths, x_lengths.max())
 
         x_mask = get_mask_from_len(x_lengths, x_max_length, device=x.device, dtype=x.dtype).unsqueeze(1)
-        import pdb
 
-        pdb.set_trace()
         if not reverse:
             flows = self.flows
             logdet_tot = 0
@@ -94,3 +94,55 @@ class FlowSpecDecoder(nn.Module):
             y = y[:, :, :y_max_length]
         y_lengths = torch.div(y_lengths, self.n_sqz, rounding_mode="floor") * self.n_sqz
         return y, y_lengths, y_max_length
+
+
+class DiffusionDecoder(nn.Module):
+    def __init__(self, steps, noise_schedule) -> None:
+        super().__init__()
+        self.steps = steps
+        self.model = WaveGrad()
+        self.loss = nn.L1Loss()
+        self.set_noise_schedule(noise_schedule)
+
+    def set_noise_schedule(self, noise_schedule):
+        self.beta = noise_schedule
+        self.alpha = 1 - self.beta
+        self.alpha_cum = np.cumprod(self.alpha)
+
+    def forward(self, motion, motion_lens, z, z_lens):
+        b, N, T = motion.shape
+
+        s = torch.randint(1, self.steps + 1, [N], device=motion.device)
+        l_a, l_b = self.beta[s - 1], self.beta[s]
+        noise_scale = l_a + torch.rand(N, device=motion.device) * (l_b - l_a)
+        noise_scale = noise_scale.unsqueeze(1)
+        noise = torch.randn_like(motion)
+        noisy_audio = noise_scale * motion + (1.0 - noise_scale**2) ** 0.5 * noise
+        predicted = self.model(noisy_audio, z, noise_scale.squeeze(1))
+        return self.loss(noise, predicted.squeeze(1))
+
+    def sample(self, z):
+        """
+
+        Args:
+            z (torch.FloatTensor): shape: (batch, n_motion_vectors, T)
+        """
+        audio = torch.randn(*z.shape, device=z.device)
+        noise_scale = torch.from_numpy(self.alpha_cum**0.5).float().unsqueeze(1).to(z.device)
+
+        for n in range(len(self.alpha) - 1, -1, -1):
+            c1 = 1 / self.alpha[n] ** 0.5
+            c2 = (1 - self.alpha[n]) / (1 - self.alpha_cum[n]) ** 0.5
+            audio = c1 * (audio - c2 * self.model(audio, z, noise_scale[n]).squeeze(1))
+            if n > 0:
+                noise = torch.randn_like(audio)
+                sigma = ((1.0 - self.alpha_cum[n - 1]) / (1.0 - self.alpha_cum[n]) * self.beta[n]) ** 0.5
+                audio += sigma * noise
+        return audio
+
+
+class FPDecoder(nn.Module):
+    def __init__(self) -> None:
+        super().__init__()
+
+    pass

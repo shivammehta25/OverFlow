@@ -1,9 +1,11 @@
 import torch
 from torch import nn
 
+import monotonic_align
+from src.model.Decoder import DiffusionDecoder, FlowSpecDecoder
 from src.model.Encoder import Encoder
-from src.model.FlowDecoder import FlowSpecDecoder
 from src.model.HMM import HMM
+from src.utilities.functions import get_mask_from_len
 
 
 class OverFlow(nn.Module):
@@ -28,7 +30,7 @@ class OverFlow(nn.Module):
         # self.encoder = Tacotron2Encoder(hparams)
         self.hmm = HMM(hparams)
         self.decoder_mel = FlowSpecDecoder(hparams, hparams.n_mel_channels, hparams.p_dropout_dec_mel)
-        self.decoder_motion = FlowSpecDecoder(hparams, hparams.n_motion_joints, hparams.p_dropout_dec_motion)
+        self.decoder_motion = DiffusionDecoder(hparams.steps, hparams.noise_schedule)
         self.logger = hparams.logger
 
     def parse_batch(self, batch):
@@ -52,16 +54,31 @@ class OverFlow(nn.Module):
             (mel_padded, motion_padded),
         )
 
+    def get_aligned_encoder_output(self, z_lengths, encoder_outputs, text_lengths):
+        attn = self._get_most_likely_path(z_lengths, text_lengths)
+        z = torch.matmul(attn.transpose(1, 2), encoder_outputs)
+        # #! TODO: Working here maybe I don't need this and can diffuse through just z
+        return z
+
+    @torch.no_grad()
+    def _get_most_likely_path(self, z_lengths, text_lengths):
+        z_mask = get_mask_from_len(z_lengths, device=z_lengths.device)
+        x_mask = get_mask_from_len(text_lengths, device=text_lengths.device)
+        attn_mask = x_mask.unsqueeze(2) * z_mask.unsqueeze(1)
+        attn = monotonic_align.maximum_path(self.hmm.log_alpha_scaled.transpose(1, 2).contiguous(), attn_mask)
+        return attn
+
     def forward(self, inputs):
         text_inputs, text_lengths, mels, motions, mel_lengths = inputs
         text_lengths, mel_lengths = text_lengths.data, mel_lengths.data
         embedded_inputs = self.embedding(text_inputs).transpose(1, 2)
         encoder_outputs, text_lengths = self.encoder(embedded_inputs, text_lengths)
-        z_mel, z_lengths, logdet_mel = self.decoder_mel(mels, mel_lengths)
-        z_motion, z_lengths, logdet_motion = self.decoder_motion(motions, mel_lengths)
-        z = torch.concat([z_mel, z_motion], dim=1)
-        logdet = logdet_mel + logdet_motion
+        z, z_lengths, logdet = self.decoder_mel(mels, mel_lengths)
         log_probs = self.hmm(encoder_outputs, text_lengths, z, z_lengths)
+
+        # encoder_output_aligned = self.get_aligned_encoder_output(z_lengths, encoder_outputs, text_lengths)
+        # diffusion_loss = self.decoder_motion(encoder_output_aligned, z_lengths, motions, mel_lengths)
+
         loss = (log_probs + logdet) / (text_lengths.sum() + mel_lengths.sum())
         return loss
 

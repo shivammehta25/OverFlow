@@ -2,7 +2,7 @@
 import pytest
 import torch
 
-from src.model.FlowDecoder import FlowSpecDecoder
+from src.model.Decoder import FlowSpecDecoder
 from src.utilities.functions import get_mask_from_len
 from tests.test_utilities import reset_all_weights
 

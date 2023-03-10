@@ -182,7 +182,7 @@ class FFTransformer(nn.Module):
         dropout,
         dropatt,
         dropemb=0.0,
-        embed_input=True,
+        embed_input=False,
         n_embed=None,
         d_embed=None,
         padding_idx=0,

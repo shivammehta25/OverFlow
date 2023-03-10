@@ -7,6 +7,7 @@ import os
 from argparse import Namespace
 
 import joblib as jl
+import numpy as np
 import torch
 
 from src.utilities.data import Normalise
@@ -145,8 +146,7 @@ def create_hparams(generate_parameters=False):
         n_frames_per_step=1,  # AR Order
         train_go=False,
         variance_floor=0.001,
-        data_dropout_mel=0,
-        data_dropout_motion=0,
+        data_dropout=0,
         data_dropout_while_eval=True,
         data_dropout_while_sampling=True,
         predict_means=False,
@@ -160,8 +160,7 @@ def create_hparams(generate_parameters=False):
         ################################
         prenet_n_layers=2,
         prenet_dim=256,
-        prenet_dropout_mel=0.5,
-        prenet_dropout_motion=0.5,
+        prenet_dropout=0.5,
         prenet_dropout_while_eval=True,
         ################################
         # Decoder RNN parameters       #
@@ -185,6 +184,11 @@ def create_hparams(generate_parameters=False):
         n_sqz=2,
         sigmoid_scale=False,
         gin_channels=0,
+        ################################
+        # Decoder Diffusion Parameters #
+        ################################
+        noise_schedule=np.linspace(1e-6, 0.01, 1000),
+        steps=1000,
         ################################
         # Optimization Hyperparameters #
         ################################

@@ -87,15 +87,15 @@ class Decoder(nn.Module):
         self.hparams = hparams
 
         input_size = hparams.post_prenet_rnn_dim + hparams.encoder_params[hparams.encoder_type]["hidden_channels"]
-        output_size = 2 * (hparams.n_mel_channels + hparams.n_motion_joints) + 1
-        self.step_size = hparams.n_mel_channels + hparams.n_motion_joints
+        output_size = 2 * hparams.n_mel_channels + 1
+
         self.validate_parameters()
 
         self.decoder_network = ParameterModel(
             hparams.parameternetwork,
             input_size,
             output_size,
-            self.step_size,
+            hparams.n_mel_channels,
             hparams.init_transition_probability,
             hparams.init_mean,
             hparams.init_std,
@@ -146,9 +146,9 @@ class Decoder(nn.Module):
         ar_mel_inputs = self.decoder_network(ar_mel_inputs)
 
         mean, std, transition_vector = (
-            ar_mel_inputs[:, :, 0 : self.step_size],
-            ar_mel_inputs[:, :, self.step_size : 2 * self.step_size],
-            ar_mel_inputs[:, :, 2 * self.step_size :].squeeze(2),
+            ar_mel_inputs[:, :, 0 : self.hparams.n_mel_channels],
+            ar_mel_inputs[:, :, self.hparams.n_mel_channels : 2 * self.hparams.n_mel_channels],
+            ar_mel_inputs[:, :, 2 * self.hparams.n_mel_channels :].squeeze(2),
         )
         std = F.softplus(std)
         std = self.floor_variance(std)

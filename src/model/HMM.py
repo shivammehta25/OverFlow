@@ -17,18 +17,11 @@ class HMM(nn.Module):
         self.transition_model = TransitionModel()
         self.emission_model = EmissionModel()
 
-        self.prenet_mel = Prenet(
+        self.prenet = Prenet(
             hparams.n_mel_channels * hparams.n_frames_per_step,
             hparams.prenet_n_layers,
             hparams.prenet_dim,
-            hparams.prenet_dropout_mel,
-        )
-
-        self.prenet_motion = Prenet(
-            hparams.n_motion_joints * hparams.n_frames_per_step,
-            hparams.prenet_n_layers,
-            hparams.prenet_dim,
-            hparams.prenet_dropout_motion,
+            hparams.prenet_dropout,
         )
 
         self.post_prenet_rnn = nn.LSTMCell(input_size=hparams.prenet_dim, hidden_size=hparams.post_prenet_rnn_dim)
@@ -44,13 +37,11 @@ class HMM(nn.Module):
             )
 
         if hparams.train_go:
-            self.go_tokens = nn.Parameter(
-                torch.stack([hparams.go_token_init_value] * (hparams.n_frames_per_step + hparams.n_motion_joints))
-            )
+            self.go_tokens = nn.Parameter(torch.stack([hparams.go_token_init_value] * hparams.n_frames_per_step))
         else:
             self.register_buffer(
                 "go_tokens",
-                torch.zeros(hparams.n_frames_per_step, (hparams.n_mel_channels + hparams.n_motion_joints)),
+                torch.zeros(hparams.n_frames_per_step, hparams.n_mel_channels),
             )
 
     def forward(self, text_embeddings, text_lengths, mel_inputs, mel_inputs_lengths):
@@ -185,24 +176,11 @@ class HMM(nn.Module):
             h_post_prenet (torch.FloatTensor): rnn hidden state of the current timestep
             c_post_prenet (torch.FloatTensor): rnn cell state of the current timestep
         """
-        mel_ar_inputs = ar_inputs[:, t : t + self.hparams.n_frames_per_step, : self.hparams.n_mel_channels]
-        motion_ar_inputs = ar_inputs[:, t : t + self.hparams.n_frames_per_step, self.hparams.n_mel_channels :]
-
-        # Perform data dropout on mels
-        prenet_input_mel = self.perform_data_dropout_of_ar_inputs(
-            mel_ar_inputs, data_dropout_flag, self.hparams.data_dropout_mel
+        prenet_input = self.perform_data_dropout_of_ar_mel_inputs(
+            ar_inputs[:, t : t + self.hparams.n_frames_per_step], data_dropout_flag
         )
-        ar_mel_inputs_prenet = self.prenet_mel(prenet_input_mel.flatten(1), prenet_dropout_flag)
-
-        # Perform data dropout on motion
-        prenet_input_motion = self.perform_data_dropout_of_ar_inputs(
-            motion_ar_inputs, data_dropout_flag, self.hparams.data_dropout_motion
-        )
-        ar_motion_inputs_prenet = self.prenet_motion(prenet_input_motion.flatten(1), prenet_dropout_flag)
-
-        # Concatenate the mels and motion
-        ar_inputs = ar_mel_inputs_prenet + ar_motion_inputs_prenet
-        h_post_prenet, c_post_prenet = self.post_prenet_rnn(ar_mel_inputs_prenet, (h_post_prenet, c_post_prenet))
+        ar_inputs_prenet = self.prenet(prenet_input.flatten(1), prenet_dropout_flag)
+        h_post_prenet, c_post_prenet = self.post_prenet_rnn(ar_inputs_prenet, (h_post_prenet, c_post_prenet))
 
         return h_post_prenet, c_post_prenet
 
@@ -215,14 +193,14 @@ class HMM(nn.Module):
         """
         batch_size, T, n_mel_channels = mel_inputs.shape
 
-        assert n_mel_channels == (
-            self.hparams.n_mel_channels + self.hparams.n_motion_joints
+        assert (
+            n_mel_channels == self.hparams.n_mel_channels
         ), "Mel channels not configured properly the input: {} and " "configuration: {} are different".format(
-            n_mel_channels, (self.hparams.n_mel_channels + self.hparams.n_motion_joints)
+            n_mel_channels, self.hparams.n_mel_channels
         )
 
         go_tokens = self.go_tokens.unsqueeze(0).expand(
-            batch_size, self.hparams.n_frames_per_step, (self.hparams.n_mel_channels + self.hparams.n_motion_joints)
+            batch_size, self.hparams.n_frames_per_step, self.hparams.n_mel_channels
         )
         ar_inputs = torch.cat((go_tokens, mel_inputs), dim=1)[:, :T]
         return ar_inputs
@@ -267,7 +245,7 @@ class HMM(nn.Module):
             device_tensor.new_zeros(batch_size, hidden_state_dim),
         )
 
-    def perform_data_dropout_of_ar_inputs(self, mel_inputs, dropout_flag, dropout_value):
+    def perform_data_dropout_of_ar_mel_inputs(self, mel_inputs, dropout_flag):
         r"""
         Takes mel frames as inputs and applies data dropout on it
 
@@ -283,7 +261,7 @@ class HMM(nn.Module):
 
         data_dropout_mask = F.dropout(
             mel_inputs.new_ones(batch_size, n_frame_per_step),
-            p=dropout_value,
+            p=self.hparams.data_dropout,
             training=dropout_flag,
         ).unsqueeze(2)
         mel_inputs = mel_inputs * data_dropout_mask
@@ -360,13 +338,12 @@ class HMM(nn.Module):
         return sum_final_log_c
 
     @torch.inference_mode()
-    def sample(self, encoder_outputs, sampling_temps, T=None):
+    def sample(self, encoder_outputs, sampling_temp=1.0, T=None):
         r"""
         Samples an output from the parameter models
 
         Args:
             encoder_outputs (float tensor): (batch, text_len, encoder_embedding_dim)
-            sampling_temps (dict): Sampling temperature for each output
             T (int): Max time to sample
 
         Returns:
@@ -378,7 +355,7 @@ class HMM(nn.Module):
 
         self.N = encoder_outputs.shape[1]
         if self.hparams.n_frames_per_step > 0:
-            ar_inputs = self.go_tokens.unsqueeze(0)
+            ar_mel_inputs = self.go_tokens.unsqueeze(0)
         else:
             raise ValueError(
                 "n_frames_per_step should be greater than 0,  \
@@ -392,7 +369,7 @@ class HMM(nn.Module):
         current_z_number = 0
         z.append(current_z_number)
 
-        h_post_prenet, c_post_prenet = self.init_lstm_states(1, self.hparams.post_prenet_rnn_dim, ar_inputs)
+        h_post_prenet, c_post_prenet = self.init_lstm_states(1, self.hparams.post_prenet_rnn_dim, ar_mel_inputs)
 
         input_parameter_values = []
         output_parameter_values = []
@@ -400,27 +377,14 @@ class HMM(nn.Module):
         prenet_dropout_flag = self.get_dropout_while_eval(self.hparams.prenet_dropout_while_eval)
 
         while True:
-            ar_mel_inputs = ar_inputs[:, :, : self.hparams.n_mel_channels]
-            ar_motion_inputs = ar_inputs[:, :, self.hparams.n_mel_channels :]
             if self.hparams.data_dropout_while_sampling:
-                # Data dropout for mel inputs
-                dropout_mask_mels = F.dropout(
-                    ar_inputs.new_ones(ar_inputs.shape[0], ar_inputs.shape[1], 1),
-                    p=self.hparams.data_dropout_mel,
+                dropout_mask = F.dropout(
+                    ar_mel_inputs.new_ones(ar_mel_inputs.shape[0], ar_mel_inputs.shape[1], 1),
+                    p=self.hparams.data_dropout,
                 )
-                ar_mel_inputs = dropout_mask_mels * ar_mel_inputs
+                ar_mel_inputs = dropout_mask * ar_mel_inputs
 
-                # Data dropout for motion inputs
-                dropout_mask_motion = F.dropout(
-                    ar_inputs.new_ones(ar_inputs.shape[0], ar_inputs.shape[1], 1),
-                    p=self.hparams.data_dropout_motion,
-                )
-                ar_motion_inputs = dropout_mask_motion * ar_motion_inputs
-
-            prenet_output_mel = self.prenet_mel(ar_mel_inputs.flatten(1).unsqueeze(0), prenet_dropout_flag)
-            prenet_output_motion = self.prenet_motion(ar_motion_inputs.flatten(1).unsqueeze(0), prenet_dropout_flag)
-            prenet_output = prenet_output_mel + prenet_output_motion
-
+            prenet_output = self.prenet(ar_mel_inputs.flatten(1).unsqueeze(0), prenet_dropout_flag)
             # will be 1 while sampling
             h_post_prenet, c_post_prenet = self.post_prenet_rnn(
                 prenet_output.squeeze(0), (h_post_prenet, c_post_prenet)
@@ -431,15 +395,14 @@ class HMM(nn.Module):
 
             transition_probability = torch.sigmoid(transition_vector.flatten())
             staying_probability = torch.sigmoid(-transition_vector.flatten())
-            input_parameter_values.append([ar_inputs, current_z_number])
+            input_parameter_values.append([ar_mel_inputs, current_z_number])
             output_parameter_values.append([mean, std, transition_probability])
 
-            x_t = self.sample_from_emission(mean, std, sampling_temps)
-            # x_t = self.emission_model.sample(mean, std, sampling_temp=sampling_temps)
+            x_t = self.emission_model.sample(mean, std, sampling_temp=sampling_temp)
 
             if self.hparams.predict_means:
                 x_t = mean
-            ar_inputs = torch.cat((ar_inputs, x_t), dim=1)[:, 1:]
+            ar_mel_inputs = torch.cat((ar_mel_inputs, x_t), dim=1)[:, 1:]
 
             x.append(x_t.flatten())
 
@@ -463,33 +426,6 @@ class HMM(nn.Module):
             t += 1
 
         return torch.stack(x), z, input_parameter_values, output_parameter_values
-
-    def sample_from_emission(self, mean: torch.Tensor, std: torch.Tensor, sampling_temps: dict):
-        """Sample both modalities independently.
-
-        Args:
-            mean (torch.Tensor): total mean
-                shape: (1, 1, n_mel_channels + n_motion_channels)
-            std (torch.Tensor): total std
-                shape: (1, 1, n_mel_channels + n_motion_channels)
-            sampling_temps (dict): sampling_temp for each modality having audio and motion as keys
-
-        Returns:
-            torch.Tensor: concatenated audio and motion samples
-                shape: (1, 1, n_mel_channels + n_motion_channels)
-        """
-        x_t_audio = self.emission_model.sample(
-            mean[:, :, : self.hparams.n_mel_channels],
-            std[:, :, : self.hparams.n_mel_channels],
-            sampling_temp=sampling_temps["audio"],
-        )
-        x_t_motion = self.emission_model.sample(
-            mean[:, :, self.hparams.n_mel_channels :],
-            std[:, :, self.hparams.n_mel_channels :],
-            sampling_temp=sampling_temps["motion"],
-        )
-        x_t = torch.cat((x_t_audio, x_t_motion), dim=2)
-        return x_t
 
     def initialize_log_state_priors(self, text_embeddings):
         """Creates the log pi in forward algorithm.

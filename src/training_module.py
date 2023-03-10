@@ -225,7 +225,7 @@ class TrainingModule(pl.LightningModule):
         return mel_output, states_travelled
 
     @torch.inference_mode()
-    def sample(self, text_inputs, text_lengths=None, sampling_temp_audio=1.0, sampling_temp_motio=0.0):
+    def sample(self, text_inputs, text_lengths=None, sampling_temps={"audio": 1.0, "motion": 1.0}):
         """
         Samples from the model
 
@@ -239,9 +239,7 @@ class TrainingModule(pl.LightningModule):
             List[Tuple[torch.FloatTensor]]: input parameters
             List[Tuple[torch.FloatTensor]]: output parameters
         """
-        return self.model.sample(
-            text_inputs, text_lengths, sampling_temps={"audio": sampling_temp_audio, "motion": sampling_temp_motio}
-        )
+        return self.model.sample(text_inputs, text_lengths, sampling_temps=sampling_temps)
 
     def log_grad_norm(self, grad_norm_dict):
         r"""

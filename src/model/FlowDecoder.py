@@ -62,7 +62,9 @@ class FlowSpecDecoder(nn.Module):
         x, x_lengths, x_max_length = self.preprocess(x, x_lengths, x_lengths.max())
 
         x_mask = get_mask_from_len(x_lengths, x_max_length, device=x.device, dtype=x.dtype).unsqueeze(1)
+        import pdb
 
+        pdb.set_trace()
         if not reverse:
             flows = self.flows
             logdet_tot = 0

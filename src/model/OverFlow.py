@@ -104,7 +104,6 @@ class OverFlow(nn.Module):
             mel_motion_latent[:, : self.n_mel_channels],
             mel_motion_latent[:, self.n_mel_channels :],
         )
-
         mel_output, mel_lengths, _ = self.decoder_mel(
             mel_latent.unsqueeze(0).transpose(1, 2), text_lengths.new_tensor([mel_latent.shape[0]]), reverse=True
         )
@@ -112,7 +111,6 @@ class OverFlow(nn.Module):
         motion_output, _, _ = self.decoder_motion(
             motion_latent.unsqueeze(0).transpose(1, 2), text_lengths.new_tensor([motion_latent.shape[0]]), reverse=True
         )
-
         if self.mel_normaliser:
             mel_output = self.mel_normaliser.inverse_normalise(mel_output)
         if self.motion_normaliser:

@@ -1,15 +1,12 @@
-import subprocess
 import warnings
-from pathlib import Path
 
-import soundfile as sf
 import torch
 from pytorch_lightning.utilities import rank_zero_only
 
 from pymo.preprocessing import MocapParameterizer
 from pymo.viz_tools import render_mp4
-from pymo.writers import BVHWriter
 from src.utilities.plotting import (
+    generate_motion_visualization,
     plot_alpha_scaled_to_numpy,
     plot_go_tokens_to_numpy,
     plot_hidden_states_to_numpy,
@@ -158,38 +155,24 @@ def log_validation(
             # Add target audio
             target_audio, sr = stft_module.griffin_lim(mel_targets.unsqueeze(0))
             logger.add_audio("natural_speech/griffin_lim", target_audio, iteration, sample_rate=sr)
-            sf.write(f"{logger.log_dir}/input_{iteration}.wav", target_audio.flatten(), 22500, "PCM_24")
 
-            # Add motion target
-            motion_input = motion_input.squeeze(0).cpu().numpy()[:45].T
-            bvh_values = motion_visualizer_pipeline.inverse_transform([motion_input])
-            bvh_filename = f"{logger.log_dir}/input_{iteration}.bvh"
-
-            # Write input bvh file
-            writer = BVHWriter()
-            with open(bvh_filename, "w") as f:
-                writer.write(bvh_values[0], f)
-
-            # To stickfigure
-            X_pos = MocapParameterizer("position").fit_transform(bvh_values)
-            render_mp4(X_pos[0], f"{logger.log_dir}/input_temp_{iteration}.mp4", axis_scale=200)
-            combine_video_audio(
-                f"{logger.log_dir}/input_temp_{iteration}.mp4",
+            generate_motion_visualization(
+                target_audio,
                 f"{logger.log_dir}/input_{iteration}.wav",
+                motion_input.squeeze(0).cpu().numpy()[:45].T,
                 f"{logger.log_dir}/input_{iteration}.mp4",
+                motion_visualizer_pipeline,
+                f"{logger.log_dir}/input_{iteration}.bvh",
             )
 
-        # Generate motion output
-        motion_output = motion_output.squeeze(0).cpu().numpy()[:, :45]
-        bvh_values = motion_visualizer_pipeline.inverse_transform([motion_output])
-        X_pos = MocapParameterizer("position").fit_transform(bvh_values)
-        sf.write(f"{logger.log_dir}/output_{iteration}.wav", generated_audio.flatten(), 22500, "PCM_24")
-        render_mp4(X_pos[0], f"{logger.log_dir}/output_temp_{iteration}.mp4", axis_scale=200)
-        combine_video_audio(
-            f"{logger.log_dir}/output_temp_{iteration}.mp4",
+        generate_motion_visualization(
+            generated_audio,
             f"{logger.log_dir}/output_{iteration}.wav",
+            motion_output.squeeze(0).cpu().numpy()[:, :45],
             f"{logger.log_dir}/output_{iteration}.mp4",
+            motion_visualizer_pipeline,
         )
+        # Generate motion output
 
         motion_mean = model.decoder_motion(
             means.T[model.n_mel_channels :].unsqueeze(0), means.new_tensor([means.shape[0]]).int(), reverse=True
@@ -200,10 +183,3 @@ def log_validation(
         bvh_values = motion_visualizer_pipeline.inverse_transform([motion_mean])
         X_pos = MocapParameterizer("position").fit_transform(bvh_values)
         render_mp4(X_pos[0], f"{logger.log_dir}/output_mean_{iteration}.mp4", axis_scale=200)
-
-
-def combine_video_audio(video_filename, audio_filename, final_filename):
-    command = f"ffmpeg -i {video_filename} -i {audio_filename} -c:v copy -c:a aac {final_filename}"
-    subprocess.check_call(command, shell=True)
-    Path(video_filename).unlink()
-    Path(audio_filename).unlink()

@@ -3,14 +3,21 @@ plotting.py
 
 File contains utilities for plotting
 """
+import subprocess
+from pathlib import Path
 from typing import Any
 
 import matplotlib
 import matplotlib.pylab as plt
 import numpy as np
 import seaborn as sns
+import soundfile as sf
 import torch
 from matplotlib.colors import LogNorm
+
+from pymo.preprocessing import MocapParameterizer
+from pymo.viz_tools import render_mp4
+from pymo.writers import BVHWriter
 
 matplotlib.use("Agg")
 
@@ -181,3 +188,48 @@ def plot_hidden_states_to_numpy(hidden_states):
     data = save_figure_to_numpy(fig)
     plt.close()
     return data
+
+
+def combine_video_audio(video_filename, audio_filename, final_filename):
+    command = f"ffmpeg -i {video_filename} -i {audio_filename} -c:v copy -c:a aac {final_filename} -y"
+    subprocess.check_call(command, shell=True)
+    Path(video_filename).unlink()
+    Path(audio_filename).unlink()
+
+
+def generate_motion_visualization(
+    audio, audio_filename, motion, motion_filename, motion_visualizer_pipeline, bvh_filename=None
+):
+    """
+
+    Args:
+        audio (_type_): (1, T_audio)
+        audio_filename (_type_): str/path
+        motion (_type_): (T_motion, 45)
+        motion_filename (_type_): str/path
+        motion_visualizer_pipeline (_type_): Pipeline
+        bvh_filename (_type_, optional): str/path. Defaults to None.
+    """
+    audio_filename = Path(audio_filename)
+    motion_filename = Path(motion_filename)
+
+    sf.write(audio_filename, audio.flatten(), 22500, "PCM_24")
+
+    # Add motion target
+    bvh_values = motion_visualizer_pipeline.inverse_transform([motion])
+
+    if bvh_filename is not None:
+        # Write input bvh file
+        writer = BVHWriter()
+        with open(bvh_filename, "w") as f:
+            writer.write(bvh_values[0], f)
+
+    # To stickfigure
+    X_pos = MocapParameterizer("position").fit_transform(bvh_values)
+
+    render_mp4(X_pos[0], motion_filename.with_suffix(".temp.mp4"), axis_scale=200)
+    combine_video_audio(
+        motion_filename.with_suffix(".temp.mp4"),
+        audio_filename,
+        motion_filename,
+    )

@@ -7,7 +7,6 @@ import os
 from argparse import Namespace
 
 import joblib as jl
-import numpy as np
 import torch
 
 from src.utilities.data import Normalise
@@ -57,7 +56,7 @@ def create_hparams(generate_parameters=False):
         ################################
         # Experiment Parameters        #
         ################################
-        run_name="NoisyData",
+        run_name="TransformerMotion",
         gpus=[1],
         max_epochs=50000,
         val_check_interval=100,
@@ -101,7 +100,7 @@ def create_hparams(generate_parameters=False):
         ################################
         # Motion Parameters            #
         ################################
-        n_motion_joints=48,
+        n_motion_joints=45,
         motion_visualizer=jl.load("data/cormac/processed_sm0_0_86fps/data_pipe.expmap_86.1328125fps.sav"),
         ################################
         # Data Properties              #
@@ -150,8 +149,7 @@ def create_hparams(generate_parameters=False):
         data_dropout_while_eval=True,
         data_dropout_while_sampling=True,
         predict_means=False,
-        base_sampling_temperature_audio=0.667,
-        base_sampling_temperature_motion=0,
+        base_sampling_temperature=0.667,
         max_sampling_time=1000,
         deterministic_transition=True,
         duration_quantile_threshold=0.3,
@@ -185,10 +183,23 @@ def create_hparams(generate_parameters=False):
         sigmoid_scale=False,
         gin_channels=0,
         ################################
-        # Decoder Diffusion Parameters #
+        # Decoder Transformer Parameters#
         ################################
-        noise_schedule=np.linspace(1e-6, 0.01, 1000),
-        steps=1000,
+        transformer_decoder_params={
+            "hidden_channels": 384,
+            "n_layer": 6,
+            "n_head": 1,
+            "d_head": 64,
+            "d_inner": 1024,
+            "kernel_size": 3,
+            "dropout": 0.1,
+            "dropatt": 0.1,
+            "dropemb": 0.0,
+            "embed_input": False,
+            "pre_lnorm": True,
+            "rel_attention": False,
+            "rel_window_size": 10,
+        },
         ################################
         # Optimization Hyperparameters #
         ################################

@@ -6,6 +6,8 @@ import torch
 import torch.nn as nn
 
 import src.model.DecoderComponents.flows as flows
+from src.model.layers import LinearNorm
+from src.model.transformer import FFTransformer
 from src.model.wavegrad import WaveGrad
 from src.utilities.functions import get_mask_from_len, squeeze, unsqueeze
 
@@ -141,8 +143,24 @@ class DiffusionDecoder(nn.Module):
         return audio
 
 
-class FPDecoder(nn.Module):
-    def __init__(self) -> None:
+class MotionDecoder(nn.Module):
+    def __init__(self, hparams):
         super().__init__()
+        self.in_proj = LinearNorm(hparams.n_mel_channels, hparams.transformer_decoder_params["hidden_channels"])
+        self.encoder = FFTransformer(**hparams.transformer_decoder_params)
+        self.out_proj = LinearNorm(hparams.transformer_decoder_params["hidden_channels"], hparams.n_motion_joints)
 
-    pass
+    def forward(self, x, input_lengths):
+        """
+
+        Args:
+            x : (b, c, T_mel)
+            input_lengths: (b)
+
+        Returns:
+            x: (b, T_mel, c)
+        """
+        x = self.in_proj(x.transpose(1, 2)).transpose(1, 2)
+        x, enc_mask = self.encoder(x, seq_lens=input_lengths)
+        x = self.out_proj(x) * enc_mask
+        return x, input_lengths

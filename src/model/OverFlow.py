@@ -1,11 +1,9 @@
 import torch
 from torch import nn
 
-import monotonic_align
-from src.model.Decoder import DiffusionDecoder, FlowSpecDecoder
+from src.model.Decoder import FlowSpecDecoder, MotionDecoder
 from src.model.Encoder import Encoder
 from src.model.HMM import HMM
-from src.utilities.functions import get_mask_from_len
 
 
 class OverFlow(nn.Module):
@@ -14,10 +12,7 @@ class OverFlow(nn.Module):
         self.n_mel_channels = hparams.n_mel_channels
         self.n_frames_per_step = hparams.n_frames_per_step
         self.n_motion_joints = hparams.n_motion_joints
-        self.base_sampling_temperatures = {
-            "audio": hparams.base_sampling_temperature_audio,
-            "motion": hparams.base_sampling_temperature_motion,
-        }
+        self.base_sampling_temperature = hparams.base_sampling_temperature
         self.embedding = nn.Embedding(
             hparams.n_symbols, hparams.encoder_params[hparams.encoder_type]["hidden_channels"]
         )
@@ -30,7 +25,8 @@ class OverFlow(nn.Module):
         # self.encoder = Tacotron2Encoder(hparams)
         self.hmm = HMM(hparams)
         self.decoder_mel = FlowSpecDecoder(hparams, hparams.n_mel_channels, hparams.p_dropout_dec_mel)
-        self.decoder_motion = DiffusionDecoder(hparams.steps, hparams.noise_schedule)
+        self.decoder_motion = MotionDecoder(hparams)
+        self.motion_loss = nn.MSELoss()
         self.logger = hparams.logger
 
     def parse_batch(self, batch):
@@ -54,20 +50,6 @@ class OverFlow(nn.Module):
             (mel_padded, motion_padded),
         )
 
-    def get_aligned_encoder_output(self, z_lengths, encoder_outputs, text_lengths):
-        attn = self._get_most_likely_path(z_lengths, text_lengths)
-        z = torch.matmul(attn.transpose(1, 2), encoder_outputs)
-        # #! TODO: Working here maybe I don't need this and can diffuse through just z
-        return z
-
-    @torch.no_grad()
-    def _get_most_likely_path(self, z_lengths, text_lengths):
-        z_mask = get_mask_from_len(z_lengths, device=z_lengths.device)
-        x_mask = get_mask_from_len(text_lengths, device=text_lengths.device)
-        attn_mask = x_mask.unsqueeze(2) * z_mask.unsqueeze(1)
-        attn = monotonic_align.maximum_path(self.hmm.log_alpha_scaled.transpose(1, 2).contiguous(), attn_mask)
-        return attn
-
     def forward(self, inputs):
         text_inputs, text_lengths, mels, motions, mel_lengths = inputs
         text_lengths, mel_lengths = text_lengths.data, mel_lengths.data
@@ -75,15 +57,16 @@ class OverFlow(nn.Module):
         encoder_outputs, text_lengths = self.encoder(embedded_inputs, text_lengths)
         z, z_lengths, logdet = self.decoder_mel(mels, mel_lengths)
         log_probs = self.hmm(encoder_outputs, text_lengths, z, z_lengths)
-
-        # encoder_output_aligned = self.get_aligned_encoder_output(z_lengths, encoder_outputs, text_lengths)
-        # diffusion_loss = self.decoder_motion(encoder_output_aligned, z_lengths, motions, mel_lengths)
-
-        loss = (log_probs + logdet) / (text_lengths.sum() + mel_lengths.sum())
+        motion_output, _ = self.decoder_motion(z, z_lengths)
+        # Make input data the same size as the decoder output for loss computation
+        motions, _, _ = self.decoder_mel.preprocess(motions, z_lengths, z_lengths.max())
+        motion_loss = self.motion_loss(motion_output, motions.transpose(1, 2))
+        hmm_loss = (log_probs + logdet) / (text_lengths.sum() + mel_lengths.sum())
+        loss = hmm_loss + motion_loss
         return loss
 
     @torch.inference_mode()
-    def sample(self, text_inputs, text_lengths=None, sampling_temps=None):
+    def sample(self, text_inputs, text_lengths=None, sampling_temp=None):
         r"""
         Sampling mel spectrogram based on text inputs
         Args:
@@ -103,31 +86,28 @@ class OverFlow(nn.Module):
         if text_lengths is None:
             text_lengths = text_inputs.new_tensor(text_inputs.shape[0])
 
-        if sampling_temps is None:
-            sampling_temps = self.base_sampling_temperatures
+        if sampling_temp is None:
+            sampling_temp = self.base_sampling_temperature
 
         text_inputs, text_lengths = text_inputs.unsqueeze(0), text_lengths.unsqueeze(0)
         embedded_inputs = self.embedding(text_inputs).transpose(1, 2)
         encoder_outputs, text_lengths = self.encoder(embedded_inputs, text_lengths)
 
         (
-            mel_motion_latent,
+            z,
             states_travelled,
             input_parameters,
             output_parameters,
-        ) = self.hmm.sample(encoder_outputs, sampling_temps=sampling_temps)
+        ) = self.hmm.sample(encoder_outputs, sampling_temp=sampling_temp)
 
-        mel_latent, motion_latent = (
-            mel_motion_latent[:, : self.n_mel_channels],
-            mel_motion_latent[:, self.n_mel_channels :],
-        )
         mel_output, mel_lengths, _ = self.decoder_mel(
-            mel_latent.unsqueeze(0).transpose(1, 2), text_lengths.new_tensor([mel_latent.shape[0]]), reverse=True
+            z.unsqueeze(0).transpose(1, 2), text_lengths.new_tensor([z.shape[0]]), reverse=True
         )
+        z, _, _ = self.decoder_mel.preprocess(
+            z.unsqueeze(0).transpose(1, 2), text_lengths.new_tensor([z.shape[0]]), z.shape[0]
+        )
+        motion_output, _ = self.decoder_motion(z, mel_lengths)
 
-        motion_output, _, _ = self.decoder_motion(
-            motion_latent.unsqueeze(0).transpose(1, 2), text_lengths.new_tensor([motion_latent.shape[0]]), reverse=True
-        )
         if self.mel_normaliser:
             mel_output = self.mel_normaliser.inverse_normalise(mel_output)
         if self.motion_normaliser:

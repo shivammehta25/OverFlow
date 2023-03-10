@@ -218,15 +218,8 @@ class TextMelLoader(Dataset):
         return (text, mel, motion)
 
     def get_motion(self, filename, mel_shape, ext=".expmap_86.1328125fps.pkl"):
-        try:
-            # raise FileNotFoundError
-            file_loc = self.motion_fileloc / Path(Path(filename).name).with_suffix(ext)
-            motion = torch.from_numpy(pd.read_pickle(file_loc).to_numpy())
-            # motion = torch.concat([motion, torch.randn(motion.shape[0], 3)], dim=1)
-            motion = torch.concat([motion, torch.zeros(motion.shape[0], 3)], dim=1)
-            motion += torch.randn(motion.shape) * 0.01
-        except FileNotFoundError:
-            motion = torch.randn(mel_shape, self.n_motion_joints)
+        file_loc = self.motion_fileloc / Path(Path(filename).name).with_suffix(ext)
+        motion = torch.from_numpy(pd.read_pickle(file_loc).to_numpy())
         return motion.T
 
     def resize_mel_motion_to_same_size(self, mel, motion):

@@ -108,6 +108,16 @@ class Encoder(nn.Module):
             raise ValueError(f"Unknown encoder type: {hparams.encoder_type}")
 
     def forward(self, x: torch.FloatTensor, x_len: torch.LongTensor) -> Tuple[torch.FloatTensor, torch.LongTensor]:
+        """
+        Args:
+            x (torch.FloatTensor): (b, C, T_text)
+            x_len (torch.LongTensor): (b)
+
+        Returns:
+            Tuple[torch.FloatTensor, torch.LongTensor]:
+                - b, T_text, C
+                - b
+        """
         return self.encoder(x, x_len)
 
     def inference(self, *args, **kwargs):

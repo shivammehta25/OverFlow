@@ -36,8 +36,8 @@ class TrainingModule(pl.LightningModule):
         Returns:
             output (Any): output of the forward function
         """
-        log_probs = self.model(x)
-        return log_probs
+        log_probs, motion_loss = self.model(x)
+        return log_probs, motion_loss
 
     def configure_optimizers(self):
         r"""
@@ -83,12 +83,27 @@ class TrainingModule(pl.LightningModule):
             loss (torch.FloatTensor): loss of the forward run of your model
         """
         x, y = self.model.parse_batch(train_batch)
-        log_probs = self(x)
-        loss = -log_probs.mean()
+        log_probs, motion_loss = self(x)
+        hmm_loss = -log_probs.mean()
+        loss = hmm_loss + motion_loss
         self.log(
-            "loss/train",
+            "loss/train_total",
             loss.item(),
             prog_bar=True,
+            on_step=True,
+            sync_dist=True,
+            logger=True,
+        )
+        self.log(
+            "loss/train_hmm",
+            hmm_loss.item(),
+            on_step=True,
+            sync_dist=True,
+            logger=True,
+        )
+        self.log(
+            "loss/train_motion",
+            motion_loss.item(),
             on_step=True,
             sync_dist=True,
             logger=True,
@@ -109,9 +124,9 @@ class TrainingModule(pl.LightningModule):
         current = total - free
         self.max_gpu_usage = max(self.max_gpu_usage, current)
         self.log(
-            "trainer_stats/MaxGPUMemory", self.max_gpu_usage, logger=True, prog_bar=True, on_step=True, sync_dist=True
+            "trainer_stats/MaxGPUMemory", self.max_gpu_usage, prog_bar=True, logger=True, on_step=True, sync_dist=True
         )
-        self.log("trainer_stats/CurrentGPUMemory", current, logger=True, prog_bar=True, on_step=True, sync_dist=True)
+        self.log("trainer_stats/CurrentGPUMemory", current, logger=True, on_step=True, sync_dist=True)
 
     def validation_step(self, val_batch, batch_idx):
         r"""
@@ -122,9 +137,22 @@ class TrainingModule(pl.LightningModule):
             batch_idx (): batch index
         """
         x, y = self.model.parse_batch(val_batch)
-        log_probs = self(x)
-        loss = -log_probs.mean()
-        self.log("loss/val", loss.item(), prog_bar=True, sync_dist=True, logger=True)
+        log_probs, motion_loss = self(x)
+        hmm_loss = -log_probs.mean()
+        loss = hmm_loss + motion_loss
+        self.log("loss/val_total", loss.item(), prog_bar=True, sync_dist=True, logger=True)
+        self.log(
+            "loss/val_hmm",
+            hmm_loss.item(),
+            sync_dist=True,
+            logger=True,
+        )
+        self.log(
+            "loss/val_motion",
+            motion_loss.item(),
+            sync_dist=True,
+            logger=True,
+        )
         return loss
 
     def on_before_zero_grad(self, optimizer):

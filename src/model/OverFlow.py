@@ -62,8 +62,7 @@ class OverFlow(nn.Module):
         motions, _, _ = self.decoder_mel.preprocess(motions, z_lengths, z_lengths.max())
         motion_loss = self.motion_loss(motion_output, motions.transpose(1, 2))
         hmm_loss = (log_probs + logdet) / (text_lengths.sum() + mel_lengths.sum())
-        loss = hmm_loss + motion_loss
-        return loss
+        return hmm_loss, motion_loss
 
     @torch.inference_mode()
     def sample(self, text_inputs, text_lengths=None, sampling_temp=None):

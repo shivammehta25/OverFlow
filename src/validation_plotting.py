@@ -168,7 +168,7 @@ def log_validation(
         generate_motion_visualization(
             generated_audio,
             f"{logger.log_dir}/output_{iteration}.wav",
-            motion_output.squeeze(0).cpu().numpy()[:, :45],
+            motion_output.squeeze(0).cpu().numpy().T,
             f"{logger.log_dir}/output_{iteration}.mp4",
             motion_visualizer_pipeline,
         )

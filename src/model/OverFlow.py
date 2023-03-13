@@ -25,7 +25,7 @@ class OverFlow(nn.Module):
         # self.encoder = Tacotron2Encoder(hparams)
         self.hmm = HMM(hparams)
         self.decoder_mel = FlowSpecDecoder(hparams, hparams.n_mel_channels, hparams.p_dropout_dec_mel)
-        self.decoder_motion = MotionDecoder(hparams)
+        self.decoder_motion = MotionDecoder(hparams, hparams.motion_decoder_type)
         self.motion_loss = nn.MSELoss()
         self.logger = hparams.logger
 

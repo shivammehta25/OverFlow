@@ -17,7 +17,8 @@
             "type": "python",
             "request": "launch",
             "program": "${workspaceFolder}/train.py",
-            "console": "integratedTerminal"
+            "console": "integratedTerminal",
+            "justMyCode": false
         }
     ]
 }

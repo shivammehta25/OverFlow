@@ -7,7 +7,7 @@ import torch.nn as nn
 
 import src.model.DecoderComponents.flows as flows
 from src.model.layers import LinearNorm
-from src.model.transformer import FFTransformer
+from src.model.transformer import Conformer, FFTransformer
 from src.model.wavegrad import WaveGrad
 from src.utilities.functions import get_mask_from_len, squeeze, unsqueeze
 
@@ -143,11 +143,19 @@ class DiffusionDecoder(nn.Module):
 
 
 class MotionDecoder(nn.Module):
-    def __init__(self, hparams):
+    def __init__(self, hparams, decoder_type="transformer"):
         super().__init__()
-        self.in_proj = LinearNorm(hparams.n_mel_channels, hparams.transformer_decoder_params["hidden_channels"])
-        self.encoder = FFTransformer(**hparams.transformer_decoder_params)
-        self.out_proj = LinearNorm(hparams.transformer_decoder_params["hidden_channels"], hparams.n_motion_joints)
+        self.in_proj = LinearNorm(hparams.n_mel_channels, hparams.motion_decoder_param[decoder_type]["hidden_channels"])
+        self.decoder_type = decoder_type
+        if decoder_type == "transformer":
+            self.encoder = FFTransformer(**hparams.motion_decoder_param[decoder_type])
+        elif decoder_type == "conformer":
+            self.encoder = Conformer(**hparams.motion_decoder_param[decoder_type])
+        else:
+            raise ValueError(f"Unknown decoder type: {decoder_type}")
+        self.out_proj = LinearNorm(
+            hparams.motion_decoder_param[decoder_type]["hidden_channels"], hparams.n_motion_joints
+        )
 
     def forward(self, x, input_lengths):
         """

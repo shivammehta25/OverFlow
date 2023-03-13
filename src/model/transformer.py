@@ -15,6 +15,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from conformer import ConformerBlock
 from conformer.conformer import Attention as RelAttention
 
 from src.utilities.functions import get_mask_from_len
@@ -221,6 +222,7 @@ class FFTransformer(nn.Module):
                     dropatt=dropatt,
                     pre_lnorm=pre_lnorm,
                     rel_attention=rel_attention,
+                    rel_window_size=rel_window_size,
                 )
             )
 
@@ -247,3 +249,43 @@ class FFTransformer(nn.Module):
 
         # out = self.drop(out)
         return out, mask
+
+
+class Conformer(nn.Module):
+    def __init__(
+        self,
+        hidden_channels,
+        d_head,
+        n_layer,
+        n_head,
+        ff_mult,
+        conv_expansion_factor,
+        dropout,
+        dropatt,
+        dropconv,
+        conv_kernel_size,
+    ) -> None:
+        super().__init__()
+
+        self.layers = nn.ModuleList()
+        for _ in range(n_layer):
+            self.layers.append(
+                ConformerBlock(
+                    dim=hidden_channels,
+                    dim_head=d_head,
+                    heads=n_head,
+                    ff_mult=ff_mult,
+                    conv_expansion_factor=conv_expansion_factor,
+                    ff_dropout=dropout,
+                    attn_dropout=dropatt,
+                    conv_dropout=dropconv,
+                    conv_kernel_size=conv_kernel_size,
+                )
+            )
+
+    def forward(self, x, seq_lens):
+        x = x.transpose(1, 2)
+        enc_mask = get_mask_from_len(seq_lens, device=seq_lens.device, dtype=seq_lens.dtype)
+        for layer in self.layers:
+            x = layer(x, enc_mask)
+        return x, enc_mask.unsqueeze(2)

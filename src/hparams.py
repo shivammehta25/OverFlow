@@ -56,7 +56,7 @@ def create_hparams(generate_parameters=False):
         ################################
         # Experiment Parameters        #
         ################################
-        run_name="TransformerMotion",
+        run_name="ConformerMotion",
         gpus=[1],
         max_epochs=50000,
         val_check_interval=100,
@@ -149,7 +149,7 @@ def create_hparams(generate_parameters=False):
         data_dropout_while_eval=True,
         data_dropout_while_sampling=True,
         predict_means=False,
-        base_sampling_temperature=0.667,
+        base_sampling_temperature=0.0,
         max_sampling_time=1000,
         deterministic_transition=True,
         duration_quantile_threshold=0.3,
@@ -185,20 +185,35 @@ def create_hparams(generate_parameters=False):
         ################################
         # Decoder Transformer Parameters#
         ################################
-        transformer_decoder_params={
-            "hidden_channels": 384,
-            "n_layer": 6,
-            "n_head": 1,
-            "d_head": 64,
-            "d_inner": 1024,
-            "kernel_size": 3,
-            "dropout": 0.1,
-            "dropatt": 0.1,
-            "dropemb": 0.0,
-            "embed_input": False,
-            "pre_lnorm": True,
-            "rel_attention": False,
-            "rel_window_size": 10,
+        motion_decoder_type="conformer",
+        motion_decoder_param={
+            "transformer": {
+                "hidden_channels": 384,
+                "n_layer": 6,
+                "n_head": 1,
+                "d_head": 64,
+                "d_inner": 1024,
+                "kernel_size": 3,
+                "dropout": 0.1,
+                "dropatt": 0.1,
+                "dropemb": 0.0,
+                "embed_input": False,
+                "pre_lnorm": True,
+                "rel_attention": False,
+                "rel_window_size": 10,
+            },
+            "conformer": {
+                "hidden_channels": 384,
+                "d_head": 64,
+                "n_layer": 6,
+                "n_head": 1,
+                "ff_mult": 4,
+                "conv_expansion_factor": 2,
+                "dropout": 0.1,
+                "dropconv": 0.1,
+                "dropatt": 0.1,
+                "conv_kernel_size": 21,
+            },
         },
         ################################
         # Optimization Hyperparameters #

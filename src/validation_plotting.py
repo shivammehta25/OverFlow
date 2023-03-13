@@ -5,6 +5,7 @@ from pytorch_lightning.utilities import rank_zero_only
 
 from pymo.preprocessing import MocapParameterizer
 from pymo.viz_tools import render_mp4
+from src.utilities.data import align_gesture_with_mel
 from src.utilities.plotting import (
     generate_motion_visualization,
     plot_alpha_scaled_to_numpy,
@@ -32,7 +33,7 @@ def log_validation(
     motion_input,
     motion_output,
     motion_visualizer_pipeline,
-    resumed_from_checkpoint,
+    hparams,
 ):
     """
     Args:
@@ -156,10 +157,15 @@ def log_validation(
             target_audio, sr = stft_module.griffin_lim(mel_targets.unsqueeze(0))
             logger.add_audio("natural_speech/griffin_lim", target_audio, iteration, sample_rate=sr)
 
+            reduced_motion = motion_input.squeeze(0)[:, :: hparams.frame_rate_reduction_factor].T
+            upsampled_motion = align_gesture_with_mel(
+                reduced_motion, mel_targets.shape[1], gesture_fps=86.1326125 / hparams.frame_rate_reduction_factor
+            ).T.unsqueeze(0)
+
             generate_motion_visualization(
                 target_audio,
                 f"{logger.log_dir}/input_{iteration}.wav",
-                motion_input.squeeze(0).cpu().numpy().T,
+                upsampled_motion.squeeze(0).cpu().numpy().T,
                 f"{logger.log_dir}/input_{iteration}.mp4",
                 motion_visualizer_pipeline,
                 f"{logger.log_dir}/input_{iteration}.bvh",
@@ -168,13 +174,16 @@ def log_validation(
         generate_motion_visualization(
             generated_audio,
             f"{logger.log_dir}/output_{iteration}.wav",
-            motion_output.squeeze(0).cpu().numpy().T,
+            motion_output.squeeze(0).cpu().numpy(),
             f"{logger.log_dir}/output_{iteration}.mp4",
             motion_visualizer_pipeline,
         )
         # Generate motion output
 
         motion_mean = model.decoder_motion(means.T.unsqueeze(0), means.new_tensor([means.shape[0]]).int())[0].squeeze(0)
+        motion_mean = align_gesture_with_mel(
+            motion_mean, mel_targets.shape[1], gesture_fps=86.1326125 / hparams.frame_rate_reduction_factor
+        )
         motion_mean = model.motion_normaliser.inverse_normalise(motion_mean).cpu().numpy()
         bvh_values = motion_visualizer_pipeline.inverse_transform([motion_mean])
         X_pos = MocapParameterizer("position").fit_transform(bvh_values)

@@ -3,6 +3,7 @@ data.py
 
 Utilities for processing of Data
 """
+import math
 import random
 from functools import partial
 from multiprocessing import Pool, cpu_count
@@ -11,6 +12,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import torch
+import torch.nn.functional as F
 from scipy.io.wavfile import read
 from torch.utils.data.dataset import Dataset
 from tqdm.auto import tqdm
@@ -328,3 +330,37 @@ class Normalise:
 
         x = x.mul(self.std).add(self.mean)
         return x
+
+
+def align_gesture_with_mel(gesture_arr, mel_length, gesture_fps, hop_length=256, sampling_rate=22050):
+    """ "
+    shape: T, D
+    output: T, D
+    """
+    audio_frame_hop_time = hop_length / sampling_rate
+    gesture_frame_time = 1.0 / gesture_fps
+    total_gesture_time = gesture_arr.shape[0] * gesture_frame_time
+    num_out_frame = math.floor(total_gesture_time / audio_frame_hop_time)
+    align_indices = np.arange(num_out_frame, dtype=np.float32)
+    align_indices *= audio_frame_hop_time
+    align_indices /= gesture_frame_time
+    align_indices = np.floor(align_indices).astype(np.int)
+    out_arr = gesture_arr[align_indices, :]
+    return make_tensor_equal_to_size(out_arr.T.unsqueeze(0), mel_length).squeeze(0).T
+
+
+def make_tensor_equal_to_size(some_tensor, len_needed):
+    """
+    pad if it is less than mel_length and crop if it is greater than mel_length
+    Args:
+        gestures: shape: b, c, T
+        mel_length (int): T
+
+    return: shape: b, c, mel_length
+    """
+    if some_tensor.shape[2] > len_needed:
+        some_tensor = some_tensor[:, :, :len_needed]
+    elif some_tensor.shape[2] <= len_needed:
+        some_tensor = F.pad(some_tensor, (0, len_needed - some_tensor.shape[2]), "constant")
+
+    return some_tensor

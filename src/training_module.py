@@ -200,7 +200,7 @@ class TrainingModule(pl.LightningModule):
                 self.hparams.motion_normaliser.inverse_normalise(motions),
                 motion_output,
                 self.motion_visualizer,
-                self.trainer.resume_from_checkpoint,
+                self.hparams,
             )
 
             self.trainer.save_checkpoint(

@@ -145,7 +145,13 @@ class DiffusionDecoder(nn.Module):
 class MotionDecoder(nn.Module):
     def __init__(self, hparams, decoder_type="transformer"):
         super().__init__()
-        self.in_proj = LinearNorm(hparams.n_mel_channels, hparams.motion_decoder_param[decoder_type]["hidden_channels"])
+        self.frame_rate_reduction_factor = hparams.frame_rate_reduction_factor
+        self.downsampling_proj = nn.Conv1d(
+            hparams.n_mel_channels,
+            hparams.motion_decoder_param[decoder_type]["hidden_channels"],
+            kernel_size=hparams.frame_rate_reduction_factor,
+            stride=hparams.frame_rate_reduction_factor,
+        )
         self.decoder_type = decoder_type
         if decoder_type == "transformer":
             self.encoder = FFTransformer(**hparams.motion_decoder_param[decoder_type])
@@ -167,7 +173,8 @@ class MotionDecoder(nn.Module):
         Returns:
             x: (b, T_mel, c)
         """
-        x = self.in_proj(x.transpose(1, 2)).transpose(1, 2)
+        x = self.downsampling_proj(x)
+        input_lengths = torch.div(input_lengths, self.frame_rate_reduction_factor, rounding_mode="floor")
         x, enc_mask = self.encoder(x, seq_lens=input_lengths)
         x = self.out_proj(x) * enc_mask
         return x, input_lengths

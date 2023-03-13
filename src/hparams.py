@@ -56,8 +56,8 @@ def create_hparams(generate_parameters=False):
         ################################
         # Experiment Parameters        #
         ################################
-        run_name="ConformerMotion",
-        gpus=[1],
+        run_name="TransformerEvery4",
+        gpus=[2],
         max_epochs=50000,
         val_check_interval=100,
         save_model_checkpoint=500,
@@ -80,7 +80,6 @@ def create_hparams(generate_parameters=False):
         training_files="data/filelists/cormac_train.txt",
         validation_files="data/filelists/cormac_val.txt",
         text_cleaners=["english_cleaners"],
-        motion_fileloc="data/cormac/processed_sm0_0_86fps",
         # training_files="data/filelists/ljs_audio_text_train_filelist.txt",
         # validation_files="data/filelists/ljs_audio_text_val_filelist.txt",
         phonetise=True,
@@ -101,6 +100,9 @@ def create_hparams(generate_parameters=False):
         # Motion Parameters            #
         ################################
         n_motion_joints=45,
+        frame_rate_reduction_factor=4,
+        motion_fileloc="data/cormac/processed_sm0_0_86fps",
+        motion_filename_ext="expmap_86.1328125fps.pkl",
         motion_visualizer=jl.load("data/cormac/processed_sm0_0_86fps/data_pipe.expmap_86.1328125fps.sav"),
         ################################
         # Data Properties              #
@@ -185,7 +187,7 @@ def create_hparams(generate_parameters=False):
         ################################
         # Decoder Transformer Parameters#
         ################################
-        motion_decoder_type="conformer",
+        motion_decoder_type="transformer",
         motion_decoder_param={
             "transformer": {
                 "hidden_channels": 384,

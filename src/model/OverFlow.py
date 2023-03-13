@@ -4,6 +4,7 @@ from torch import nn
 from src.model.Decoder import FlowSpecDecoder, MotionDecoder
 from src.model.Encoder import Encoder
 from src.model.HMM import HMM
+from src.utilities.data import align_gesture_with_mel, make_tensor_equal_to_size
 
 
 class OverFlow(nn.Module):
@@ -12,6 +13,7 @@ class OverFlow(nn.Module):
         self.n_mel_channels = hparams.n_mel_channels
         self.n_frames_per_step = hparams.n_frames_per_step
         self.n_motion_joints = hparams.n_motion_joints
+        self.frame_rate_reduction_factor = hparams.frame_rate_reduction_factor
         self.base_sampling_temperature = hparams.base_sampling_temperature
         self.embedding = nn.Embedding(
             hparams.n_symbols, hparams.encoder_params[hparams.encoder_type]["hidden_channels"]
@@ -59,7 +61,11 @@ class OverFlow(nn.Module):
         log_probs = self.hmm(encoder_outputs, text_lengths, z, z_lengths)
         motion_output, _ = self.decoder_motion(z, z_lengths)
         # Make input data the same size as the decoder output for loss computation
-        motions, _, _ = self.decoder_mel.preprocess(motions, z_lengths, z_lengths.max())
+        motions = self.decoder_mel.preprocess(motions, z_lengths, z_lengths.max())[0][
+            :, :, :: self.frame_rate_reduction_factor
+        ]
+        motions = make_tensor_equal_to_size(motions, motion_output.shape[1])
+
         motion_loss = self.motion_loss(motion_output, motions.transpose(1, 2))
         hmm_loss = (log_probs + logdet) / (text_lengths.sum() + mel_lengths.sum())
         return hmm_loss, motion_loss
@@ -106,6 +112,10 @@ class OverFlow(nn.Module):
             z.unsqueeze(0).transpose(1, 2), text_lengths.new_tensor([z.shape[0]]), z.shape[0]
         )
         motion_output, _ = self.decoder_motion(z, mel_lengths)
+
+        motion_output = align_gesture_with_mel(
+            motion_output.squeeze(0), mel_output.shape[2], gesture_fps=86.1326125 / self.frame_rate_reduction_factor
+        ).T.unsqueeze(0)
 
         if self.mel_normaliser:
             mel_output = self.mel_normaliser.inverse_normalise(mel_output)

@@ -56,7 +56,7 @@ def create_hparams(generate_parameters=False):
         ################################
         # Experiment Parameters        #
         ################################
-        run_name="TransformerEvery4",
+        run_name="TransformerEvery4Scheduler",
         gpus=[2],
         max_epochs=50000,
         val_check_interval=100,
@@ -225,10 +225,9 @@ def create_hparams(generate_parameters=False):
         grad_clip_thresh=5.0,
         stochastic_weight_avg=False,
         optimizer_params={
-            "scheduler": None,
-            "warmup": 2000,
+            "scheduler": "noam",
+            "noam_params": {"warmup": 1000},
         },
     )
 
-    return hparams
     return hparams

@@ -46,14 +46,14 @@ class TrainingModule(pl.LightningModule):
         Returns:
             (torch.optim.Optimizer)
         """
-        optimizer = torch.optim.Adam(
+        optimizer = torch.optim.AdamW(
             self.parameters(),
             lr=self.hparams.learning_rate,
             weight_decay=self.hparams.weight_decay,
         )
 
         if self.hparams.optimizer_params["scheduler"] == "noam":
-            self.warmup = self.hparams.optimizer_params["warmup"]
+            self.warmup = self.hparams.optimizer_params["noam_params"]["warmup"]
 
             def warm_decay(step):
                 if step < self.warmup:
@@ -86,6 +86,11 @@ class TrainingModule(pl.LightningModule):
         log_probs, motion_loss = self(x)
         hmm_loss = -log_probs.mean()
         loss = hmm_loss + motion_loss
+
+        # Do not optimize if the loss is garbage
+        if loss.item() >= 10000 or torch.isnan(loss):
+            return None
+
         self.log(
             "loss/train_total",
             loss.item(),

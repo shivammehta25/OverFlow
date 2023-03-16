@@ -34,7 +34,7 @@ def test_sample(hparams, dummy_data_uncollated, send_len):
         neural_hmm.sample(text, torch.tensor(len(text))) if send_len else neural_hmm.sample(text)
     )
     assert mel_output.shape[2] == hparams.n_mel_channels
-    assert motion_output.shape[1] == hparams.n_motion_joints
+    assert motion_output.shape[2] == hparams.n_motion_joints
     assert input_parameters[0][0].shape[-1] == hparams.n_mel_channels
     assert output_parameters[0][0].shape[-1] == hparams.n_mel_channels
     assert output_parameters[0][1].shape[-1] == hparams.n_mel_channels

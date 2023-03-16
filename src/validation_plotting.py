@@ -180,7 +180,9 @@ def log_validation(
         )
         # Generate motion output
 
-        motion_mean = model.decoder_motion(means.T.unsqueeze(0), means.new_tensor([means.shape[0]]).int())[0].squeeze(0)
+        motion_mean = model.decoder_motion(
+            means.T.unsqueeze(0), means.new_tensor([means.shape[0]]).int(), reverse=True
+        )["generated"].squeeze(0)
         motion_mean = align_gesture_with_mel(
             motion_mean, mel_targets.shape[1], gesture_fps=86.1326125 / hparams.frame_rate_reduction_factor
         )

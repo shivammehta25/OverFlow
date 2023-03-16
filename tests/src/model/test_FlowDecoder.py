@@ -2,7 +2,7 @@
 import pytest
 import torch
 
-from src.model.Decoder import FlowSpecDecoder
+from src.model.Decoder import FlowSpecDecoder, MotionDecoder
 from src.utilities.functions import get_mask_from_len
 from tests.test_utilities import reset_all_weights
 
@@ -32,19 +32,37 @@ def test_FlowDecoder(
 
     hparams.p_dropout_dec = 0.0  # Turn off dropout to check invertibility
 
-    decoder = FlowSpecDecoder(hparams, hparams.n_mel_channels + hparams.n_motion_joints, hparams.p_dropout_dec)
+    decoder = FlowSpecDecoder(hparams, hparams.n_mel_channels, hparams.p_dropout_dec)
 
     reset_all_weights(decoder)
 
     _, _, mel_padded, motion_padded, output_lengths = dummy_data
-    z, z_lengths, logdet = decoder(torch.concat([mel_padded, motion_padded], dim=1), output_lengths)
+    z, z_lengths, logdet = decoder(mel_padded, output_lengths)
     assert logdet.shape[0] == test_batch_size
-    assert z.shape[1] == (hparams.n_mel_channels + hparams.n_motion_joints)
+    assert z.shape[1] == hparams.n_mel_channels
     assert (z.shape[2] == mel_padded.shape[2]) or (z.shape[2] == (mel_padded.shape[2] - 1)), "Output format matches"
 
     mel_, _, logdet_ = decoder(z, z_lengths, reverse=True)
     len_mask = get_mask_from_len(z_lengths, device=z_lengths.device).unsqueeze(1)
     mel_padded = mel_padded[:, :, : z.shape[2]] * len_mask
-    motion_padded = motion_padded[:, :, : z.shape[2]] * len_mask
-    assert torch.isclose(torch.concat([mel_padded, motion_padded], dim=1), mel_, atol=1e-5).all(), "Not Invertible"
+    assert torch.isclose(mel_padded, mel_, atol=1e-5).all(), "Invertible"
     assert logdet_ is None
+
+
+@pytest.mark.parametrize(
+    "motion_decoder_type, reverse",
+    [("conformer", True), ("transformer", True), ("conformer", False), ("transformer", False)],
+)
+def test_MotionDecoder(hparams, dummy_data, test_batch_size, motion_decoder_type, reverse):
+    """Test the MotionDecoder class."""
+    decoder_motion = MotionDecoder(hparams, motion_decoder_type)
+    _, _, mel_padded, motion_padded, output_lengths = dummy_data
+    if not reverse:
+        motion_output = decoder_motion(mel_padded, output_lengths, motion_padded)
+        assert motion_output["target"].shape == motion_output["generated"].shape
+
+    if reverse:
+        motion_output = decoder_motion(mel_padded, output_lengths, reverse=True)
+        assert motion_output["target"] is None
+
+    assert motion_output["generated"].shape[-1] == hparams.n_motion_joints

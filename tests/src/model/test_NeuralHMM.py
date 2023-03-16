@@ -16,8 +16,8 @@ def test_parse_batch(hparams, dummy_data):
 
 def test_forward(hparams, dummy_data, test_batch_size):
     neural_hmm = OverFlow(hparams)
-    log_probs = neural_hmm.forward(dummy_data)
-    assert log_probs.shape == (test_batch_size,)
+    hmm_loss, _ = neural_hmm.forward(dummy_data)
+    assert hmm_loss.shape == (test_batch_size,)
 
 
 @pytest.mark.parametrize("send_len", [True, False])
@@ -35,6 +35,6 @@ def test_sample(hparams, dummy_data_uncollated, send_len):
     )
     assert mel_output.shape[2] == hparams.n_mel_channels
     assert motion_output.shape[2] == hparams.n_motion_joints
-    assert input_parameters[0][0].shape[-1] == (hparams.n_mel_channels + hparams.n_motion_joints)
-    assert output_parameters[0][0].shape[-1] == (hparams.n_mel_channels + hparams.n_motion_joints)
-    assert output_parameters[0][1].shape[-1] == (hparams.n_mel_channels + hparams.n_motion_joints)
+    assert input_parameters[0][0].shape[-1] == hparams.n_mel_channels
+    assert output_parameters[0][0].shape[-1] == hparams.n_mel_channels
+    assert output_parameters[0][1].shape[-1] == hparams.n_mel_channels

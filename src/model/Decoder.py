@@ -9,7 +9,7 @@ import torch.distributions as tdist
 import torch.nn as nn
 
 import src.model.DecoderComponents.flows as flows
-from src.model.layers import LinearNorm
+from src.model.layers import ConvNorm, LinearNorm
 from src.model.transformer import Conformer, FFTransformer
 from src.model.wavegrad import WaveGrad
 from src.utilities.functions import get_mask_from_len, squeeze, unsqueeze
@@ -149,14 +149,10 @@ class MotionDecoder(nn.Module):
     def __init__(self, hparams, decoder_type="transformer"):
         super().__init__()
         self.frame_rate_reduction_factor = hparams.frame_rate_reduction_factor
-        self.decoder_type = decoder_type
-        self.n_motion_joints = hparams.n_motion_joints
-
-        self.downsampling_proj = nn.Conv1d(
+        self.in_proj = ConvNorm(
             hparams.n_mel_channels,
             hparams.motion_decoder_param[decoder_type]["hidden_channels"],
-            kernel_size=hparams.frame_rate_reduction_factor,
-            stride=hparams.frame_rate_reduction_factor,
+            kernel_size=5,
         )
         if decoder_type == "transformer":
             self.encoder = FFTransformer(**hparams.motion_decoder_param[decoder_type])
@@ -173,46 +169,41 @@ class MotionDecoder(nn.Module):
             hparams.motion_decoder_param[decoder_type]["hidden_channels"], hparams.n_motion_joints
         )
 
-    def forward(self, x, input_lengths, y=None, reverse=False, sampling_temp=0.334):
+    def forward(self, x, input_lengths, motion_target=None, reverse=False):
         """
 
         Args:
             x : (b, c, T_mel)
             input_lengths: (b)
+            output: (b, n_joints, T_mel)
 
         Returns:
-            x: (b, T_mel, c)
+            x: (b, T_mel // frame_rate_reduction_factor, c)
+            input_lengths: (b)  # reduced by frame_rate_reduction_factor
+            motion: (b, T_mel // frame_rate_reduction_factor, c)
         """
-        x = self.downsampling_proj(x)
-        # reduce input length by the reduction factor
-        input_lengths = torch.div(input_lengths, self.frame_rate_reduction_factor, rounding_mode="floor")
-
-        if self.decoder_type != "flow":
-            x, enc_mask = self.encoder(x, seq_lens=input_lengths)
-            x = self.out_proj(x) * enc_mask
-            return x, input_lengths
-
+        assert input_lengths is not None, "Placeholder for future use"
+        if reverse is False:
+            assert motion_target is not None
+            motion_target = motion_target[:, :, :: self.frame_rate_reduction_factor].transpose(1, 2)
         else:
-            x_mask = get_mask_from_len(input_lengths, device=input_lengths.device, dtype=input_lengths.dtype)
-            x = (self.latent_proj(x.transpose(1, 2)) * x_mask.unsqueeze(-1)).transpose(1, 2)
-            x_m, x_s = x[:, : self.n_motion_joints + 3], x[:, self.n_motion_joints + 3 :]
-            if reverse:
-                z = self.base_dist(x_m, x_s * sampling_temp).sample() if sampling_temp > 0 else x_m
-                flow_output, flow_output_len, logdet = self.encoder(z, input_lengths, reverse=True)
-            else:
-                flow_output, flow_output_len, logdet = self.encoder(y, input_lengths)
+            motion_target = None
 
-        output = {
-            "flow_output": flow_output,
-            "flow_output_len": flow_output_len,
-            "logdet": logdet,
+        #
+        x = x[:, :, :: self.frame_rate_reduction_factor]
+        # output_lengths = x.ne(0).all(-2).sum(-1)
+        output_lengths = torch.round(
+            torch.where(input_lengths % 4 == 0, input_lengths, input_lengths + 2) / self.frame_rate_reduction_factor
+        ).int()
+        x = self.in_proj(x)
+        x, enc_mask = self.encoder(x, seq_lens=output_lengths)
+        x = self.out_proj(x) * enc_mask
+
+        if motion_target is not None:
+            motion_target = motion_target * enc_mask
+
+        return {
+            "generated": x,
+            "generated_lengths": output_lengths,
+            "target": motion_target,
         }
-        if not reverse:
-            output.update(
-                {
-                    "x_m": x_m,
-                    "x_s": x_s,
-                }
-            )
-
-        return output

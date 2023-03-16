@@ -4,7 +4,7 @@ from torch import nn
 from src.model.Decoder import FlowSpecDecoder, MotionDecoder
 from src.model.Encoder import Encoder
 from src.model.HMM import HMM
-from src.utilities.data import align_gesture_with_mel, make_tensor_equal_to_size
+from src.utilities.data import align_gesture_with_mel
 
 
 class OverFlow(nn.Module):
@@ -64,23 +64,10 @@ class OverFlow(nn.Module):
         encoder_outputs, text_lengths = self.encoder(embedded_inputs, text_lengths)
         z, z_lengths, logdet = self.decoder_mel(mels, mel_lengths)
         log_probs = self.hmm(encoder_outputs, text_lengths, z, z_lengths)
-        motions = self.decoder_mel.preprocess(motions, z_lengths, z_lengths.max())[0][
-            :, :, :: self.frame_rate_reduction_factor
-        ]
-
-        if self.motion_decoder_type != "flow":
-            motion_output, _ = self.decoder_motion(z, z_lengths)
-            # Make input data the same size as the decoder output for loss computation
-            motions = make_tensor_equal_to_size(motions, motion_output.shape[1])
-            motion_loss = self.motion_loss(motion_output, motions.transpose(1, 2))
-
-        else:
-            self.decoder_motion(
-                z,
-                z_lengths,
-                motions,
-            )
-
+        # Match the size of latent variable and motion
+        motions = self.decoder_mel.preprocess(motions, z_lengths, z_lengths.max())[0]
+        motion_decoder_output = self.decoder_motion(z, z_lengths, motions)
+        motion_loss = self.motion_loss(motion_decoder_output["generated"], motion_decoder_output["target"])
         hmm_loss = (log_probs + logdet) / (text_lengths.sum() + mel_lengths.sum())
         return hmm_loss, motion_loss
 
@@ -93,9 +80,11 @@ class OverFlow(nn.Module):
             text_lengths (int tensor, Optional):  single value scalar with length of input (x)
 
         Returns:
-            mel_outputs (list): list of len of the output of mel spectrogram
+            mel_outputs (torch.FloatTensor): list of len of the output of mel spectrogram
                     each containing n_mel_channels channels
                 shape: (len, n_mel_channels)
+            motion_output: (torch.FloatTensor): list of len of the output of motion
+                shape: (len, n_motion_joints)
             states_travelled (list): list of phoneme travelled at each time step t
                 shape: (len)
         """
@@ -125,10 +114,12 @@ class OverFlow(nn.Module):
         z, _, _ = self.decoder_mel.preprocess(
             z.unsqueeze(0).transpose(1, 2), text_lengths.new_tensor([z.shape[0]]), z.shape[0]
         )
-        motion_output, _ = self.decoder_motion(z, mel_lengths, reverse=True, sampling_temp=sampling_temp)
+        motion_output = self.decoder_motion(z, mel_lengths, reverse=True)
 
         motion_output = align_gesture_with_mel(
-            motion_output.squeeze(0), mel_output.shape[2], gesture_fps=86.1326125 / self.frame_rate_reduction_factor
+            motion_output["generated"].squeeze(0),
+            mel_output.shape[2],
+            gesture_fps=86.1326125 / self.frame_rate_reduction_factor,
         ).T.unsqueeze(0)
 
         if self.mel_normaliser:

@@ -56,8 +56,8 @@ def create_hparams(generate_parameters=False):
         ################################
         # Experiment Parameters        #
         ################################
-        run_name="TransformerEvery4Scheduler",
-        gpus=[2],
+        run_name="Test",
+        gpus=[0],
         max_epochs=50000,
         val_check_interval=100,
         save_model_checkpoint=500,
@@ -179,7 +179,7 @@ def create_hparams(generate_parameters=False):
         n_blocks_dec=12,
         n_block_layers=4,
         p_dropout_dec_mel=0.05,
-        p_dropout_dec_motion=0.05,
+        p_dropout_dec_motion=None,
         n_split=4,
         n_sqz=2,
         sigmoid_scale=False,
@@ -187,7 +187,7 @@ def create_hparams(generate_parameters=False):
         ################################
         # Decoder Transformer Parameters#
         ################################
-        motion_decoder_type="transformer",
+        motion_decoder_type="flow",
         motion_decoder_param={
             "transformer": {
                 "hidden_channels": 384,
@@ -216,6 +216,19 @@ def create_hparams(generate_parameters=False):
                 "dropatt": 0.1,
                 "conv_kernel_size": 21,
             },
+            "flow": {
+                "hidden_channels": 384,
+                "flow_hidden_channels": 150,
+                "kernel_size_dec": 5,
+                "dilation_rate": 1,
+                "n_blocks_dec": 12,
+                "n_block_layers": 4,
+                "p_dropout_dec": 0.05,
+                "n_split": 4,
+                "n_sqz": 2,
+                "sigmoid_scale": False,
+                "gin_channels": 0,
+            },
         },
         ################################
         # Optimization Hyperparameters #
@@ -225,7 +238,7 @@ def create_hparams(generate_parameters=False):
         grad_clip_thresh=5.0,
         stochastic_weight_avg=False,
         optimizer_params={
-            "scheduler": "noam",
+            "scheduler": None,
             "noam_params": {"warmup": 1000},
         },
     )

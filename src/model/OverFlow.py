@@ -15,6 +15,7 @@ class OverFlow(nn.Module):
         self.n_motion_joints = hparams.n_motion_joints
         self.frame_rate_reduction_factor = hparams.frame_rate_reduction_factor
         self.base_sampling_temperature = hparams.base_sampling_temperature
+        self.motion_decoder_type = hparams.motion_decoder_type
         self.embedding = nn.Embedding(
             hparams.n_symbols, hparams.encoder_params[hparams.encoder_type]["hidden_channels"]
         )
@@ -28,7 +29,11 @@ class OverFlow(nn.Module):
         self.hmm = HMM(hparams)
         self.decoder_mel = FlowSpecDecoder(hparams, hparams.n_mel_channels, hparams.p_dropout_dec_mel)
         self.decoder_motion = MotionDecoder(hparams, hparams.motion_decoder_type)
-        self.motion_loss = nn.MSELoss()
+        if hparams.motion_decoder_type in ("transformer", "conformer"):
+            self.motion_loss = nn.MSELoss()
+        else:
+            # TODO: define custom loss
+            self.motion_loss = None
         self.logger = hparams.logger
 
     def parse_batch(self, batch):
@@ -59,14 +64,23 @@ class OverFlow(nn.Module):
         encoder_outputs, text_lengths = self.encoder(embedded_inputs, text_lengths)
         z, z_lengths, logdet = self.decoder_mel(mels, mel_lengths)
         log_probs = self.hmm(encoder_outputs, text_lengths, z, z_lengths)
-        motion_output, _ = self.decoder_motion(z, z_lengths)
-        # Make input data the same size as the decoder output for loss computation
         motions = self.decoder_mel.preprocess(motions, z_lengths, z_lengths.max())[0][
             :, :, :: self.frame_rate_reduction_factor
         ]
-        motions = make_tensor_equal_to_size(motions, motion_output.shape[1])
 
-        motion_loss = self.motion_loss(motion_output, motions.transpose(1, 2))
+        if self.motion_decoder_type != "flow":
+            motion_output, _ = self.decoder_motion(z, z_lengths)
+            # Make input data the same size as the decoder output for loss computation
+            motions = make_tensor_equal_to_size(motions, motion_output.shape[1])
+            motion_loss = self.motion_loss(motion_output, motions.transpose(1, 2))
+
+        else:
+            self.decoder_motion(
+                z,
+                z_lengths,
+                motions,
+            )
+
         hmm_loss = (log_probs + logdet) / (text_lengths.sum() + mel_lengths.sum())
         return hmm_loss, motion_loss
 
@@ -111,7 +125,7 @@ class OverFlow(nn.Module):
         z, _, _ = self.decoder_mel.preprocess(
             z.unsqueeze(0).transpose(1, 2), text_lengths.new_tensor([z.shape[0]]), z.shape[0]
         )
-        motion_output, _ = self.decoder_motion(z, mel_lengths)
+        motion_output, _ = self.decoder_motion(z, mel_lengths, reverse=True, sampling_temp=sampling_temp)
 
         motion_output = align_gesture_with_mel(
             motion_output.squeeze(0), mel_output.shape[2], gesture_fps=86.1326125 / self.frame_rate_reduction_factor

@@ -1,8 +1,11 @@
 """
 Glow-TTS Code from https://github.com/jaywalnut310/glow-tts
 """
+from argparse import Namespace
+
 import numpy as np
 import torch
+import torch.distributions as tdist
 import torch.nn as nn
 
 import src.model.DecoderComponents.flows as flows
@@ -146,24 +149,31 @@ class MotionDecoder(nn.Module):
     def __init__(self, hparams, decoder_type="transformer"):
         super().__init__()
         self.frame_rate_reduction_factor = hparams.frame_rate_reduction_factor
+        self.decoder_type = decoder_type
+        self.n_motion_joints = hparams.n_motion_joints
+
         self.downsampling_proj = nn.Conv1d(
             hparams.n_mel_channels,
             hparams.motion_decoder_param[decoder_type]["hidden_channels"],
             kernel_size=hparams.frame_rate_reduction_factor,
             stride=hparams.frame_rate_reduction_factor,
         )
-        self.decoder_type = decoder_type
         if decoder_type == "transformer":
             self.encoder = FFTransformer(**hparams.motion_decoder_param[decoder_type])
         elif decoder_type == "conformer":
             self.encoder = Conformer(**hparams.motion_decoder_param[decoder_type])
+        elif decoder_type == "flow":
+            self.base_dist = tdist.normal.Normal
+            hparams_decoder = Namespace(**hparams.motion_decoder_param[decoder_type])
+            self.latent_proj = LinearNorm(hparams_decoder.hidden_channels, (hparams.n_motion_joints + 3) * 2)
+            self.encoder = FlowSpecDecoder(hparams_decoder, hparams.n_motion_joints + 3)
         else:
             raise ValueError(f"Unknown decoder type: {decoder_type}")
         self.out_proj = LinearNorm(
             hparams.motion_decoder_param[decoder_type]["hidden_channels"], hparams.n_motion_joints
         )
 
-    def forward(self, x, input_lengths):
+    def forward(self, x, input_lengths, y=None, reverse=False, sampling_temp=0.334):
         """
 
         Args:
@@ -174,7 +184,35 @@ class MotionDecoder(nn.Module):
             x: (b, T_mel, c)
         """
         x = self.downsampling_proj(x)
+        # reduce input length by the reduction factor
         input_lengths = torch.div(input_lengths, self.frame_rate_reduction_factor, rounding_mode="floor")
-        x, enc_mask = self.encoder(x, seq_lens=input_lengths)
-        x = self.out_proj(x) * enc_mask
-        return x, input_lengths
+
+        if self.decoder_type != "flow":
+            x, enc_mask = self.encoder(x, seq_lens=input_lengths)
+            x = self.out_proj(x) * enc_mask
+            return x, input_lengths
+
+        else:
+            x_mask = get_mask_from_len(input_lengths, device=input_lengths.device, dtype=input_lengths.dtype)
+            x = (self.latent_proj(x.transpose(1, 2)) * x_mask.unsqueeze(-1)).transpose(1, 2)
+            x_m, x_s = x[:, : self.n_motion_joints + 3], x[:, self.n_motion_joints + 3 :]
+            if reverse:
+                z = self.base_dist(x_m, x_s * sampling_temp).sample() if sampling_temp > 0 else x_m
+                flow_output, flow_output_len, logdet = self.encoder(z, input_lengths, reverse=True)
+            else:
+                flow_output, flow_output_len, logdet = self.encoder(y, input_lengths)
+
+        output = {
+            "flow_output": flow_output,
+            "flow_output_len": flow_output_len,
+            "logdet": logdet,
+        }
+        if not reverse:
+            output.update(
+                {
+                    "x_m": x_m,
+                    "x_s": x_s,
+                }
+            )
+
+        return output

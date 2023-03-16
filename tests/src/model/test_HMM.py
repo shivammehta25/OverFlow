@@ -18,9 +18,7 @@ def test_hmm_forward(hparams, dummy_embedded_data, test_batch_size):
         motion_padded,
         output_lengths,
     ) = dummy_embedded_data
-    loss = model.forward(
-        embedded_input, input_lengths, torch.concat([mel_padded, motion_padded], dim=1), output_lengths
-    )
+    loss = model.forward(embedded_input, input_lengths, mel_padded, output_lengths)
     assert (not torch.isnan(loss).any()) and (not torch.isinf(loss).any())
     assert model.N == embedded_input.shape[1]
     assert model.log_alpha_scaled.shape == (
@@ -45,7 +43,7 @@ def test_mask_lengths(hparams, dummy_embedded_data, test_batch_size):
         motion_padded,
         output_lengths,
     ) = dummy_embedded_data
-    model.forward(embedded_input, input_lengths, torch.concat([mel_padded, motion_padded], dim=1), output_lengths)
+    model.forward(embedded_input, input_lengths, mel_padded, output_lengths)
     log_c = torch.randn(test_batch_size, mel_padded.shape[2])
 
     log_c = model.mask_lengths(mel_padded.transpose(1, 2), output_lengths, log_c)
@@ -93,14 +91,13 @@ def test_process_ar_timestep(
         motion_padded,
         output_lengths,
     ) = dummy_embedded_data
-    mel_motion_padded = torch.concat([mel_padded, motion_padded], dim=1).transpose(1, 2)
-    h_post_prenet, c_post_prenet = model.init_lstm_states(
-        test_batch_size, hparams.post_prenet_rnn_dim, mel_motion_padded
-    )
+
+    mel_padded = mel_padded.transpose(1, 2)
+    h_post_prenet, c_post_prenet = model.init_lstm_states(test_batch_size, hparams.post_prenet_rnn_dim, mel_padded)
 
     h_post_prenet, c_post_prenet = model.process_ar_timestep(
         t,
-        mel_motion_padded,
+        mel_padded,
         h_post_prenet,
         c_post_prenet,
         data_dropout_flag,
@@ -120,7 +117,7 @@ def test_add_go_token(hparams, dummy_embedded_data):
         motion_padded,
         output_lengths,
     ) = dummy_embedded_data
-    mel_padded = torch.concat([mel_padded, motion_padded], dim=1).transpose(1, 2)
+    mel_padded = mel_padded.transpose(1, 2)
     ar_mel = model.add_go_token(mel_padded)
     assert ar_mel.shape == mel_padded.shape
     assert (ar_mel[:, 1:] == mel_padded[:, :-1]).all(), "Go token not appended properly"
@@ -160,7 +157,7 @@ def test_perform_data_dropout_of_ar_mel_inputs(hparams, dummy_embedded_data, dro
         output_lengths,
     ) = dummy_embedded_data
     mel_padded = mel_padded.transpose(1, 2)
-    mel_padded = model.perform_data_dropout_of_ar_inputs(mel_padded, dropout_flag, hparams.data_dropout)
+    mel_padded = model.perform_data_dropout_of_ar_mel_inputs(mel_padded, dropout_flag)
     mask = get_mask_from_len(output_lengths, device=output_lengths.device)
     if dropout_flag:
         assert (mel_padded.sum(2).masked_select(mask) == 0).any()
@@ -213,17 +210,15 @@ def test_sample(hparams, dummy_embedded_data, test_batch_size):
         _,
         output_lengths,
     ) = dummy_embedded_data
-    sampling_temps = {
-        "audio": hparams.base_sampling_temperature_audio,
-        "motion": hparams.base_sampling_temperature_motion,
-    }
+
     (mel_output, states_travelled, input_parameters, output_parameters) = model.sample(
-        embedded_input[0:1], sampling_temps
+        embedded_input[0:1],
+        hparams.base_sampling_temperature,
     )
-    assert len(mel_output[0]) == (hparams.n_mel_channels + hparams.n_motion_joints)
-    assert input_parameters[0][0].shape[-1] == (hparams.n_mel_channels + hparams.n_motion_joints)
-    assert output_parameters[0][0].shape[-1] == (hparams.n_mel_channels + hparams.n_motion_joints)
-    assert output_parameters[0][1].shape[-1] == (hparams.n_mel_channels + hparams.n_motion_joints)
+    assert len(mel_output[0]) == hparams.n_mel_channels
+    assert input_parameters[0][0].shape[-1] == hparams.n_mel_channels
+    assert output_parameters[0][0].shape[-1] == hparams.n_mel_channels
+    assert output_parameters[0][1].shape[-1] == hparams.n_mel_channels
 
 
 @pytest.mark.parametrize("sampling_temp", [0.0, 0.5, 1.0])
@@ -236,25 +231,21 @@ def test_sample_temperature(hparams, dummy_embedded_data, test_batch_size, sampl
         _,
         output_lengths,
     ) = dummy_embedded_data
-    sampling_temps = {
-        "audio": sampling_temp,
-        "motion": sampling_temp,
-    }
     # Without sampling
     (mel_output1, states_travelled, input_parameters, output_parameters) = model.sample(
-        embedded_input[0:1], sampling_temps=sampling_temps
+        embedded_input[0:1], sampling_temp=sampling_temp
     )
 
     # Sampling with temperature
     model.hparams.predict_means = False
     (mel_output2, states_travelled, input_parameters, output_parameters) = model.sample(
-        embedded_input[0:1], sampling_temps=sampling_temps
+        embedded_input[0:1], sampling_temp=sampling_temp
     )
 
     if sampling_temp == 0.0:
         assert torch.isclose(mel_output1, mel_output2).all()
 
-    assert len(mel_output2[0]) == (hparams.n_mel_channels + hparams.n_motion_joints)
-    assert input_parameters[0][0].shape[-1] == (hparams.n_mel_channels + hparams.n_motion_joints)
-    assert output_parameters[0][0].shape[-1] == (hparams.n_mel_channels + hparams.n_motion_joints)
-    assert output_parameters[0][1].shape[-1] == (hparams.n_mel_channels + hparams.n_motion_joints)
+    assert len(mel_output2[0]) == (hparams.n_mel_channels)
+    assert input_parameters[0][0].shape[-1] == (hparams.n_mel_channels)
+    assert output_parameters[0][0].shape[-1] == (hparams.n_mel_channels)
+    assert output_parameters[0][1].shape[-1] == (hparams.n_mel_channels)

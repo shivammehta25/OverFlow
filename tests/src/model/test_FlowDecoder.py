@@ -2,7 +2,7 @@
 import pytest
 import torch
 
-from src.model.Decoder import FlowSpecDecoder
+from src.model.Decoder import FlowSpecDecoder, MotionDecoder
 from src.utilities.functions import get_mask_from_len
 from tests.test_utilities import reset_all_weights
 
@@ -47,3 +47,14 @@ def test_FlowDecoder(
     mel_padded = mel_padded[:, :, : z.shape[2]] * len_mask
     assert torch.isclose(mel_padded, mel_, atol=1e-5).all(), "Invertible"
     assert logdet_ is None
+
+
+@pytest.mark.parametrize("motion_decoder_type", ["conformer", "transformer"])
+def test_MotionDecoder(hparams, dummy_data, test_batch_size, motion_decoder_type):
+    """Test the MotionDecoder class."""
+    decoder_motion = MotionDecoder(hparams, motion_decoder_type)
+    _, _, mel_padded, motion_padded, output_lengths = dummy_data
+    motion_output, motion_len = decoder_motion(mel_padded, output_lengths)
+    assert motion_output.shape[-1] == hparams.n_motion_joints
+    assert motion_output.shape[0] == test_batch_size
+    assert motion_len.shape[0] == test_batch_size

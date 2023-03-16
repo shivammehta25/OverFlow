@@ -6,7 +6,7 @@ import torch
 import torch.nn as nn
 
 import src.model.DecoderComponents.flows as flows
-from src.model.layers import LinearNorm
+from src.model.layers import ConvNorm, LinearNorm
 from src.model.transformer import Conformer, FFTransformer
 from src.model.wavegrad import WaveGrad
 from src.utilities.functions import get_mask_from_len, squeeze, unsqueeze
@@ -146,11 +146,10 @@ class MotionDecoder(nn.Module):
     def __init__(self, hparams, decoder_type="transformer"):
         super().__init__()
         self.frame_rate_reduction_factor = hparams.frame_rate_reduction_factor
-        self.downsampling_proj = nn.Conv1d(
+        self.in_proj = ConvNorm(
             hparams.n_mel_channels,
             hparams.motion_decoder_param[decoder_type]["hidden_channels"],
-            kernel_size=hparams.frame_rate_reduction_factor,
-            stride=hparams.frame_rate_reduction_factor,
+            kernel_size=5,
         )
         self.decoder_type = decoder_type
         if decoder_type == "transformer":
@@ -163,18 +162,41 @@ class MotionDecoder(nn.Module):
             hparams.motion_decoder_param[decoder_type]["hidden_channels"], hparams.n_motion_joints
         )
 
-    def forward(self, x, input_lengths):
+    def forward(self, x, input_lengths, motion_target=None, reverse=False):
         """
 
         Args:
             x : (b, c, T_mel)
             input_lengths: (b)
+            output: (b, n_joints, T_mel)
 
         Returns:
-            x: (b, T_mel, c)
+            x: (b, T_mel // frame_rate_reduction_factor, c)
+            input_lengths: (b)  # reduced by frame_rate_reduction_factor
+            motion: (b, T_mel // frame_rate_reduction_factor, c)
         """
-        x = self.downsampling_proj(x)
-        input_lengths = torch.div(input_lengths, self.frame_rate_reduction_factor, rounding_mode="floor")
-        x, enc_mask = self.encoder(x, seq_lens=input_lengths)
+        assert input_lengths is not None, "Placeholder for future use"
+        if reverse is False:
+            assert motion_target is not None
+            motion_target = motion_target[:, :, :: self.frame_rate_reduction_factor].transpose(1, 2)
+        else:
+            motion_target = None
+
+        #
+        x = x[:, :, :: self.frame_rate_reduction_factor]
+        # output_lengths = x.ne(0).all(-2).sum(-1)
+        output_lengths = torch.round(
+            torch.where(input_lengths % 4 == 0, input_lengths, input_lengths + 2) / self.frame_rate_reduction_factor
+        ).int()
+        x = self.in_proj(x)
+        x, enc_mask = self.encoder(x, seq_lens=output_lengths)
         x = self.out_proj(x) * enc_mask
-        return x, input_lengths
+
+        if motion_target is not None:
+            motion_target = motion_target * enc_mask
+
+        return {
+            "generated": x,
+            "generated_lengths": output_lengths,
+            "target": motion_target,
+        }

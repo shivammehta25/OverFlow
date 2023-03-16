@@ -23,7 +23,7 @@ def get_a_mel():
 
 # TODO: change number of channels
 def get_a_motion(mel_length):
-    return torch.randn(48, mel_length)
+    return torch.randn(45, mel_length)
 
 
 def get_a_text_mel_motion_pair():

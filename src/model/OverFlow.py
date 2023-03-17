@@ -33,7 +33,7 @@ class OverFlow(nn.Module):
             self.motion_loss = nn.MSELoss()
         else:
             # TODO: define custom loss
-            self.motion_loss = None
+            self.motion_loss = lambda x: -x.mean()
         self.logger = hparams.logger
 
     def parse_batch(self, batch):
@@ -67,7 +67,11 @@ class OverFlow(nn.Module):
         # Match the size of latent variable and motion
         motions = self.decoder_mel.preprocess(motions, z_lengths, z_lengths.max())[0]
         motion_decoder_output = self.decoder_motion(z, z_lengths, motions)
-        motion_loss = self.motion_loss(motion_decoder_output["generated"], motion_decoder_output["target"])
+        if self.motion_decoder_type in ("transformer", "conformer"):
+            motion_loss = self.motion_loss(motion_decoder_output["generated"], motion_decoder_output["target"])
+        elif self.motion_decoder_type == "flow":
+            motion_loss = self.motion_loss(motion_decoder_output["loss"])
+
         hmm_loss = (log_probs + logdet) / (text_lengths.sum() + mel_lengths.sum())
         return hmm_loss, motion_loss
 
@@ -114,7 +118,7 @@ class OverFlow(nn.Module):
         z, _, _ = self.decoder_mel.preprocess(
             z.unsqueeze(0).transpose(1, 2), text_lengths.new_tensor([z.shape[0]]), z.shape[0]
         )
-        motion_output = self.decoder_motion(z, mel_lengths, reverse=True)
+        motion_output = self.decoder_motion(z, mel_lengths, reverse=True, sampling_temp=sampling_temp)
 
         motion_output = align_gesture_with_mel(
             motion_output["generated"].squeeze(0),

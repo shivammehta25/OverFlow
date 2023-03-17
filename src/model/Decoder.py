@@ -7,6 +7,8 @@ import numpy as np
 import torch
 import torch.distributions as tdist
 import torch.nn as nn
+import torch.nn.functional as F
+from einops import rearrange
 
 import src.model.DecoderComponents.flows as flows
 from src.model.layers import ConvNorm, LinearNorm
@@ -148,7 +150,9 @@ class DiffusionDecoder(nn.Module):
 class MotionDecoder(nn.Module):
     def __init__(self, hparams, decoder_type="transformer"):
         super().__init__()
+        self.decoder_type = decoder_type
         self.frame_rate_reduction_factor = hparams.frame_rate_reduction_factor
+        self.n_motion_joints = hparams.n_motion_joints
         self.in_proj = ConvNorm(
             hparams.n_mel_channels,
             hparams.motion_decoder_param[decoder_type]["hidden_channels"],
@@ -161,7 +165,7 @@ class MotionDecoder(nn.Module):
         elif decoder_type == "flow":
             self.base_dist = tdist.normal.Normal
             hparams_decoder = Namespace(**hparams.motion_decoder_param[decoder_type])
-            self.latent_proj = LinearNorm(hparams_decoder.hidden_channels, (hparams.n_motion_joints + 3) * 2)
+            self.latent_proj = LinearNorm(hparams_decoder.hidden_channels, hparams.n_motion_joints * 2)
             self.encoder = FlowSpecDecoder(hparams_decoder, hparams.n_motion_joints + 3)
         else:
             raise ValueError(f"Unknown decoder type: {decoder_type}")
@@ -169,7 +173,7 @@ class MotionDecoder(nn.Module):
             hparams.motion_decoder_param[decoder_type]["hidden_channels"], hparams.n_motion_joints
         )
 
-    def forward(self, x, input_lengths, motion_target=None, reverse=False):
+    def forward(self, x, input_lengths, motion_target=None, reverse=False, sampling_temp=1.0):
         """
 
         Args:
@@ -189,21 +193,38 @@ class MotionDecoder(nn.Module):
         else:
             motion_target = None
 
-        #
         x = x[:, :, :: self.frame_rate_reduction_factor]
-        # output_lengths = x.ne(0).all(-2).sum(-1)
         output_lengths = torch.round(
             torch.where(input_lengths % 4 == 0, input_lengths, input_lengths + 2) / self.frame_rate_reduction_factor
         ).int()
         x = self.in_proj(x)
-        x, enc_mask = self.encoder(x, seq_lens=output_lengths)
-        x = self.out_proj(x) * enc_mask
+        if self.decoder_type in ["transformer", "conformer"]:
+            x, enc_mask = self.encoder(x, seq_lens=output_lengths)
+            x = self.out_proj(x) * enc_mask
+            if motion_target is not None:
+                motion_target = motion_target * enc_mask
 
-        if motion_target is not None:
-            motion_target = motion_target * enc_mask
+        elif self.decoder_type == "flow":
+            random_element = torch.randn(x.shape[0], x.shape[-1], 3, device=x.device, dtype=x.dtype)
+            x = self.latent_proj(rearrange(x, "b c t -> b t c"))
+            x_m = rearrange(x[:, :, : self.n_motion_joints], "b t c -> b c t")
+            x_s = torch.clamp_min(rearrange(F.softplus(x[:, :, self.n_motion_joints :]), "b t c -> b c t"), 1e-3)
 
-        return {
-            "generated": x,
-            "generated_lengths": output_lengths,
-            "target": motion_target,
-        }
+            if reverse is False:
+                motion_target = rearrange(torch.concat([motion_target, random_element], dim=-1), "b t c -> b c t")
+                z, z_lengths, logdet = self.encoder(motion_target, output_lengths)
+                z = z[:, : self.n_motion_joints]
+                x_m, *_ = self.encoder.preprocess(x_m, z_lengths, z_lengths.max())
+                x_s, *_ = self.encoder.preprocess(x_s, z_lengths, z_lengths.max())
+                mask = get_mask_from_len(z_lengths, device=z_lengths.device, dtype=z_lengths.dtype)
+                prob = self.base_dist(x_m, x_s).log_prob(z) * rearrange(mask, "b t -> b () t")
+                prob = prob.sum([1, 2]) / (z_lengths.sum() * prob.shape[1])  # Averaging across time and channels
+                loss = prob + logdet
+            else:
+                z = self.base_dist(x_m, x_s).sample() if sampling_temp > 0 else x_m
+                z = torch.concat([z, rearrange(random_element, "b t c -> b c t")], dim=1)
+                z, output_lengths, _ = self.encoder(z, output_lengths, reverse=True)
+                x = rearrange(z[:, : self.n_motion_joints], "b c t -> b t c")
+                loss = None
+
+        return {"generated": x, "generated_lengths": output_lengths, "target": motion_target, "loss": loss}

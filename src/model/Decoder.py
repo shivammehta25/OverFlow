@@ -4,6 +4,7 @@ Glow-TTS Code from https://github.com/jaywalnut310/glow-tts
 import numpy as np
 import torch
 import torch.nn as nn
+from einops import rearrange
 
 import src.model.DecoderComponents.flows as flows
 from src.model.layers import LinearNorm
@@ -142,6 +143,30 @@ class DiffusionDecoder(nn.Module):
         return audio
 
 
+class RNNDecoder(nn.Module):
+    def __init__(self, hidden_channels, n_layer, dropout, bidirectional=True):
+        super().__init__()
+        self.rnn = nn.LSTM(
+            input_size=hidden_channels,
+            hidden_size=hidden_channels,
+            num_layers=n_layer,
+            dropout=dropout,
+            bidirectional=bidirectional,
+        )
+        self.hidden_channels = hidden_channels
+        self.num_layers = n_layer
+        self.dropout = dropout
+        self.bidirectional = bidirectional
+
+    def forward(self, x, seq_lens):
+        x = rearrange(x, "b c t -> b t c")
+        x = nn.utils.rnn.pack_padded_sequence(x, seq_lens.cpu(), enforce_sorted=False, batch_first=True)
+        x, _ = self.rnn(x)
+        x, _ = nn.utils.rnn.pad_packed_sequence(x)
+        x = rearrange(x, "t b (x c) -> b t c x", c=self.hidden_channels).mean(-1)
+        return x, get_mask_from_len(seq_lens, device=seq_lens.device, dtype=seq_lens.dtype).unsqueeze(-1)
+
+
 class MotionDecoder(nn.Module):
     def __init__(self, hparams, decoder_type="transformer"):
         super().__init__()
@@ -151,6 +176,8 @@ class MotionDecoder(nn.Module):
             self.encoder = FFTransformer(**hparams.motion_decoder_param[decoder_type])
         elif decoder_type == "conformer":
             self.encoder = Conformer(**hparams.motion_decoder_param[decoder_type])
+        elif decoder_type == "rnn":
+            self.encoder = RNNDecoder(**hparams.motion_decoder_param[decoder_type])
         else:
             raise ValueError(f"Unknown decoder type: {decoder_type}")
         self.out_proj = LinearNorm(

@@ -49,12 +49,17 @@ def test_FlowDecoder(
     assert logdet_ is None
 
 
-@pytest.mark.parametrize("motion_decoder_type", ["conformer", "transformer"])
+@pytest.mark.parametrize("motion_decoder_type", ["conformer", "transformer", "rnn"])
 def test_MotionDecoder(hparams, dummy_data, test_batch_size, motion_decoder_type):
     """Test the MotionDecoder class."""
     decoder_motion = MotionDecoder(hparams, motion_decoder_type)
     _, _, mel_padded, motion_padded, output_lengths = dummy_data
-    motion_output, motion_len = decoder_motion(mel_padded, output_lengths)
+    mel_padded, output_lengths, _ = FlowSpecDecoder.preprocess(
+        mel_padded, output_lengths, output_lengths.max(), hparams.n_sqz
+    )
+    decoder_output = decoder_motion(mel_padded, output_lengths, motion_padded)
+    motion_output = decoder_output["motions"]
+    motion_len = decoder_output["motion_lengths"]
     assert motion_output.shape[-1] == hparams.n_motion_joints
     assert motion_output.shape[0] == test_batch_size
     assert motion_len.shape[0] == test_batch_size

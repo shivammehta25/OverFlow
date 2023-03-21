@@ -57,12 +57,10 @@ class OverFlow(nn.Module):
         encoder_outputs, text_lengths = self.encoder(embedded_inputs, text_lengths)
         z, z_lengths, logdet = self.decoder_mel(mels, mel_lengths)
         log_probs = self.hmm(encoder_outputs, text_lengths, z, z_lengths)
-        motion_output, _ = self.decoder_motion(z, z_lengths)
+        motion_decoder_output = self.decoder_motion(z, z_lengths, motions, reverse=False)
         # Make input data the same size as the decoder output for loss computation
-        motions, _, _ = self.decoder_mel.preprocess(motions, z_lengths, z_lengths.max())
-        motion_loss = self.motion_loss(motion_output, motions.transpose(1, 2))
         hmm_loss = (log_probs + logdet) / (text_lengths.sum() + mel_lengths.sum())
-        return hmm_loss, motion_loss
+        return hmm_loss, motion_decoder_output["loss"]
 
     @torch.inference_mode()
     def sample(self, text_inputs, text_lengths=None, sampling_temp=None):
@@ -103,9 +101,9 @@ class OverFlow(nn.Module):
             z.unsqueeze(0).transpose(1, 2), text_lengths.new_tensor([z.shape[0]]), reverse=True
         )
         z, _, _ = self.decoder_mel.preprocess(
-            z.unsqueeze(0).transpose(1, 2), text_lengths.new_tensor([z.shape[0]]), z.shape[0]
+            z.unsqueeze(0).transpose(1, 2), text_lengths.new_tensor([z.shape[0]]), z.shape[0], self.decoder_mel.n_sqz
         )
-        motion_output, _ = self.decoder_motion(z, mel_lengths)
+        motion_output = self.decoder_motion(z, mel_lengths, reverse=True)["motions"]
 
         if self.mel_normaliser:
             mel_output = self.mel_normaliser.inverse_normalise(mel_output)

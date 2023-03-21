@@ -56,8 +56,8 @@ def create_hparams(generate_parameters=False):
         ################################
         # Experiment Parameters        #
         ################################
-        run_name="LSTMDecoder",
-        gpus=[7],
+        run_name="Test",
+        gpus=[0],
         max_epochs=50000,
         val_check_interval=100,
         save_model_checkpoint=500,
@@ -75,7 +75,7 @@ def create_hparams(generate_parameters=False):
         ################################
         # Data Parameters             #
         ################################
-        batch_size=12,
+        batch_size=3,
         load_mel_from_disk=False,
         training_files="data/filelists/cormac_train.txt",
         validation_files="data/filelists/cormac_val.txt",
@@ -185,7 +185,7 @@ def create_hparams(generate_parameters=False):
         ################################
         # Decoder Transformer Parameters#
         ################################
-        motion_decoder_type="rnn",
+        motion_decoder_type="conformer",
         motion_decoder_param={
             "transformer": {
                 "hidden_channels": 384,
@@ -219,6 +219,14 @@ def create_hparams(generate_parameters=False):
                 "n_layer": 2,
                 "dropout": 0.5,
                 "bidirectional": True,
+            },
+            "gradtts": {
+                "hidden_channels": 384,
+                "n_speks": 1,
+                "spk_embed_dim": 64,
+                "beta_min": 0.05,
+                "beta_max": 20,
+                "pe_scale": 1000,
             },
         },
         ################################

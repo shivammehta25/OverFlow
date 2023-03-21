@@ -7,6 +7,7 @@ import torch.nn as nn
 from einops import rearrange
 
 import src.model.DecoderComponents.flows as flows
+from src.model.diffusion import Diffusion as GradTTSDiffusion
 from src.model.layers import LinearNorm
 from src.model.transformer import Conformer, FFTransformer
 from src.model.wavegrad import WaveGrad
@@ -63,7 +64,7 @@ class FlowSpecDecoder(nn.Module):
             x_lengths.max(),
         ), f"The shape of the  \
             input should be (batch_dim, n_mel_channels, T_max) but received {x.shape}"
-        x, x_lengths, x_max_length = self.preprocess(x, x_lengths, x_lengths.max())
+        x, x_lengths, x_max_length = self.preprocess(x, x_lengths, x_lengths.max(), self.n_sqz)
 
         x_mask = get_mask_from_len(x_lengths, x_max_length, device=x.device, dtype=x.dtype).unsqueeze(1)
 
@@ -90,11 +91,12 @@ class FlowSpecDecoder(nn.Module):
         for f in self.flows:
             f.store_inverse()
 
-    def preprocess(self, y, y_lengths, y_max_length):
+    @staticmethod
+    def preprocess(y, y_lengths, y_max_length, n_sqz):
         if y_max_length is not None:
-            y_max_length = torch.div(y_max_length, self.n_sqz, rounding_mode="floor") * self.n_sqz
+            y_max_length = torch.div(y_max_length, n_sqz, rounding_mode="floor") * n_sqz
             y = y[:, :, :y_max_length]
-        y_lengths = torch.div(y_lengths, self.n_sqz, rounding_mode="floor") * self.n_sqz
+        y_lengths = torch.div(y_lengths, n_sqz, rounding_mode="floor") * n_sqz
         return y, y_lengths, y_max_length
 
 
@@ -168,23 +170,31 @@ class RNNDecoder(nn.Module):
 
 
 class MotionDecoder(nn.Module):
+    _FORWARD_DECODERS = ["transformer", "conformer", "rnn"]
+    _DIFFUSION_DECODERS = ["gradtts"]
+
     def __init__(self, hparams, decoder_type="transformer"):
         super().__init__()
-        self.in_proj = LinearNorm(hparams.n_mel_channels, hparams.motion_decoder_param[decoder_type]["hidden_channels"])
         self.decoder_type = decoder_type
+        self.n_sqz = hparams.n_sqz
+        self.in_proj = LinearNorm(hparams.n_mel_channels, hparams.motion_decoder_param[decoder_type]["hidden_channels"])
+        self.motion_loss = nn.MSELoss()
         if decoder_type == "transformer":
             self.encoder = FFTransformer(**hparams.motion_decoder_param[decoder_type])
         elif decoder_type == "conformer":
             self.encoder = Conformer(**hparams.motion_decoder_param[decoder_type])
         elif decoder_type == "rnn":
             self.encoder = RNNDecoder(**hparams.motion_decoder_param[decoder_type])
+        elif decoder_type == "gradtts":
+            self.decoder = GradTTSDiffusion(**hparams.motion_decoder_param[decoder_type])
+            self.motion_loss = None  # The loss will be returned by the decoder
         else:
             raise ValueError(f"Unknown decoder type: {decoder_type}")
         self.out_proj = LinearNorm(
             hparams.motion_decoder_param[decoder_type]["hidden_channels"], hparams.n_motion_joints
         )
 
-    def forward(self, x, input_lengths):
+    def forward_forward(self, x, input_lengths):
         """
 
         Args:
@@ -197,4 +207,41 @@ class MotionDecoder(nn.Module):
         x = self.in_proj(x.transpose(1, 2)).transpose(1, 2)
         x, enc_mask = self.encoder(x, seq_lens=input_lengths)
         x = self.out_proj(x) * enc_mask
-        return x, input_lengths
+        output = {
+            "motions": x,
+            "motion_lengths": input_lengths,
+            "enc_mask": enc_mask,
+        }
+        return output
+
+    @staticmethod
+    def _validate_inputs(target_motions, reverse):
+        if reverse:
+            assert target_motions is None
+        else:
+            assert target_motions is not None
+
+    def forward(self, x, input_lengths, target_motions=None, reverse=False):
+        self._validate_inputs(target_motions, reverse)
+
+        if self.decoder_type in self._FORWARD_DECODERS:
+            if reverse:
+                return self.forward_forward(x, input_lengths)
+            else:
+                decoder_output = self.forward_forward(x, input_lengths)
+                # Assure that the target motions are padded to the same length as the input motions
+                target_motions, _, _ = FlowSpecDecoder.preprocess(
+                    target_motions, input_lengths, input_lengths.max(), self.n_sqz
+                )
+                decoder_output["loss"] = self.motion_loss(decoder_output["motions"], target_motions.transpose(1, 2))
+                return decoder_output
+
+        elif self.decoder_type in self._DIFFUSION_DECODERS:
+            if reverse:
+                pass
+                # Reverse diffusion
+            else:
+                pass
+                # loss computation
+        else:
+            raise ValueError(f"Unknown decoder type: {self.decoder_type}")

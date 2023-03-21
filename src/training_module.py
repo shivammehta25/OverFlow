@@ -196,7 +196,7 @@ class TrainingModule(pl.LightningModule):
                 input_parameters,
                 output_parameters,
                 self.global_step,
-                self.train_dataloader().dataset.stft,
+                self.stft if hasattr(self, "stft") else self.train_dataloader().dataset.stft,
                 self.hparams.motion_normaliser.inverse_normalise(motions),
                 motion_output,
                 self.motion_visualizer,

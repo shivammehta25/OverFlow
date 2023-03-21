@@ -141,7 +141,7 @@ class SinusoidalPosEmb(BaseModule):
 
 
 class GradLogPEstimator2d(BaseModule):
-    def __init__(self, dim, dim_mults=(1, 2, 4), groups=8, n_spks=None, spk_emb_dim=64, n_feats=80, pe_scale=1000):
+    def __init__(self, dim, dim_mults=(1, 2, 4), groups=8, n_spks=None, spk_emb_dim=64, n_feats=45, pe_scale=1000):
         super().__init__()
         self.dim = dim
         self.dim_mults = dim_mults
@@ -248,7 +248,17 @@ def get_noise(t, beta_init, beta_term, cumulative=False):
 
 
 class Diffusion(BaseModule):
-    def __init__(self, n_feats, hidden_channels, n_spks=1, spk_emb_dim=64, beta_min=0.05, beta_max=20, pe_scale=1000):
+    def __init__(
+        self,
+        n_feats,
+        hidden_channels,
+        n_spks=1,
+        spk_emb_dim=64,
+        beta_min=0.05,
+        beta_max=20,
+        pe_scale=1000,
+        n_timesteps=50,
+    ):
         super().__init__()
         self.n_feats = n_feats
         self.dim = hidden_channels
@@ -257,8 +267,11 @@ class Diffusion(BaseModule):
         self.beta_min = beta_min
         self.beta_max = beta_max
         self.pe_scale = pe_scale
+        self.n_timesteps = n_timesteps
 
-        self.estimator = GradLogPEstimator2d(hidden_channels, n_spks=n_spks, spk_emb_dim=spk_emb_dim, pe_scale=pe_scale)
+        self.estimator = GradLogPEstimator2d(
+            hidden_channels, n_spks=n_spks, spk_emb_dim=spk_emb_dim, pe_scale=pe_scale, n_feats=n_feats
+        )
 
     def forward_diffusion(self, x0, mask, mu, t):
         time = t.unsqueeze(-1).unsqueeze(-1)
@@ -290,7 +303,10 @@ class Diffusion(BaseModule):
         return xt
 
     @torch.no_grad()
-    def forward(self, z, mask, mu, n_timesteps, stoc=False, spk=None):
+    def forward(self, z, mask, mu, n_timesteps=None, stoc=False, spk=None):
+        if n_timesteps is None:
+            n_timesteps = self.n_timesteps
+
         return self.reverse_diffusion(z, mask, mu, n_timesteps, stoc, spk)
 
     def loss_t(self, x0, mask, mu, t, spk=None):
@@ -305,6 +321,18 @@ class Diffusion(BaseModule):
         return loss, xt
 
     def compute_loss(self, x0, mask, mu, spk=None, offset=1e-5):
+        """
+
+        Args:
+            x0 : [B, C, T]
+            mask: [B, 1, T]
+            mu (_type_): [B, C, T]
+            spk (_type_, optional): _description_. Defaults to None.
+            offset (_type_, optional): _description_. Defaults to 1e-5.
+
+        Returns:
+            _type_: _description_
+        """
         t = torch.rand(x0.shape[0], dtype=x0.dtype, device=x0.device, requires_grad=False)
         t = torch.clamp(t, offset, 1.0 - offset)
         return self.loss_t(x0, mask, mu, t, spk)

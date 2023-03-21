@@ -185,7 +185,7 @@ def create_hparams(generate_parameters=False):
         ################################
         # Decoder Transformer Parameters#
         ################################
-        motion_decoder_type="conformer",
+        motion_decoder_type="gradtts",
         motion_decoder_param={
             "transformer": {
                 "hidden_channels": 384,
@@ -222,11 +222,12 @@ def create_hparams(generate_parameters=False):
             },
             "gradtts": {
                 "hidden_channels": 384,
-                "n_speks": 1,
-                "spk_embed_dim": 64,
+                "n_spks": 1,
+                "spk_emb_dim": 64,
                 "beta_min": 0.05,
                 "beta_max": 20,
                 "pe_scale": 1000,
+                "n_timesteps": 50,
             },
         },
         ################################
@@ -242,5 +243,4 @@ def create_hparams(generate_parameters=False):
         },
     )
 
-    return hparams
     return hparams

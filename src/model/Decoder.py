@@ -4,6 +4,7 @@ Glow-TTS Code from https://github.com/jaywalnut310/glow-tts
 import numpy as np
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 from einops import rearrange
 
 import src.model.DecoderComponents.flows as flows
@@ -11,7 +12,12 @@ from src.model.diffusion import Diffusion as GradTTSDiffusion
 from src.model.layers import LinearNorm
 from src.model.transformer import Conformer, FFTransformer
 from src.model.wavegrad import WaveGrad
-from src.utilities.functions import get_mask_from_len, squeeze, unsqueeze
+from src.utilities.functions import (
+    fix_len_compatibility,
+    get_mask_from_len,
+    squeeze,
+    unsqueeze,
+)
 
 
 class FlowSpecDecoder(nn.Module):
@@ -177,7 +183,11 @@ class MotionDecoder(nn.Module):
         super().__init__()
         self.decoder_type = decoder_type
         self.n_sqz = hparams.n_sqz
+        self.n_motion_joints = hparams.n_motion_joints
         self.in_proj = LinearNorm(hparams.n_mel_channels, hparams.motion_decoder_param[decoder_type]["hidden_channels"])
+        self.out_proj = LinearNorm(
+            hparams.motion_decoder_param[decoder_type]["hidden_channels"], hparams.n_motion_joints
+        )
         self.motion_loss = nn.MSELoss()
         if decoder_type == "transformer":
             self.encoder = FFTransformer(**hparams.motion_decoder_param[decoder_type])
@@ -186,13 +196,14 @@ class MotionDecoder(nn.Module):
         elif decoder_type == "rnn":
             self.encoder = RNNDecoder(**hparams.motion_decoder_param[decoder_type])
         elif decoder_type == "gradtts":
-            self.decoder = GradTTSDiffusion(**hparams.motion_decoder_param[decoder_type])
+            self.encoder = GradTTSDiffusion(
+                n_feats=hparams.n_motion_joints, **hparams.motion_decoder_param[decoder_type]
+            )
             self.motion_loss = None  # The loss will be returned by the decoder
+            self.in_proj = nn.Conv1d(hparams.n_mel_channels, hparams.n_motion_joints, 1)
+            self.out_proj = None
         else:
             raise ValueError(f"Unknown decoder type: {decoder_type}")
-        self.out_proj = LinearNorm(
-            hparams.motion_decoder_param[decoder_type]["hidden_channels"], hparams.n_motion_joints
-        )
 
     def forward_forward(self, x, input_lengths):
         """
@@ -224,24 +235,61 @@ class MotionDecoder(nn.Module):
     def forward(self, x, input_lengths, target_motions=None, reverse=False):
         self._validate_inputs(target_motions, reverse)
 
+        if target_motions is not None:
+            target_motions, _, _ = FlowSpecDecoder.preprocess(
+                target_motions, input_lengths, input_lengths.max(), self.n_sqz
+            )
+
         if self.decoder_type in self._FORWARD_DECODERS:
             if reverse:
                 return self.forward_forward(x, input_lengths)
             else:
                 decoder_output = self.forward_forward(x, input_lengths)
                 # Assure that the target motions are padded to the same length as the input motions
-                target_motions, _, _ = FlowSpecDecoder.preprocess(
-                    target_motions, input_lengths, input_lengths.max(), self.n_sqz
-                )
                 decoder_output["loss"] = self.motion_loss(decoder_output["motions"], target_motions.transpose(1, 2))
                 return decoder_output
 
         elif self.decoder_type in self._DIFFUSION_DECODERS:
+            x = self.in_proj(x)
+            original_length = x.shape[-1]
+            input_lengths_max = fix_len_compatibility(int(input_lengths.max()))
+            extra_noise_to_make_channels_even = torch.randn(
+                x.shape[0], 3, original_length, device=x.device, dtype=x.dtype
+            )
+            x = torch.concat([x, extra_noise_to_make_channels_even], dim=1)
+            # Pad tensor to the max length
+            x = F.pad(x, (0, input_lengths_max - x.shape[-1]))
             if reverse:
-                pass
                 # Reverse diffusion
+                inputs_mask = get_mask_from_len(
+                    input_lengths, input_lengths_max, device=input_lengths.device, dtype=input_lengths.dtype
+                ).unsqueeze(1)
+                z = x + torch.randn_like(x, device=x.device)
+                output = self.encoder(z, inputs_mask, x)
+                output = output[:, : self.n_motion_joints, :original_length]
+                return {
+                    "motions": rearrange(output, "b c t -> b t c"),
+                    "motion_lengths": input_lengths,
+                    "enc_mask": inputs_mask.squeeze(1).unsqueeze(-1),
+                }
             else:
-                pass
                 # loss computation
+                # pad target motion to the max length as well
+                extra_noise_to_make_channels_even = torch.randn(
+                    x.shape[0], 3, original_length, device=x.device, dtype=x.dtype
+                )
+                target_motions = torch.concat([target_motions, extra_noise_to_make_channels_even], dim=1)
+                target_motions = F.pad(target_motions, (0, input_lengths_max - target_motions.shape[-1]))
+                inputs_mask = get_mask_from_len(
+                    input_lengths, input_lengths_max, device=input_lengths.device, dtype=input_lengths.dtype
+                ).unsqueeze(1)
+                loss, xt = self.encoder.compute_loss(target_motions, inputs_mask, x)
+                return {
+                    "loss": loss,
+                    "motions": rearrange(
+                        xt[:, : self.n_motion_joints, :original_length], "b c t -> b t c"
+                    ),  # Noisy image at timestep t
+                    "motion_lengths": input_lengths,
+                }
         else:
             raise ValueError(f"Unknown decoder type: {self.decoder_type}")

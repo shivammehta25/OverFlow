@@ -166,5 +166,12 @@ def unsqueeze(x, x_mask=None, n_sqz=2):
 
 
 ######################################################
-# End Glow TTS Methods
+# Grad TTS Methods
 ######################################################
+
+
+def fix_len_compatibility(length, num_downsamplings_in_unet=2):
+    while True:
+        if length % (2**num_downsamplings_in_unet) == 0:
+            return length
+        length += 1

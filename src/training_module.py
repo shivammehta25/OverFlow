@@ -86,6 +86,11 @@ class TrainingModule(pl.LightningModule):
         log_probs, motion_loss = self(x)
         hmm_loss = -log_probs.mean()
         loss = hmm_loss + motion_loss
+
+        # Do not optimize if the loss is garbage
+        if loss.item() >= 10000 or torch.isnan(loss):
+            return None
+
         self.log(
             "loss/train_total",
             loss.item(),

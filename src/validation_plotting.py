@@ -174,9 +174,9 @@ def log_validation(
         )
         # Generate motion output
 
-        motion_mean = model.decoder_motion(means.T.unsqueeze(0), means.new_tensor([means.shape[0]]).int())[
-            "motions"
-        ].squeeze(0)
+        motion_mean = model.decoder_motion(
+            means.T.unsqueeze(0), means.new_tensor([means.shape[0]]).int(), reverse=True
+        )["motions"].squeeze(0)
         motion_mean = model.motion_normaliser.inverse_normalise(motion_mean).cpu().numpy()
         bvh_values = motion_visualizer_pipeline.inverse_transform([motion_mean])
         X_pos = MocapParameterizer("position").fit_transform(bvh_values)

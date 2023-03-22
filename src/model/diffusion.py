@@ -336,3 +336,32 @@ class Diffusion(BaseModule):
         t = torch.rand(x0.shape[0], dtype=x0.dtype, device=x0.device, requires_grad=False)
         t = torch.clamp(t, offset, 1.0 - offset)
         return self.loss_t(x0, mask, mu, t, spk)
+
+
+# class MyDiffusion(BaseModule):
+#     def __init__(
+#         self,
+#         n_feats,
+#         hidden_channels,
+#         n_spks=1,
+#         spk_emb_dim=64,
+#         beta_min=0.05,
+#         beta_max=20,
+#         pe_scale=1000,
+#         n_timesteps=50,
+#     ):
+#         super().__init__()
+#         self.n_feats = n_feats
+#         self.dim = hidden_channels
+#         self.n_spks = n_spks
+#         self.spk_emb_dim = spk_emb_dim
+#         self.beta_min = beta_min
+#         self.beta_max = beta_max
+#         self.pe_scale = pe_scale
+#         self.n_timesteps = n_timesteps
+
+#         self.estimator = GradLogPEstimator2d(
+#             hidden_channels, n_spks=n_spks, spk_emb_dim=spk_emb_dim, pe_scale=pe_scale, n_feats=n_feats
+#         )
+
+#     def forward(self, noisy_x,t, hmm_output, mask):

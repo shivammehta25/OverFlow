@@ -4,7 +4,6 @@ Glow-TTS Code from https://github.com/jaywalnut310/glow-tts
 import numpy as np
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 from einops import rearrange
 
 import src.model.DecoderComponents.flows as flows
@@ -12,12 +11,7 @@ from src.model.diffusion import Diffusion as GradTTSDiffusion
 from src.model.layers import LinearNorm
 from src.model.transformer import Conformer, FFTransformer
 from src.model.wavegrad import WaveGrad
-from src.utilities.functions import (
-    fix_len_compatibility,
-    get_mask_from_len,
-    squeeze,
-    unsqueeze,
-)
+from src.utilities.functions import get_mask_from_len, squeeze, unsqueeze
 
 
 class FlowSpecDecoder(nn.Module):
@@ -250,23 +244,15 @@ class MotionDecoder(nn.Module):
                 return decoder_output
 
         elif self.decoder_type in self._DIFFUSION_DECODERS:
-            x = self.in_proj(x)
-            original_length = x.shape[-1]
-            input_lengths_max = fix_len_compatibility(int(input_lengths.max()))
-            extra_noise_to_make_channels_even = torch.randn(
-                x.shape[0], 3, original_length, device=x.device, dtype=x.dtype
-            )
-            x = torch.concat([x, extra_noise_to_make_channels_even], dim=1)
-            # Pad tensor to the max length
-            x = F.pad(x, (0, input_lengths_max - x.shape[-1]))
+            inputs_mask = get_mask_from_len(
+                input_lengths, input_lengths.max(), device=input_lengths.device, dtype=input_lengths.dtype
+            ).unsqueeze(1)
+
+            x = self.in_proj(x * inputs_mask)
             if reverse:
                 # Reverse diffusion
-                inputs_mask = get_mask_from_len(
-                    input_lengths, input_lengths_max, device=input_lengths.device, dtype=input_lengths.dtype
-                ).unsqueeze(1)
                 z = x + torch.randn_like(x, device=x.device)
                 output = self.encoder(z, inputs_mask, x)
-                output = output[:, : self.n_motion_joints, :original_length]
                 return {
                     "motions": rearrange(output, "b c t -> b t c"),
                     "motion_lengths": input_lengths,
@@ -274,21 +260,10 @@ class MotionDecoder(nn.Module):
                 }
             else:
                 # loss computation
-                # pad target motion to the max length as well
-                extra_noise_to_make_channels_even = torch.randn(
-                    x.shape[0], 3, original_length, device=x.device, dtype=x.dtype
-                )
-                target_motions = torch.concat([target_motions, extra_noise_to_make_channels_even], dim=1)
-                target_motions = F.pad(target_motions, (0, input_lengths_max - target_motions.shape[-1]))
-                inputs_mask = get_mask_from_len(
-                    input_lengths, input_lengths_max, device=input_lengths.device, dtype=input_lengths.dtype
-                ).unsqueeze(1)
                 loss, xt = self.encoder.compute_loss(target_motions, inputs_mask, x)
                 return {
                     "loss": loss,
-                    "motions": rearrange(
-                        xt[:, : self.n_motion_joints, :original_length], "b c t -> b t c"
-                    ),  # Noisy image at timestep t
+                    "motions": rearrange(xt, "b c t -> b t c"),  # Noisy image at timestep t
                     "motion_lengths": input_lengths,
                 }
         else:

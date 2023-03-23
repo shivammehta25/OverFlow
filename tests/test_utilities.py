@@ -18,6 +18,8 @@ def get_a_text():
 
 def get_a_mel():
     length = random.randint(10, 20)
+    if length % 2 == 0:
+        length += 1
     return torch.rand(80, length).clamp(min=1e-3).log()
 
 

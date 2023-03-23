@@ -56,7 +56,7 @@ def create_hparams(generate_parameters=False):
         ################################
         # Experiment Parameters        #
         ################################
-        run_name="DiffMotionGradTTS",
+        run_name="Test",
         gpus=[2],
         max_epochs=50000,
         val_check_interval=100,
@@ -233,7 +233,7 @@ def create_hparams(generate_parameters=False):
         ################################
         # Optimization Hyperparameters #
         ################################
-        learning_rate=1e-3,
+        learning_rate=3e-4,
         weight_decay=1e-6,
         grad_clip_thresh=5.0,
         stochastic_weight_avg=False,

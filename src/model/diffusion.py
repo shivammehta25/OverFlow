@@ -2,7 +2,10 @@ import math
 
 import numpy as np
 import torch
+import torch.nn.functional as F
 from einops import rearrange
+
+from src.utilities.functions import fix_len_compatibility
 
 
 class BaseModule(torch.nn.Module):
@@ -154,11 +157,14 @@ class GradLogPEstimator2d(BaseModule):
             self.spk_mlp = torch.nn.Sequential(
                 torch.nn.Linear(spk_emb_dim, spk_emb_dim * 4), Mish(), torch.nn.Linear(spk_emb_dim * 4, n_feats)
             )
+
         self.time_pos_emb = SinusoidalPosEmb(dim)
         self.mlp = torch.nn.Sequential(torch.nn.Linear(dim, dim * 4), Mish(), torch.nn.Linear(dim * 4, dim))
 
+        self.in_proj = torch.nn.Sequential(torch.nn.Linear(n_feats, dim), torch.nn.Mish())
         dims = [2 + (1 if n_spks > 1 else 0), *map(lambda m: dim * m, dim_mults)]
         in_out = list(zip(dims[:-1], dims[1:]))
+
         self.downs = torch.nn.ModuleList([])
         self.ups = torch.nn.ModuleList([])
         num_resolutions = len(in_out)
@@ -194,8 +200,16 @@ class GradLogPEstimator2d(BaseModule):
             )
         self.final_block = Block(dim, dim)
         self.final_conv = torch.nn.Conv2d(dim, 1, 1)
+        self.out_proj = torch.nn.Conv1d(dim, n_feats, 1)
 
     def forward(self, x, mask, mu, t, spk=None):
+        max_length_orig = mask.sum(-1).max().item()
+        mask_orig = mask
+        max_length = fix_len_compatibility(max_length_orig)
+        mask = F.pad(mask, (0, max_length - max_length_orig), value=False)
+        x = F.interpolate(x, size=max_length)
+        mu = F.interpolate(mu, size=max_length)
+
         if not isinstance(spk, type(None)):
             s = self.spk_mlp(spk)
 
@@ -208,6 +222,9 @@ class GradLogPEstimator2d(BaseModule):
             s = s.unsqueeze(-1).repeat(1, 1, x.shape[-1])
             x = torch.stack([mu, x, s], 1)
         mask = mask.unsqueeze(1)
+
+        x = self.in_proj(rearrange(x * mask, "b x c t -> b x t c"))
+        x = rearrange(x, "b x t c -> b x c t")
 
         hiddens = []
         masks = [mask]
@@ -234,9 +251,10 @@ class GradLogPEstimator2d(BaseModule):
             x = upsample(x * mask_up)
 
         x = self.final_block(x, mask)
-        output = self.final_conv(x * mask)
-
-        return (output * mask).squeeze(1)
+        output = self.final_conv(x * mask).squeeze(1)
+        mask = mask.squeeze(1)
+        output = self.out_proj(output * mask)
+        return F.interpolate(output, size=max_length_orig) * mask_orig
 
 
 def get_noise(t, beta_init, beta_term, cumulative=False):
@@ -275,8 +293,8 @@ class Diffusion(BaseModule):
 
     def forward_diffusion(self, x0, mask, mu, t):
         time = t.unsqueeze(-1).unsqueeze(-1)
-        cum_noise = get_noise(time, self.beta_min, self.beta_max, cumulative=True)
-        mean = x0 * torch.exp(-0.5 * cum_noise) + mu * (1.0 - torch.exp(-0.5 * cum_noise))
+        cum_noise = get_noise(time, self.beta_min, self.beta_max, cumulative=True)  # \int_0^t \beta_t
+        mean = x0 * torch.exp(-0.5 * cum_noise) + mu * (1.0 - torch.exp(-0.5 * cum_noise))  # eq 23. from eq 3.
         variance = 1.0 - torch.exp(-cum_noise)
         z = torch.randn(x0.shape, dtype=x0.dtype, device=x0.device, requires_grad=False)
         xt = mean + z * torch.sqrt(variance)
@@ -291,7 +309,7 @@ class Diffusion(BaseModule):
             time = t.unsqueeze(-1).unsqueeze(-1)
             noise_t = get_noise(time, self.beta_min, self.beta_max, cumulative=False)
             if stoc:  # adds stochastic term
-                dxt_det = 0.5 * (mu - xt) - self.estimator(xt, mask, mu, t, spk)
+                dxt_det = 0.5 * (mu - xt) - self.estimator(xt, mask, mu, t, spk)  # eq 8 in paper.
                 dxt_det = dxt_det * noise_t * h
                 dxt_stoc = torch.randn(z.shape, dtype=z.dtype, device=z.device, requires_grad=False)
                 dxt_stoc = dxt_stoc * torch.sqrt(noise_t * h)

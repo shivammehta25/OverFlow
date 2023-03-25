@@ -56,8 +56,8 @@ def create_hparams(generate_parameters=False):
         ################################
         # Experiment Parameters        #
         ################################
-        run_name="Test",
-        gpus=[2],
+        run_name="MyDiffusionDDIM",
+        gpus=[4],
         max_epochs=50000,
         val_check_interval=100,
         save_model_checkpoint=500,
@@ -185,7 +185,7 @@ def create_hparams(generate_parameters=False):
         ################################
         # Decoder Transformer Parameters#
         ################################
-        motion_decoder_type="gradtts",
+        motion_decoder_type="mydiffusion",
         motion_decoder_param={
             "transformer": {
                 "hidden_channels": 384,
@@ -229,11 +229,19 @@ def create_hparams(generate_parameters=False):
                 "pe_scale": 1000,
                 "n_timesteps": 50,
             },
+            "mydiffusion": {
+                "scheduler": "ddim",
+                "beta_schedule": "squaredcos_cap_v2",
+                "loss": "l1",
+                "n_timesteps_train": 1000,
+                "n_timesteps_inference": 50,
+                "hidden_channels": 64,  # Unused hardcoded values for now
+            },
         },
         ################################
         # Optimization Hyperparameters #
         ################################
-        learning_rate=3e-4,
+        learning_rate=1e-3,
         weight_decay=1e-6,
         grad_clip_thresh=5.0,
         stochastic_weight_avg=False,

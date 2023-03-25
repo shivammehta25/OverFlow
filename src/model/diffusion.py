@@ -2,9 +2,12 @@ import math
 
 import numpy as np
 import torch
+import torch.nn as nn
 import torch.nn.functional as F
+from diffusers import DDIMScheduler, DDPMScheduler
 from einops import rearrange
 
+from src.model.wavegrad import WaveGrad
 from src.utilities.functions import fix_len_compatibility
 
 
@@ -320,11 +323,12 @@ class Diffusion(BaseModule):
             xt = (xt - dxt) * mask
         return xt
 
-    @torch.no_grad()
-    def forward(self, z, mask, mu, n_timesteps=None, stoc=False, spk=None):
+    @torch.inference_mode()
+    def forward(self, mu, mask, n_timesteps=None, stoc=False, spk=None):
         if n_timesteps is None:
             n_timesteps = self.n_timesteps
 
+        z = mu + torch.randn_like(mu, device=mu.device)  # this is xT
         return self.reverse_diffusion(z, mask, mu, n_timesteps, stoc, spk)
 
     def loss_t(self, x0, mask, mu, t, spk=None):
@@ -356,30 +360,67 @@ class Diffusion(BaseModule):
         return self.loss_t(x0, mask, mu, t, spk)
 
 
-# class MyDiffusion(BaseModule):
-#     def __init__(
-#         self,
-#         n_feats,
-#         hidden_channels,
-#         n_spks=1,
-#         spk_emb_dim=64,
-#         beta_min=0.05,
-#         beta_max=20,
-#         pe_scale=1000,
-#         n_timesteps=50,
-#     ):
-#         super().__init__()
-#         self.n_feats = n_feats
-#         self.dim = hidden_channels
-#         self.n_spks = n_spks
-#         self.spk_emb_dim = spk_emb_dim
-#         self.beta_min = beta_min
-#         self.beta_max = beta_max
-#         self.pe_scale = pe_scale
-#         self.n_timesteps = n_timesteps
+class MyDiffusion(BaseModule):
+    __AVAILABLE_SCHEDULERS__ = ["ddim", "ddpm"]
+    __AVAILABLE_LOSS__ = ["l1", "l2"]
 
-#         self.estimator = GradLogPEstimator2d(
-#             hidden_channels, n_spks=n_spks, spk_emb_dim=spk_emb_dim, pe_scale=pe_scale, n_feats=n_feats
-#         )
+    def __init__(
+        self,
+        motion_channels,
+        latent_channels,
+        scheduler="ddpm",
+        beta_schedule="squaredcos_cap_v2",
+        loss="l1",
+        n_timesteps_train=1000,
+        n_timesteps_inference=50,
+    ):
+        super().__init__()
+        self.motion_channels = motion_channels
+        self.latent_channels = latent_channels
+        self.n_timesteps_train = n_timesteps_train
+        self.n_timesteps_inference = n_timesteps_inference
 
-#     def forward(self, noisy_x,t, hmm_output, mask):
+        assert scheduler in self.__AVAILABLE_SCHEDULERS__, f"Scheduler must be one of {self.__AVAILABLE_SCHEDULERS__}"
+        assert loss in self.__AVAILABLE_LOSS__, f"Loss must be one of {self.__AVAILABLE_LOSS__}"
+
+        if scheduler == "ddim":
+            self.scheduler = DDIMScheduler(num_train_timesteps=n_timesteps_train, beta_schedule=beta_schedule)
+        elif scheduler == "ddpm":
+            self.scheduler = DDPMScheduler(num_train_timesteps=n_timesteps_train, beta_schedule=beta_schedule)
+
+        self.estimator = WaveGrad(motion_channels, latent_channels)
+        if loss == "l1":
+            self.loss = nn.L1Loss()
+        elif loss == "l2":
+            self.loss = nn.MSELoss()
+        else:
+            raise ValueError("loss must be l1 or l2")
+
+    def update_scheduler_inference_timesteps(self, n_timesteps):
+        if n_timesteps is None:
+            n_timesteps = self.n_timesteps_inference
+
+        if isinstance(self.scheduler, DDIMScheduler):
+            self.scheduler.set_timesteps(num_inference_steps=n_timesteps)
+
+    @torch.inference_mode()
+    def forward(self, z, mask, n_timesteps=None, stoc=False, spk=None):
+        self.update_scheduler_inference_timesteps(n_timesteps)
+
+        x = torch.randn(z.shape[0], self.motion_channels, z.shape[-1], device=z.device, dtype=z.dtype)
+
+        for i, t in enumerate(self.scheduler.timesteps):
+            t = t.unsqueeze(0).to(z.device)
+            residual = self.estimator(x, mask, z, t)
+
+            x = self.scheduler.step(residual, t, x).prev_sample
+
+        return x * mask
+
+    def compute_loss(self, x0, mask, z, spk=None):
+        noise = torch.randn_like(x0)
+        timesteps = torch.randint(0, self.n_timesteps_train, (x0.shape[0],), dtype=torch.long, device=x0.device)
+        noisy_x0 = self.scheduler.add_noise(x0, noise, timesteps)
+        pred = self.estimator(noisy_x0, mask, z, timesteps)
+        loss = self.loss(pred * mask, x0 * mask)
+        return loss, pred

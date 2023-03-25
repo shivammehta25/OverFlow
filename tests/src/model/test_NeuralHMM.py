@@ -40,9 +40,29 @@ def test_sample(hparams, dummy_data_uncollated, send_len):
     assert output_parameters[0][1].shape[-1] == hparams.n_mel_channels
 
 
-@pytest.mark.parametrize("motion_decoder_type", ["conformer", "transformer", "rnn", "gradtts"])
-def test_sample_different_decoders(hparams, dummy_data_uncollated, motion_decoder_type):
+@pytest.mark.parametrize("motion_decoder_type", ["conformer", "transformer", "rnn", "gradtts", "mydiffusion"])
+def test_differint_samplers(hparams, dummy_data_uncollated, motion_decoder_type):
     hparams.motion_decoder_type = motion_decoder_type
+    neural_hmm = OverFlow(hparams)
+    text = dummy_data_uncollated[0][0]
+    (
+        mel_output,
+        motion_output,
+        states_travelled,
+        input_parameters,
+        output_parameters,
+    ) = neural_hmm.sample(text, torch.tensor(len(text)))
+    assert mel_output.shape[2] == hparams.n_mel_channels
+    assert motion_output.shape[1] == hparams.n_motion_joints
+    assert input_parameters[0][0].shape[-1] == hparams.n_mel_channels
+    assert output_parameters[0][0].shape[-1] == hparams.n_mel_channels
+    assert output_parameters[0][1].shape[-1] == hparams.n_mel_channels
+
+
+@pytest.mark.parametrize("motion_decoder_type, scheduler", [("mydiffusion", "ddpm"), ("mydiffusion", "ddim")])
+def test_differint_scheduler(hparams, dummy_data_uncollated, motion_decoder_type, scheduler):
+    hparams.motion_decoder_type = motion_decoder_type
+    hparams.motion_decoder_param[motion_decoder_type]["scheduler"] = scheduler
     neural_hmm = OverFlow(hparams)
     text = dummy_data_uncollated[0][0]
     (

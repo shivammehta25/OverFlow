@@ -11,6 +11,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import torch
+import torch.nn.functional as F
 from scipy.io.wavfile import read
 from torch.utils.data.dataset import Dataset
 from tqdm.auto import tqdm
@@ -214,13 +215,12 @@ class TextMelLoader(Dataset):
         if self.motion_transform:
             for t in self.motion_transform:
                 motion = t(motion)
-        mel, motion = self.resize_mel_motion_to_same_size(mel, motion)
         return (text, mel, motion)
 
     def get_motion(self, filename, mel_shape, ext=".expmap_86.1328125fps.pkl"):
         file_loc = self.motion_fileloc / Path(Path(filename).name).with_suffix(ext)
         motion = torch.from_numpy(pd.read_pickle(file_loc).to_numpy())
-        return motion.T
+        return F.interpolate(motion.T.unsqueeze(0), size=mel_shape).squeeze(0)
 
     def resize_mel_motion_to_same_size(self, mel, motion):
         splitter_idx = min(mel.shape[1], motion.shape[1])

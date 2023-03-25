@@ -1,6 +1,8 @@
 """
 Glow-TTS Code from https://github.com/jaywalnut310/glow-tts
 """
+from copy import deepcopy
+
 import numpy as np
 import torch
 import torch.nn as nn
@@ -8,6 +10,7 @@ from einops import rearrange
 
 import src.model.DecoderComponents.flows as flows
 from src.model.diffusion import Diffusion as GradTTSDiffusion
+from src.model.diffusion import MyDiffusion
 from src.model.layers import LinearNorm
 from src.model.transformer import Conformer, FFTransformer
 from src.model.wavegrad import WaveGrad
@@ -171,7 +174,7 @@ class RNNDecoder(nn.Module):
 
 class MotionDecoder(nn.Module):
     _FORWARD_DECODERS = ["transformer", "conformer", "rnn"]
-    _DIFFUSION_DECODERS = ["gradtts"]
+    _DIFFUSION_DECODERS = ["gradtts", "mydiffusion"]
 
     def __init__(self, hparams, decoder_type="transformer"):
         super().__init__()
@@ -195,6 +198,12 @@ class MotionDecoder(nn.Module):
             )
             self.motion_loss = None  # The loss will be returned by the decoder
             self.in_proj = nn.Conv1d(hparams.n_mel_channels, hparams.n_motion_joints, 1)
+            self.out_proj = None
+        elif decoder_type == "mydiffusion":
+            decoder_params = deepcopy(hparams.motion_decoder_param[decoder_type])
+            del decoder_params["hidden_channels"]
+            self.encoder = MyDiffusion(hparams.n_motion_joints, hparams.n_mel_channels, **decoder_params)
+            self.in_proj = nn.Identity()
             self.out_proj = None
         else:
             raise ValueError(f"Unknown decoder type: {decoder_type}")
@@ -251,8 +260,7 @@ class MotionDecoder(nn.Module):
             x = self.in_proj(x * inputs_mask)
             if reverse:
                 # Reverse diffusion
-                z = x + torch.randn_like(x, device=x.device)
-                output = self.encoder(z, inputs_mask, x)
+                output = self.encoder(x, inputs_mask)
                 return {
                     "motions": rearrange(output, "b c t -> b t c"),
                     "motion_lengths": input_lengths,

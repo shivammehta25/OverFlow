@@ -49,7 +49,7 @@ def test_FlowDecoder(
     assert logdet_ is None
 
 
-@pytest.mark.parametrize("motion_decoder_type", ["conformer", "transformer", "rnn", "gradtts"])
+@pytest.mark.parametrize("motion_decoder_type", ["conformer", "transformer", "rnn", "gradtts", "mydiffusion"])
 def test_MotionDecoder(hparams, dummy_data, test_batch_size, motion_decoder_type):
     """Test the MotionDecoder class."""
     decoder_motion = MotionDecoder(hparams, motion_decoder_type)

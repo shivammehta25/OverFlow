@@ -138,9 +138,10 @@ class SinusoidalPosEmb(BaseModule):
 
     def forward(self, x, scale=1000):
         device = x.device
+        dtype = x.dtype
         half_dim = self.dim // 2
         emb = math.log(10000) / (half_dim - 1)
-        emb = torch.exp(torch.arange(half_dim, device=device).float() * -emb)
+        emb = torch.exp(torch.arange(half_dim, device=device, dtype=dtype) * -emb)
         emb = scale * x.unsqueeze(1) * emb.unsqueeze(0)
         emb = torch.cat((emb.sin(), emb.cos()), dim=-1)
         return emb
@@ -210,8 +211,8 @@ class GradLogPEstimator2d(BaseModule):
         mask_orig = mask
         max_length = fix_len_compatibility(max_length_orig)
         mask = F.pad(mask, (0, max_length - max_length_orig), value=False)
-        x = F.interpolate(x, size=max_length)
-        mu = F.interpolate(mu, size=max_length)
+        x = F.interpolate(x, size=max_length, mode="linear")
+        mu = F.interpolate(mu, size=max_length, mode="linear")
 
         if not isinstance(spk, type(None)):
             s = self.spk_mlp(spk)

@@ -56,8 +56,8 @@ def create_hparams(generate_parameters=False):
         ################################
         # Experiment Parameters        #
         ################################
-        run_name="MyDiffusionDDIM",
-        gpus=[4],
+        run_name="DiffMotionGradTTSBetter",
+        gpus=[1],
         max_epochs=50000,
         val_check_interval=100,
         save_model_checkpoint=500,
@@ -185,7 +185,7 @@ def create_hparams(generate_parameters=False):
         ################################
         # Decoder Transformer Parameters#
         ################################
-        motion_decoder_type="mydiffusion",
+        motion_decoder_type="gradtts",
         motion_decoder_param={
             "transformer": {
                 "hidden_channels": 384,
@@ -241,7 +241,7 @@ def create_hparams(generate_parameters=False):
         ################################
         # Optimization Hyperparameters #
         ################################
-        learning_rate=1e-3,
+        learning_rate=3e-4,
         weight_decay=1e-6,
         grad_clip_thresh=5.0,
         stochastic_weight_avg=False,

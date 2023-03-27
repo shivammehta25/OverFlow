@@ -219,8 +219,8 @@ class TextMelLoader(Dataset):
 
     def get_motion(self, filename, mel_shape, ext=".expmap_86.1328125fps.pkl"):
         file_loc = self.motion_fileloc / Path(Path(filename).name).with_suffix(ext)
-        motion = torch.from_numpy(pd.read_pickle(file_loc).to_numpy())
-        return F.interpolate(motion.T.unsqueeze(0), size=mel_shape).squeeze(0)
+        motion = torch.from_numpy(pd.read_pickle(file_loc).to_numpy())[::4]
+        return F.interpolate(motion.T.unsqueeze(0), size=mel_shape, mode="linear").squeeze(0)
 
     def resize_mel_motion_to_same_size(self, mel, motion):
         splitter_idx = min(mel.shape[1], motion.shape[1])

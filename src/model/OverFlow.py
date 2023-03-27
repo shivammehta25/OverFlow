@@ -1,10 +1,11 @@
 import torch
+import torch.nn.functional as F
+from einops import rearrange
 from torch import nn
 
 from src.model.Decoder import FlowSpecDecoder, MotionDecoder
 from src.model.Encoder import Encoder
 from src.model.HMM import HMM
-from src.utilities.data import align_gesture_with_mel
 
 
 class OverFlow(nn.Module):
@@ -111,11 +112,9 @@ class OverFlow(nn.Module):
         )
         motion_output = self.decoder_motion(z, mel_lengths, reverse=True)
 
-        motion_output = align_gesture_with_mel(
-            motion_output["generated"].squeeze(0),
-            mel_output.shape[2],
-            gesture_fps=86.1326125 / self.frame_rate_reduction_factor,
-        ).T.unsqueeze(0)
+        motion_output = F.interpolate(
+            rearrange(motion_output["generated"], "b t c -> b c t"), mel_output.shape[2], mode="linear"
+        )
 
         if self.mel_normaliser:
             mel_output = self.mel_normaliser.inverse_normalise(mel_output)

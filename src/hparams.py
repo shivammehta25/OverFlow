@@ -56,8 +56,8 @@ def create_hparams(generate_parameters=False):
         ################################
         # Experiment Parameters        #
         ################################
-        run_name="ConformerEvery4NoConv",
-        gpus=[3],
+        run_name="Test",
+        gpus=[0],
         max_epochs=50000,
         val_check_interval=100,
         save_model_checkpoint=500,
@@ -187,7 +187,7 @@ def create_hparams(generate_parameters=False):
         ################################
         # Decoder Transformer Parameters#
         ################################
-        motion_decoder_type="transformer",
+        motion_decoder_type="conformer",
         motion_decoder_param={
             "transformer": {
                 "hidden_channels": 384,

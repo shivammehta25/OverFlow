@@ -3,8 +3,6 @@ import warnings
 import torch
 from pytorch_lightning.utilities import rank_zero_only
 
-from pymo.preprocessing import MocapParameterizer
-from pymo.viz_tools import render_mp4
 from src.utilities.plotting import (
     generate_motion_visualization,
     plot_alpha_scaled_to_numpy,
@@ -172,12 +170,3 @@ def log_validation(
             f"{logger.log_dir}/output_{iteration}.mp4",
             motion_visualizer_pipeline,
         )
-        # Generate motion output
-
-        motion_mean = model.decoder_motion(
-            means.T.unsqueeze(0), means.new_tensor([means.shape[0]]).int(), reverse=True
-        )["motions"].squeeze(0)
-        motion_mean = model.motion_normaliser.inverse_normalise(motion_mean).cpu().numpy()
-        bvh_values = motion_visualizer_pipeline.inverse_transform([motion_mean])
-        X_pos = MocapParameterizer("position").fit_transform(bvh_values)
-        render_mp4(X_pos[0], f"{logger.log_dir}/output_mean_{iteration}.mp4", axis_scale=200)

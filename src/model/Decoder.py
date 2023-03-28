@@ -235,13 +235,25 @@ class MotionDecoder(nn.Module):
         else:
             assert target_motions is not None
 
-    def forward(self, x, input_lengths, target_motions=None, reverse=False):
+    def forward(self, x, input_lengths, target_motions=None, temperature=1.0, reverse=False):
+        """
+
+        Args:
+            x ():  b, c, t
+            input_lengths (): b
+            target_motions (, optional): . b, c, t Defaults to None.
+            temperature (, optional): . Defaults to 1.0.
+            reverse (, optional): . Defaults to False.
+
+        """
         self._validate_inputs(target_motions, reverse)
 
         if target_motions is not None:
             target_motions, _, _ = FlowSpecDecoder.preprocess(
                 target_motions, input_lengths, input_lengths.max(), self.n_sqz
             )
+
+        x, input_lengths, _ = FlowSpecDecoder.preprocess(x, input_lengths, input_lengths.max(), self.n_sqz)
 
         if self.decoder_type in self._FORWARD_DECODERS:
             if reverse:
@@ -260,7 +272,7 @@ class MotionDecoder(nn.Module):
             x = self.in_proj(x * inputs_mask)
             if reverse:
                 # Reverse diffusion
-                output = self.encoder(x, inputs_mask)
+                output = self.encoder(x, inputs_mask, temperature=temperature)
                 return {
                     "motions": rearrange(output, "b c t -> b t c"),
                     "motion_lengths": input_lengths,

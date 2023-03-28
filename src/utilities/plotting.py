@@ -4,6 +4,7 @@ plotting.py
 File contains utilities for plotting
 """
 import subprocess
+import warnings
 from pathlib import Path
 from typing import Any
 
@@ -215,8 +216,10 @@ def generate_motion_visualization(
 
     sf.write(audio_filename, audio.flatten(), 22500, "PCM_24")
 
-    # Add motion target
-    bvh_values = motion_visualizer_pipeline.inverse_transform([motion])
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        # Add motion target
+        bvh_values = motion_visualizer_pipeline.inverse_transform([motion])
 
     if bvh_filename is not None:
         # Write input bvh file

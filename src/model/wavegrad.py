@@ -178,11 +178,11 @@ class WaveGrad(nn.Module):
         )
         self.upsample = nn.ModuleList(
             [
-                UBlock(768, 512, 1, [1, 2, 1, 2]),
-                UBlock(512, 512, 1, [1, 2, 1, 2]),
-                UBlock(512, 256, 1, [1, 2, 4, 8]),
-                UBlock(256, 128, 1, [1, 2, 4, 8]),
-                UBlock(128, 128, 1, [1, 2, 4, 8]),
+                UBlock(768, 512, 1, [1, 1, 1, 1]),
+                UBlock(512, 512, 1, [1, 1, 1, 1]),
+                UBlock(512, 256, 1, [1, 1, 1, 2]),
+                UBlock(256, 128, 1, [1, 1, 1, 2]),
+                UBlock(128, 128, 1, [1, 1, 2, 4]),
             ]
         )
         self.first_conv = Conv1d(latent_in_channels, 768, 3, padding=1)

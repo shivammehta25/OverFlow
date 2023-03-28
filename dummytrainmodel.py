@@ -1,20 +1,20 @@
-r"""
-training_model.py
-
-This file contains PyTorch Lightning's main module where code
-of the main model is implemented
-"""
 import os
 from argparse import Namespace
 
 import pytorch_lightning as pl
 import torch
+from einops import rearrange
+from pytorch_lightning.loggers import TensorBoardLogger
+from pytorch_lightning.utilities.seed import seed_everything
 
+from src.data_module import LightningLoader
+from src.hparams import create_hparams
+from src.model.Decoder import MotionDecoder
 from src.model.OverFlow import OverFlow
-from src.validation_plotting import log_validation
+from src.utilities.plotting import generate_motion_visualization
 
 
-class TrainingModule(pl.LightningModule):
+class TestTrainingModule(pl.LightningModule):
     def __init__(self, hparams):
         super().__init__()
         if type(hparams) != Namespace:
@@ -24,9 +24,9 @@ class TrainingModule(pl.LightningModule):
         self.save_hyperparameters(hparams)
         hparams.logger = self.logger
         self.max_gpu_usage = 0
-        self.model = OverFlow(hparams)
+        self.decoder_motion = MotionDecoder(hparams, hparams.motion_decoder_type)
 
-    def forward(self, x):
+    def forward(self, batch):
         r"""
         Forward pass of the model
 
@@ -36,8 +36,9 @@ class TrainingModule(pl.LightningModule):
         Returns:
             output (Any): output of the forward function
         """
-        log_probs, motion_loss = self.model(x)
-        return log_probs, motion_loss
+        (_, _, mels, motion, mel_lengths), _ = OverFlow.parse_batch(batch)
+        motion_decoder_output = self.decoder_motion(mels, mel_lengths, motion, reverse=False)
+        return motion_decoder_output["loss"]
 
     def configure_optimizers(self):
         r"""
@@ -82,30 +83,7 @@ class TrainingModule(pl.LightningModule):
         Returns:
             loss (torch.FloatTensor): loss of the forward run of your model
         """
-        x, y = self.model.parse_batch(train_batch)
-        log_probs, motion_loss = self(x)
-        hmm_loss = -log_probs.mean()
-        loss = hmm_loss + motion_loss
-
-        # Do not optimize if the loss is garbage
-        if loss.item() >= 10000:
-            return None
-
-        self.log(
-            "loss/train_total",
-            loss.item(),
-            prog_bar=True,
-            on_step=True,
-            sync_dist=True,
-            logger=True,
-        )
-        self.log(
-            "loss/train_hmm",
-            hmm_loss.item(),
-            on_step=True,
-            sync_dist=True,
-            logger=True,
-        )
+        motion_loss = self(train_batch)
         self.log(
             "loss/train_motion",
             motion_loss.item(),
@@ -121,8 +99,8 @@ class TrainingModule(pl.LightningModule):
             sync_dist=True,
             logger=False,
         )
-        self.set_gpu_stats(loss)
-        return loss
+        self.set_gpu_stats(motion_loss)
+        return motion_loss
 
     def set_gpu_stats(self, some_tensor):
         free, total = (x / (1024 * 1024) for x in torch.cuda.mem_get_info(some_tensor.device.index))
@@ -141,24 +119,14 @@ class TrainingModule(pl.LightningModule):
             val_batch (Any): output depends what you are returning from the train loop
             batch_idx (): batch index
         """
-        x, y = self.model.parse_batch(val_batch)
-        log_probs, motion_loss = self(x)
-        hmm_loss = -log_probs.mean()
-        loss = hmm_loss + motion_loss
-        self.log("loss/val_total", loss.item(), prog_bar=True, sync_dist=True, logger=True)
-        self.log(
-            "loss/val_hmm",
-            hmm_loss.item(),
-            sync_dist=True,
-            logger=True,
-        )
+        motion_loss = self(val_batch)
         self.log(
             "loss/val_motion",
             motion_loss.item(),
             sync_dist=True,
             logger=True,
         )
-        return loss
+        return motion_loss
 
     def on_before_zero_grad(self, optimizer):
         r"""
@@ -178,43 +146,32 @@ class TrainingModule(pl.LightningModule):
                 motions,
                 mel_lengths,
             ) = self.get_an_element_of_validation_dataset()
-            (
-                mel_output,
-                motion_output,
-                state_travelled,
-                input_parameters,
-                output_parameters,
-            ) = self.model.sample(text_inputs[0], text_lengths[0])
-            mel_output_normalised = self.model.mel_normaliser(mel_output)
-            # motion_output_normalised = self.model.motion_normaliser(motion_output)
 
-            with torch.inference_mode():
-                _ = self.model((text_inputs, text_lengths, mels, motions, mel_lengths))
+            motion_output = self.decoder_motion(
+                mels[0].unsqueeze(0), mel_lengths[0].unsqueeze(0), temperature=1.0, reverse=True
+            )["motions"]
+            motion_output = rearrange(motion_output, "b t c -> b c t")
+            stft_module = self.train_dataloader().dataset.stft
 
-            log_validation(
-                self.logger.experiment,
-                self.model,
-                mel_output,
-                mel_output_normalised,
-                state_travelled,
-                self.hparams.mel_normaliser.inverse_normalise(mels[0]),
-                input_parameters,
-                output_parameters,
-                self.global_step,
-                self.stft if hasattr(self, "stft") else self.train_dataloader().dataset.stft,
-                self.hparams.motion_normaliser.inverse_normalise(motions),
-                motion_output,
-                self.motion_visualizer,
-                self.trainer.resume_from_checkpoint,
-            )
-
-            self.trainer.save_checkpoint(
-                os.path.join(
-                    self.hparams.checkpoint_dir,
-                    self.hparams.run_name,
-                    f"checkpoint_{self.global_step}.ckpt",
+            target_audio, sr = stft_module.griffin_lim(mels[0].unsqueeze(0))
+            logger = self.logger.experiment
+            if self.global_step > 0:
+                generate_motion_visualization(
+                    target_audio,
+                    f"{logger.log_dir}/input_{self.global_step}.wav",
+                    motion_output.squeeze(0).cpu().numpy().T,
+                    f"{logger.log_dir}/input_{self.global_step}.mp4",
+                    self.motion_visualizer,
+                    f"{logger.log_dir}/input_{self.global_step}.bvh",
                 )
-            )
+
+                self.trainer.save_checkpoint(
+                    os.path.join(
+                        self.hparams.checkpoint_dir,
+                        self.hparams.run_name,
+                        f"checkpoint_{self.global_step}.ckpt",
+                    )
+                )
 
     def get_an_element_of_validation_dataset(self):
         r"""
@@ -227,7 +184,7 @@ class TrainingModule(pl.LightningModule):
             max_len (int): The maximum length of the mels spectrogram.
             mel_lengths (torch.LongTensor): The lengths of the mel spectrogram.
         """
-        x, y = self.model.parse_batch(next(iter(self.val_dataloader())))
+        x, y = OverFlow.parse_batch(next(iter(self.val_dataloader())))
         (text_inputs, text_lengths, mels, motions, mel_lengths) = x
         text_inputs = text_inputs[0].unsqueeze(0).to(self.device)
         text_lengths = text_lengths[0].unsqueeze(0).to(self.device)
@@ -285,3 +242,33 @@ class TrainingModule(pl.LightningModule):
         """
         norm_dict = {"grad_norm/" + k: v for k, v in grad_norm_dict.items()}
         self.log_dict(norm_dict, on_step=True, on_epoch=True, prog_bar=False, logger=True)
+
+
+if __name__ == "__main__":
+    hparams = create_hparams()
+    hparams.run_name = "test"
+    hparams.tensorboard_log_dir = "dummy_tb_logs"
+    hparams.checkpoint_path = "dummy_checkpoint"
+    hparams.motion_decoder_type = "gradtts"
+
+    seed_everything(hparams.seed)
+
+    data_module = LightningLoader(hparams)
+    model = TestTrainingModule(hparams)
+    logger = TensorBoardLogger(hparams.tensorboard_log_dir, name=hparams.run_name)
+
+    trainer = pl.Trainer(
+        gpus=[0],
+        logger=logger,
+        log_every_n_steps=1,
+        flush_logs_every_n_steps=1,
+        val_check_interval=hparams.val_check_interval,
+        gradient_clip_val=hparams.grad_clip_thresh,
+        max_epochs=hparams.max_epochs,
+        stochastic_weight_avg=hparams.stochastic_weight_avg,
+        precision=hparams.precision,
+        track_grad_norm=2,
+        limit_val_batches=10,
+    )
+
+    trainer.fit(model, data_module)

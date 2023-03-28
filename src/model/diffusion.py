@@ -4,9 +4,9 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from diffusers import DDIMScheduler, DDPMScheduler
-from einops import rearrange
+from einops import pack, rearrange
 
+from diffusers import DDIMScheduler, DDPMScheduler
 from src.model.wavegrad import WaveGrad
 from src.utilities.functions import fix_len_compatibility
 
@@ -138,10 +138,9 @@ class SinusoidalPosEmb(BaseModule):
 
     def forward(self, x, scale=1000):
         device = x.device
-        dtype = x.dtype
         half_dim = self.dim // 2
         emb = math.log(10000) / (half_dim - 1)
-        emb = torch.exp(torch.arange(half_dim, device=device, dtype=dtype) * -emb)
+        emb = torch.exp(torch.arange(half_dim, device=device).float() * -emb)
         emb = scale * x.unsqueeze(1) * emb.unsqueeze(0)
         emb = torch.cat((emb.sin(), emb.cos()), dim=-1)
         return emb
@@ -161,14 +160,11 @@ class GradLogPEstimator2d(BaseModule):
             self.spk_mlp = torch.nn.Sequential(
                 torch.nn.Linear(spk_emb_dim, spk_emb_dim * 4), Mish(), torch.nn.Linear(spk_emb_dim * 4, n_feats)
             )
-
         self.time_pos_emb = SinusoidalPosEmb(dim)
         self.mlp = torch.nn.Sequential(torch.nn.Linear(dim, dim * 4), Mish(), torch.nn.Linear(dim * 4, dim))
 
-        self.in_proj = torch.nn.Sequential(torch.nn.Linear(n_feats, dim), torch.nn.Mish())
         dims = [2 + (1 if n_spks > 1 else 0), *map(lambda m: dim * m, dim_mults)]
         in_out = list(zip(dims[:-1], dims[1:]))
-
         self.downs = torch.nn.ModuleList([])
         self.ups = torch.nn.ModuleList([])
         num_resolutions = len(in_out)
@@ -204,15 +200,38 @@ class GradLogPEstimator2d(BaseModule):
             )
         self.final_block = Block(dim, dim)
         self.final_conv = torch.nn.Conv2d(dim, 1, 1)
-        self.out_proj = torch.nn.Conv1d(dim, n_feats, 1)
+
+    def pad_lengths_to_convolute(self, x, mask, mu):
+        # Save original
+        max_length_orig = mask.sum(-1).max().item()
+        original_channels = x.shape[1]
+        mask_orig = mask
+
+        # Fix length compatibility
+        adjusted_lengths = fix_len_compatibility(max_length_orig)
+        adjusted_channels = fix_len_compatibility(x.shape[1])
+
+        # Extra lens to be added.
+        len_pad_values = adjusted_lengths - max_length_orig
+        channel_pad_values = adjusted_channels - original_channels
+
+        # Pad to be divisible by 4
+        mask = F.pad(mask, (0, len_pad_values), value=False)
+        if channel_pad_values > 0:
+            random_values = torch.randn(x.shape[0], channel_pad_values, x.shape[2], device=x.device, dtype=x.dtype)
+            x, _ = pack([x, random_values], "b * t")
+            mu, _ = pack([mu, random_values], "b * t")
+
+        x = F.pad(x, (0, len_pad_values))
+        mu = F.pad(mu, (0, len_pad_values))
+        return x, mask, mu, max_length_orig, mask_orig, original_channels
 
     def forward(self, x, mask, mu, t, spk=None):
-        max_length_orig = mask.sum(-1).max().item()
-        mask_orig = mask
-        max_length = fix_len_compatibility(max_length_orig)
-        mask = F.pad(mask, (0, max_length - max_length_orig), value=False)
-        x = F.interpolate(x, size=max_length, mode="linear")
-        mu = F.interpolate(mu, size=max_length, mode="linear")
+        assert (
+            x.shape[-1] == mask.shape[-1] == mu.shape[-1]
+        ), f"shape mismatch: x={x.shape}, mask={mask.shape}, mu={mu.shape}"
+
+        x, mask, mu, max_length_orig, mask_orig, original_channels = self.pad_lengths_to_convolute(x, mask, mu)
 
         if not isinstance(spk, type(None)):
             s = self.spk_mlp(spk)
@@ -226,9 +245,6 @@ class GradLogPEstimator2d(BaseModule):
             s = s.unsqueeze(-1).repeat(1, 1, x.shape[-1])
             x = torch.stack([mu, x, s], 1)
         mask = mask.unsqueeze(1)
-
-        x = self.in_proj(rearrange(x * mask, "b x c t -> b x t c"))
-        x = rearrange(x, "b x t c -> b x c t")
 
         hiddens = []
         masks = [mask]
@@ -255,10 +271,9 @@ class GradLogPEstimator2d(BaseModule):
             x = upsample(x * mask_up)
 
         x = self.final_block(x, mask)
-        output = self.final_conv(x * mask).squeeze(1)
-        mask = mask.squeeze(1)
-        output = self.out_proj(output * mask)
-        return F.interpolate(output, size=max_length_orig) * mask_orig
+        output = self.final_conv(x * mask)
+
+        return (output * mask).squeeze(1)[:, :original_channels, :max_length_orig] * mask_orig
 
 
 def get_noise(t, beta_init, beta_term, cumulative=False):
@@ -324,12 +339,11 @@ class Diffusion(BaseModule):
             xt = (xt - dxt) * mask
         return xt
 
-    @torch.inference_mode()
-    def forward(self, mu, mask, n_timesteps=None, stoc=False, spk=None):
+    @torch.no_grad()
+    def forward(self, z, mask, mu, n_timesteps=None, stoc=False, spk=None):
         if n_timesteps is None:
             n_timesteps = self.n_timesteps
 
-        z = mu + torch.randn_like(mu, device=mu.device)  # this is xT
         return self.reverse_diffusion(z, mask, mu, n_timesteps, stoc, spk)
 
     def loss_t(self, x0, mask, mu, t, spk=None):
@@ -405,7 +419,7 @@ class MyDiffusion(BaseModule):
             self.scheduler.set_timesteps(num_inference_steps=n_timesteps)
 
     @torch.inference_mode()
-    def forward(self, z, mask, n_timesteps=None, stoc=False, spk=None):
+    def forward(self, z, mask, temperature=None, n_timesteps=None, stoc=False, spk=None):
         self.update_scheduler_inference_timesteps(n_timesteps)
 
         x = torch.randn(z.shape[0], self.motion_channels, z.shape[-1], device=z.device, dtype=z.dtype)

@@ -29,7 +29,8 @@ class OverFlow(nn.Module):
         self.motion_loss = nn.MSELoss()
         self.logger = hparams.logger
 
-    def parse_batch(self, batch):
+    @staticmethod
+    def parse_batch(batch):
         """
         Takes batch as an input and returns all the tensor to GPU
         Args:
@@ -103,7 +104,7 @@ class OverFlow(nn.Module):
         z, _, _ = self.decoder_mel.preprocess(
             z.unsqueeze(0).transpose(1, 2), text_lengths.new_tensor([z.shape[0]]), z.shape[0], self.decoder_mel.n_sqz
         )
-        motion_output = self.decoder_motion(z, mel_lengths, reverse=True)["motions"]
+        motion_output = self.decoder_motion(z, mel_lengths, temperature=sampling_temp, reverse=True)["motions"]
 
         if self.mel_normaliser:
             mel_output = self.mel_normaliser.inverse_normalise(mel_output)

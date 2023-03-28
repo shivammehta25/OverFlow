@@ -56,8 +56,8 @@ def create_hparams(generate_parameters=False):
         ################################
         # Experiment Parameters        #
         ################################
-        run_name="DiffMotionGradTTSBetter",
-        gpus=[1],
+        run_name="MyDiffusion",
+        gpus=[3],
         max_epochs=50000,
         val_check_interval=100,
         save_model_checkpoint=500,
@@ -75,7 +75,7 @@ def create_hparams(generate_parameters=False):
         ################################
         # Data Parameters             #
         ################################
-        batch_size=10,
+        batch_size=14,
         load_mel_from_disk=False,
         training_files="data/filelists/cormac_train.txt",
         validation_files="data/filelists/cormac_val.txt",
@@ -185,7 +185,7 @@ def create_hparams(generate_parameters=False):
         ################################
         # Decoder Transformer Parameters#
         ################################
-        motion_decoder_type="gradtts",
+        motion_decoder_type="mydiffusion",
         motion_decoder_param={
             "transformer": {
                 "hidden_channels": 384,
@@ -230,7 +230,7 @@ def create_hparams(generate_parameters=False):
                 "n_timesteps": 50,
             },
             "mydiffusion": {
-                "scheduler": "ddim",
+                "scheduler": "ddpm",
                 "beta_schedule": "squaredcos_cap_v2",
                 "loss": "l1",
                 "n_timesteps_train": 1000,

@@ -230,7 +230,7 @@ class FFTransformer(nn.Module):
         dec_inp = dec_inp.transpose(1, 2)
         if self.word_emb is None:
             inp = dec_inp
-            mask = get_mask_from_len(seq_lens, device=seq_lens.device, dtype=seq_lens.dtype).unsqueeze(2)
+            mask = get_mask_from_len(seq_lens, inp.shape[1], device=seq_lens.device, dtype=seq_lens.dtype).unsqueeze(2)
         else:
             inp = self.word_emb(dec_inp)
             # [bsz x L x 1]
@@ -285,7 +285,7 @@ class Conformer(nn.Module):
 
     def forward(self, x, seq_lens):
         x = x.transpose(1, 2)
-        enc_mask = get_mask_from_len(seq_lens, device=seq_lens.device, dtype=seq_lens.dtype)
+        enc_mask = get_mask_from_len(seq_lens, x.shape[1], device=seq_lens.device, dtype=seq_lens.dtype)
         for layer in self.layers:
             x = layer(x, enc_mask)
         return x, enc_mask.unsqueeze(2)

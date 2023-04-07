@@ -1,16 +1,19 @@
+import argparse
 import os
 from argparse import Namespace
 
 import pytorch_lightning as pl
 import torch
+import torch.nn.functional as F
 from einops import rearrange
 from pytorch_lightning.loggers import TensorBoardLogger
-from pytorch_lightning.utilities.seed import seed_everything
 
 from src.data_module import LightningLoader
 from src.hparams import create_hparams
 from src.model.Decoder import MotionDecoder
 from src.model.OverFlow import OverFlow
+from src.model.transformer import FFTransformer
+from src.utilities.functions import fix_len_compatibility
 from src.utilities.plotting import generate_motion_visualization
 
 
@@ -24,7 +27,17 @@ class TestTrainingModule(pl.LightningModule):
         self.save_hyperparameters(hparams)
         hparams.logger = self.logger
         self.max_gpu_usage = 0
+        self.mel_proj = torch.nn.Conv1d(80, 384, 1)
+        self.mel_encoder = FFTransformer(**hparams.motion_decoder_param["transformer"])
+        self.mel_outproj = torch.nn.Conv1d(384, 80, 1)
         self.decoder_motion = MotionDecoder(hparams, hparams.motion_decoder_type)
+
+    def run_forward(self, mels, mel_lengths, motion=None, reverse=False):
+        mels = self.mel_proj(mels)
+        mels = rearrange(self.mel_encoder(mels, mel_lengths)[0], "b t c -> b c t")
+        mels = self.mel_outproj(mels)
+        motion_decoder_output = self.decoder_motion(mels, mel_lengths, motion, reverse=reverse)
+        return motion_decoder_output
 
     def forward(self, batch):
         r"""
@@ -37,7 +50,7 @@ class TestTrainingModule(pl.LightningModule):
             output (Any): output of the forward function
         """
         (_, _, mels, motion, mel_lengths), _ = OverFlow.parse_batch(batch)
-        motion_decoder_output = self.decoder_motion(mels, mel_lengths, motion, reverse=False)
+        motion_decoder_output = self.run_forward(mels, mel_lengths, motion, reverse=False)
         return motion_decoder_output["loss"]
 
     def configure_optimizers(self):
@@ -147,12 +160,13 @@ class TestTrainingModule(pl.LightningModule):
                 mel_lengths,
             ) = self.get_an_element_of_validation_dataset()
 
-            motion_output = self.decoder_motion(
-                mels[0].unsqueeze(0), mel_lengths[0].unsqueeze(0), temperature=1.0, reverse=True
-            )["motions"]
+            max_z_len = fix_len_compatibility(mels.shape[2])
+            mels = F.pad(mels, (0, max_z_len - mels.shape[-1]))
+            motion_decoder_output = self.run_forward(mels, mel_lengths, reverse=True)
+            motion_output = motion_decoder_output["motions"]
             motion_output = rearrange(motion_output, "b t c -> b c t")
+            motion_output = self.hparams.motion_normaliser.inverse_normalise(motion_output)
             stft_module = self.train_dataloader().dataset.stft
-
             target_audio, sr = stft_module.griffin_lim(mels[0].unsqueeze(0))
             logger = self.logger.experiment
             if self.global_step > 0:
@@ -245,22 +259,36 @@ class TestTrainingModule(pl.LightningModule):
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "-c",
+        "--checkpoint_path",
+        type=str,
+        default=None,
+        required=False,
+        help="checkpoint path",
+    )
+    args = parser.parse_args()
+
     hparams = create_hparams()
     hparams.run_name = "test"
     hparams.tensorboard_log_dir = "dummy_tb_logs"
-    hparams.checkpoint_path = "dummy_checkpoint"
-    hparams.motion_decoder_type = "gradtts"
-
-    seed_everything(hparams.seed)
+    hparams.checkpoint_dir = "dummy_checkpoint"
+    hparams.motion_decoder_type = "mydiffusion"
+    hparams.save_model_checkpoint = 1000
+    hparams.learning_rate = 3e-4
+    hparams.gpus = [0]  # Run with CUDA VISIBLE DEVICES
+    # hparams.batch_size=32
 
     data_module = LightningLoader(hparams)
     model = TestTrainingModule(hparams)
     logger = TensorBoardLogger(hparams.tensorboard_log_dir, name=hparams.run_name)
 
     trainer = pl.Trainer(
-        gpus=[0],
+        resume_from_checkpoint=args.checkpoint_path,
+        gpus=hparams.gpus,
         logger=logger,
-        log_every_n_steps=1,
+        log_every_n_steps=10,
         flush_logs_every_n_steps=1,
         val_check_interval=hparams.val_check_interval,
         gradient_clip_val=hparams.grad_clip_thresh,

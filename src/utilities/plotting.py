@@ -221,11 +221,11 @@ def generate_motion_visualization(
         # Add motion target
         bvh_values = motion_visualizer_pipeline.inverse_transform([motion])
 
-    if bvh_filename is not None:
-        # Write input bvh file
-        writer = BVHWriter()
-        with open(bvh_filename, "w") as f:
-            writer.write(bvh_values[0], f)
+        if bvh_filename is not None:
+            # Write input bvh file
+            writer = BVHWriter()
+            with open(bvh_filename, "w") as f:
+                writer.write(bvh_values[0], f)
 
     # To stickfigure
     X_pos = MocapParameterizer("position").fit_transform(bvh_values)

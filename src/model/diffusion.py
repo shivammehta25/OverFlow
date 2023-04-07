@@ -6,8 +6,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from einops import pack, rearrange
 
-from diffusers import DDIMScheduler, DDPMScheduler
-from src.model.wavegrad import WaveGrad
+from diffusers import DDIMScheduler, DDPMScheduler, UNet1DModel
 from src.utilities.functions import fix_len_compatibility
 
 
@@ -284,6 +283,27 @@ def get_noise(t, beta_init, beta_term, cumulative=False):
     return noise
 
 
+class UNet1DDiffuser(BaseModule):
+    def __init__(self, in_channels=90, out_channels=45):
+        super().__init__()
+
+        self.unet = UNet1DModel(
+            in_channels=in_channels,
+            out_channels=out_channels,
+            down_block_types=("DownBlock1DNoSkip", "AttnDownBlock1D"),
+            up_block_types=("AttnUpBlock1D", "UpBlock1DNoSkip"),
+            mid_block_type="UNetMidBlock1D",
+            block_out_channels=(256, 512),
+            use_timestep_embedding=True,
+            act_fn="silu",
+        )
+
+    def forward(self, x, mask, mu, t, spk=None, temperature=None):
+        x = pack([x, mu], "b * t")[0]
+
+        return self.unet(x, t).sample * mask
+
+
 class Diffusion(BaseModule):
     def __init__(
         self,
@@ -306,9 +326,7 @@ class Diffusion(BaseModule):
         self.pe_scale = pe_scale
         self.n_timesteps = n_timesteps
 
-        self.estimator = GradLogPEstimator2d(
-            hidden_channels, n_spks=n_spks, spk_emb_dim=spk_emb_dim, pe_scale=pe_scale, n_feats=n_feats
-        )
+        self.estimator = UNet1DDiffuser()
 
     def forward_diffusion(self, x0, mask, mu, t):
         time = t.unsqueeze(-1).unsqueeze(-1)
@@ -340,10 +358,11 @@ class Diffusion(BaseModule):
         return xt
 
     @torch.no_grad()
-    def forward(self, z, mask, mu, n_timesteps=None, stoc=False, spk=None):
+    def forward(self, mu, mask, n_timesteps=None, stoc=False, spk=None, temperature=None):
         if n_timesteps is None:
             n_timesteps = self.n_timesteps
 
+        z = mu + torch.randn_like(mu, device=mu.device)
         return self.reverse_diffusion(z, mask, mu, n_timesteps, stoc, spk)
 
     def loss_t(self, x0, mask, mu, t, spk=None):
@@ -385,7 +404,7 @@ class MyDiffusion(BaseModule):
         latent_channels,
         scheduler="ddpm",
         beta_schedule="squaredcos_cap_v2",
-        loss="l1",
+        loss="l2",
         n_timesteps_train=1000,
         n_timesteps_inference=50,
     ):
@@ -403,7 +422,7 @@ class MyDiffusion(BaseModule):
         elif scheduler == "ddpm":
             self.scheduler = DDPMScheduler(num_train_timesteps=n_timesteps_train, beta_schedule=beta_schedule)
 
-        self.estimator = WaveGrad(motion_channels, latent_channels)
+        self.estimator = UNet1DDiffuser(self.motion_channels + self.latent_channels)
         if loss == "l1":
             self.loss = nn.L1Loss()
         elif loss == "l2":
@@ -425,16 +444,21 @@ class MyDiffusion(BaseModule):
         x = torch.randn(z.shape[0], self.motion_channels, z.shape[-1], device=z.device, dtype=z.dtype)
 
         for i, t in enumerate(self.scheduler.timesteps):
+            # Scale input nothing for DDPM and DDIM
+            x = self.scheduler.scale_model_input(x, t)
+
+            # Get residual prediction
             t = t.unsqueeze(0).to(z.device)
             residual = self.estimator(x, mask, z, t)
 
+            # Updated sample with the residual
             x = self.scheduler.step(residual, t, x).prev_sample
 
         return x * mask
 
     def compute_loss(self, x0, mask, z, spk=None):
         noise = torch.randn_like(x0)
-        timesteps = torch.randint(0, self.n_timesteps_train, (x0.shape[0],), dtype=torch.long, device=x0.device)
+        timesteps = torch.randint(0, self.n_timesteps_train - 1, (x0.shape[0],), dtype=torch.long, device=x0.device)
         noisy_x0 = self.scheduler.add_noise(x0, noise, timesteps)
         pred = self.estimator(noisy_x0, mask, z, timesteps)
         loss = self.loss(pred * mask, x0 * mask)

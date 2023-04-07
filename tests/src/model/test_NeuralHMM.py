@@ -2,6 +2,7 @@ import pytest
 import torch
 
 from src.model.OverFlow import OverFlow
+from src.utilities.functions import fix_len_compatibility
 
 
 def test_parse_batch(hparams, dummy_data):
@@ -10,8 +11,8 @@ def test_parse_batch(hparams, dummy_data):
     text_padded, input_lengths, mel_padded, motion_padded, mel_lengths = parsed_batch[0]
     mel_padded, _ = parsed_batch[1]
     assert text_padded.shape[1] == max(input_lengths).item()
-    assert mel_padded.shape[2] == torch.max(mel_lengths).item()
-    assert motion_padded.shape[2] == torch.max(mel_lengths).item()
+    assert mel_padded.shape[2] == fix_len_compatibility(torch.max(mel_lengths).item())
+    assert motion_padded.shape[2] == fix_len_compatibility(torch.max(mel_lengths).item())
 
 
 def test_forward(hparams, dummy_data, test_batch_size):
@@ -64,6 +65,7 @@ def test_differint_scheduler(hparams, dummy_data_uncollated, motion_decoder_type
     hparams.motion_decoder_type = motion_decoder_type
     hparams.motion_decoder_param[motion_decoder_type]["scheduler"] = scheduler
     neural_hmm = OverFlow(hparams)
+    neural_hmm.decoder_motion.encoder.scheduler.set_timesteps(10)
     text = dummy_data_uncollated[0][0]
     (
         mel_output,

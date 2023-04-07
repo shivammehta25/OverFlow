@@ -1,9 +1,11 @@
 import torch
+import torch.nn.functional as F
 from torch import nn
 
 from src.model.Decoder import FlowSpecDecoder, MotionDecoder
 from src.model.Encoder import Encoder
 from src.model.HMM import HMM
+from src.utilities.functions import fix_len_compatibility
 
 
 class OverFlow(nn.Module):
@@ -26,7 +28,6 @@ class OverFlow(nn.Module):
         self.hmm = HMM(hparams)
         self.decoder_mel = FlowSpecDecoder(hparams, hparams.n_mel_channels, hparams.p_dropout_dec_mel)
         self.decoder_motion = MotionDecoder(hparams, hparams.motion_decoder_type)
-        self.motion_loss = nn.MSELoss()
         self.logger = hparams.logger
 
     @staticmethod
@@ -58,6 +59,9 @@ class OverFlow(nn.Module):
         encoder_outputs, text_lengths = self.encoder(embedded_inputs, text_lengths)
         z, z_lengths, logdet = self.decoder_mel(mels, mel_lengths)
         log_probs = self.hmm(encoder_outputs, text_lengths, z, z_lengths)
+        max_z_len = fix_len_compatibility(z.shape[2])
+        z = F.pad(z, (0, max_z_len - z.shape[-1]))
+        motions = F.pad(motions, (0, max_z_len - motions.shape[-1]))
         motion_decoder_output = self.decoder_motion(z, z_lengths, motions, reverse=False)
         # Make input data the same size as the decoder output for loss computation
         hmm_loss = (log_probs + logdet) / (text_lengths.sum() + mel_lengths.sum())
@@ -97,6 +101,9 @@ class OverFlow(nn.Module):
             input_parameters,
             output_parameters,
         ) = self.hmm.sample(encoder_outputs, sampling_temp=sampling_temp)
+
+        max_z_len = fix_len_compatibility(z.shape[0])
+        z = F.pad(z, (0, 0, 0, max_z_len - z.shape[0]))
 
         mel_output, mel_lengths, _ = self.decoder_mel(
             z.unsqueeze(0).transpose(1, 2), text_lengths.new_tensor([z.shape[0]]), reverse=True

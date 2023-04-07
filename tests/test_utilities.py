@@ -4,6 +4,7 @@ import random
 import torch
 import torch.nn as nn
 
+from src.utilities.functions import fix_len_compatibility
 from tests import PACKAGE_ROOT
 
 
@@ -18,8 +19,7 @@ def get_a_text():
 
 def get_a_mel():
     length = random.randint(10, 20)
-    if length % 2 == 0:
-        length += 1
+    length = fix_len_compatibility(length)
     return torch.rand(80, length).clamp(min=1e-3).log()
 
 

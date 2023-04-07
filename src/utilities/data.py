@@ -17,6 +17,7 @@ from torch.utils.data.dataset import Dataset
 from tqdm.auto import tqdm
 
 from src.model.layers import TacotronSTFT
+from src.utilities.functions import fix_len_compatibility
 from src.utilities.text import (
     _clean_text,
     cleaned_text_to_sequence,
@@ -45,7 +46,7 @@ def load_filepaths_and_text(filename, split="|"):
 
 
 def cache_text(data_item, text_cleaners):
-    loc, original_text = data_item
+    loc, original_text, *_ = data_item
     cleaned_text = _clean_text(original_text, text_cleaners)
     output = f"{loc}|{cleaned_text}\n"
     return output
@@ -90,6 +91,7 @@ class TextMelMotionCollate:
         # Right zero-pad mel-spec
         num_mels = batch[0][1].size(0)
         max_target_len = max(x[1].size(1) for x in batch)
+        max_target_len = fix_len_compatibility(max_target_len)
 
         # include mel padded
         mel_padded = torch.FloatTensor(len(batch), num_mels, max_target_len)
@@ -219,13 +221,8 @@ class TextMelLoader(Dataset):
 
     def get_motion(self, filename, mel_shape, ext=".expmap_86.1328125fps.pkl"):
         file_loc = self.motion_fileloc / Path(Path(filename).name).with_suffix(ext)
-        motion = torch.from_numpy(pd.read_pickle(file_loc).to_numpy())[::4]
-        return F.interpolate(motion.T.unsqueeze(0), size=mel_shape, mode="linear").squeeze(0)
-
-    def resize_mel_motion_to_same_size(self, mel, motion):
-        splitter_idx = min(mel.shape[1], motion.shape[1])
-        mel, motion = mel[:, :splitter_idx], motion[:, :splitter_idx]
-        return mel, motion
+        motion = torch.from_numpy(pd.read_pickle(file_loc).to_numpy())
+        return F.interpolate(motion.T.unsqueeze(0), size=mel_shape).squeeze(0)
 
     def get_mel(self, filename):
         r"""

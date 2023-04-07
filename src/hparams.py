@@ -56,8 +56,8 @@ def create_hparams(generate_parameters=False):
         ################################
         # Experiment Parameters        #
         ################################
-        run_name="MyDiffusion",
-        gpus=[3],
+        run_name="OverFlowMirrorGPU7",
+        gpus=[7],
         max_epochs=50000,
         val_check_interval=100,
         save_model_checkpoint=500,
@@ -77,7 +77,7 @@ def create_hparams(generate_parameters=False):
         ################################
         batch_size=14,
         load_mel_from_disk=False,
-        training_files="data/filelists/cormac_train.txt",
+        training_files="data/filelists/cormac_train_with_mirror.txt",
         validation_files="data/filelists/cormac_val.txt",
         text_cleaners=["english_cleaners"],
         motion_fileloc="data/cormac/processed_sm0_0_86fps",
@@ -185,7 +185,7 @@ def create_hparams(generate_parameters=False):
         ################################
         # Decoder Transformer Parameters#
         ################################
-        motion_decoder_type="mydiffusion",
+        motion_decoder_type="gradtts",
         motion_decoder_param={
             "transformer": {
                 "hidden_channels": 384,
@@ -228,11 +228,12 @@ def create_hparams(generate_parameters=False):
                 "beta_max": 20,
                 "pe_scale": 1000,
                 "n_timesteps": 50,
+                "prior_loss": True,
             },
             "mydiffusion": {
                 "scheduler": "ddpm",
                 "beta_schedule": "squaredcos_cap_v2",
-                "loss": "l1",
+                "loss": "l2",
                 "n_timesteps_train": 1000,
                 "n_timesteps_inference": 50,
                 "hidden_channels": 64,  # Unused hardcoded values for now

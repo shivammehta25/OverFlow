@@ -43,7 +43,7 @@ def test_FlowDecoder(
     assert (z.shape[2] == mel_padded.shape[2]) or (z.shape[2] == (mel_padded.shape[2] - 1)), "Output format matches"
 
     mel_, _, logdet_ = decoder(z, z_lengths, reverse=True)
-    len_mask = get_mask_from_len(z_lengths, device=z_lengths.device).unsqueeze(1)
+    len_mask = get_mask_from_len(z_lengths, z.shape[2], device=z_lengths.device).unsqueeze(1)
     mel_padded = mel_padded[:, :, : z.shape[2]] * len_mask
     assert torch.isclose(mel_padded, mel_, atol=1e-5).all(), "Invertible"
     assert logdet_ is None

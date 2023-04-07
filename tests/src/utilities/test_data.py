@@ -1,6 +1,7 @@
 import torch
 
 from src.utilities.data import TextMelMotionCollate
+from src.utilities.functions import fix_len_compatibility
 
 
 def test_collate_function(dummy_data_uncollated, hparams):
@@ -8,5 +9,5 @@ def test_collate_function(dummy_data_uncollated, hparams):
         hparams.n_frames_per_step
     )(dummy_data_uncollated)
     assert text_padded.shape[1] == torch.max(input_lengths).item()
-    assert mel_padded.shape[2] == torch.max(output_lengths).item()
-    assert motion_padded.shape[2] == torch.max(output_lengths).item()
+    assert mel_padded.shape[2] == fix_len_compatibility(torch.max(output_lengths).item())
+    assert motion_padded.shape[2] == fix_len_compatibility(torch.max(output_lengths).item())

@@ -158,7 +158,7 @@ def test_perform_data_dropout_of_ar_mel_inputs(hparams, dummy_embedded_data, dro
     ) = dummy_embedded_data
     mel_padded = mel_padded.transpose(1, 2)
     mel_padded = model.perform_data_dropout_of_ar_mel_inputs(mel_padded, dropout_flag)
-    mask = get_mask_from_len(output_lengths, device=output_lengths.device)
+    mask = get_mask_from_len(output_lengths, mel_padded.shape[1], device=output_lengths.device)
     if dropout_flag:
         assert (mel_padded.sum(2).masked_select(mask) == 0).any()
     else:

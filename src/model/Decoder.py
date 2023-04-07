@@ -1,6 +1,7 @@
 """
 Glow-TTS Code from https://github.com/jaywalnut310/glow-tts
 """
+import math
 from copy import deepcopy
 
 import numpy as np
@@ -61,13 +62,13 @@ class FlowSpecDecoder(nn.Module):
         Returns:
             _type_: _description_
         """
-        assert x.shape == (
+        assert (x.shape[0], x.shape[1]) == (
             x_lengths.shape[0],
             self.in_channels,
-            x_lengths.max(),
         ), f"The shape of the  \
             input should be (batch_dim, n_mel_channels, T_max) but received {x.shape}"
-        x, x_lengths, x_max_length = self.preprocess(x, x_lengths, x_lengths.max(), self.n_sqz)
+        x_max_length = x.shape[2]
+        x, x_lengths, x_max_length = self.preprocess(x, x_lengths, x_max_length, self.n_sqz)
 
         x_mask = get_mask_from_len(x_lengths, x_max_length, device=x.device, dtype=x.dtype).unsqueeze(1)
 
@@ -169,7 +170,7 @@ class RNNDecoder(nn.Module):
         x, _ = self.rnn(x)
         x, _ = nn.utils.rnn.pad_packed_sequence(x)
         x = rearrange(x, "t b (x c) -> b t c x", c=self.hidden_channels).mean(-1)
-        return x, get_mask_from_len(seq_lens, device=seq_lens.device, dtype=seq_lens.dtype).unsqueeze(-1)
+        return x, get_mask_from_len(seq_lens, x.shape[1], device=seq_lens.device, dtype=seq_lens.dtype).unsqueeze(-1)
 
 
 class MotionDecoder(nn.Module):
@@ -193,11 +194,20 @@ class MotionDecoder(nn.Module):
         elif decoder_type == "rnn":
             self.encoder = RNNDecoder(**hparams.motion_decoder_param[decoder_type])
         elif decoder_type == "gradtts":
+            self.prior_loss = hparams.motion_decoder_param[decoder_type].pop("prior_loss")
             self.encoder = GradTTSDiffusion(
                 n_feats=hparams.n_motion_joints, **hparams.motion_decoder_param[decoder_type]
             )
             self.motion_loss = None  # The loss will be returned by the decoder
-            self.in_proj = nn.Conv1d(hparams.n_mel_channels, hparams.n_motion_joints, 1)
+            self.in_proj = nn.Sequential(
+                nn.Conv1d(hparams.n_mel_channels, hparams.n_mel_channels, 5, padding=4, dilation=2),
+                nn.Mish(),
+                nn.Dropout(0.5),
+                nn.Conv1d(hparams.n_mel_channels, hparams.n_mel_channels, 3, padding=1),
+                nn.Mish(),
+                nn.Dropout(0.5),
+                nn.Conv1d(hparams.n_mel_channels, hparams.n_motion_joints, 1),
+            )
             self.out_proj = None
         elif decoder_type == "mydiffusion":
             decoder_params = deepcopy(hparams.motion_decoder_param[decoder_type])
@@ -249,11 +259,9 @@ class MotionDecoder(nn.Module):
         self._validate_inputs(target_motions, reverse)
 
         if target_motions is not None:
-            target_motions, _, _ = FlowSpecDecoder.preprocess(
-                target_motions, input_lengths, input_lengths.max(), self.n_sqz
-            )
+            target_motions, _, _ = FlowSpecDecoder.preprocess(target_motions, input_lengths, x.shape[-1], self.n_sqz)
 
-        x, input_lengths, _ = FlowSpecDecoder.preprocess(x, input_lengths, input_lengths.max(), self.n_sqz)
+        x, input_lengths, max_input_length = FlowSpecDecoder.preprocess(x, input_lengths, x.shape[-1], self.n_sqz)
 
         if self.decoder_type in self._FORWARD_DECODERS:
             if reverse:
@@ -266,7 +274,7 @@ class MotionDecoder(nn.Module):
 
         elif self.decoder_type in self._DIFFUSION_DECODERS:
             inputs_mask = get_mask_from_len(
-                input_lengths, input_lengths.max(), device=input_lengths.device, dtype=input_lengths.dtype
+                input_lengths, max_input_length, device=input_lengths.device, dtype=input_lengths.dtype
             ).unsqueeze(1)
 
             x = self.in_proj(x * inputs_mask)
@@ -281,6 +289,12 @@ class MotionDecoder(nn.Module):
             else:
                 # loss computation
                 loss, xt = self.encoder.compute_loss(target_motions, inputs_mask, x)
+                if hasattr(self, "prior_loss") and self.prior_loss:
+                    prior_loss_motion = torch.sum(
+                        0.5 * ((target_motions - x) ** 2 + math.log(2 * math.pi)) * inputs_mask
+                    )
+                    loss += prior_loss_motion / (torch.sum(inputs_mask) * self.n_motion_joints)
+
                 return {
                     "loss": loss,
                     "motions": rearrange(xt, "b c t -> b t c"),  # Noisy image at timestep t

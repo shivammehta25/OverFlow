@@ -178,11 +178,11 @@ class WaveGrad(nn.Module):
         )
         self.upsample = nn.ModuleList(
             [
-                UBlock(768, 512, 1, [1, 1, 1, 1]),
-                UBlock(512, 512, 1, [1, 1, 1, 1]),
-                UBlock(512, 256, 1, [1, 1, 1, 2]),
-                UBlock(256, 128, 1, [1, 1, 1, 2]),
-                UBlock(128, 128, 1, [1, 1, 2, 4]),
+                UBlock(768, 512, 1, [1, 2, 1, 2]),
+                UBlock(512, 512, 1, [1, 2, 1, 2]),
+                UBlock(512, 256, 1, [1, 2, 4, 8]),
+                UBlock(256, 128, 1, [1, 2, 4, 8]),
+                UBlock(128, 128, 1, [1, 2, 4, 8]),
             ]
         )
         self.first_conv = Conv1d(latent_in_channels, 768, 3, padding=1)
@@ -190,9 +190,10 @@ class WaveGrad(nn.Module):
 
     def forward(self, motion, mask, z, timestep):
         downsampled = []
+        x = motion
         for film, layer in zip(self.film, self.downsample):
-            motion = layer(motion, mask)
-            downsampled.append(film(motion, mask, timestep))
+            x = layer(x, mask)
+            downsampled.append(film(x, mask, timestep))
 
         x = self.first_conv(z, mask)
         for layer, (film_shift, film_scale) in zip(self.upsample, reversed(downsampled)):

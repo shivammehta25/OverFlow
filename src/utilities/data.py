@@ -12,6 +12,7 @@ import numpy as np
 import pandas as pd
 import torch
 import torch.nn.functional as F
+from einops import pack
 from scipy.io.wavfile import read
 from torch.utils.data.dataset import Dataset
 from tqdm.auto import tqdm
@@ -217,6 +218,11 @@ class TextMelLoader(Dataset):
         if self.motion_transform:
             for t in self.motion_transform:
                 motion = t(motion)
+        if motion.shape[0] != self.n_motion_joints:
+            c, t = motion.shape
+            c_fixed = fix_len_compatibility(c)
+            motion = pack([motion, torch.randn(c_fixed - c, t)], "* t")[0]
+
         return (text, mel, motion)
 
     def get_motion(self, filename, mel_shape, ext=".expmap_86.1328125fps.pkl"):

@@ -4,17 +4,39 @@ from argparse import Namespace
 
 import pytorch_lightning as pl
 import torch
+import torch.nn as nn
 import torch.nn.functional as F
 from einops import rearrange
 from pytorch_lightning.loggers import TensorBoardLogger
 
+from diffusers import DDPMScheduler
 from src.data_module import LightningLoader
 from src.hparams import create_hparams
 from src.model.Decoder import MotionDecoder
 from src.model.OverFlow import OverFlow
 from src.model.transformer import FFTransformer
-from src.utilities.functions import fix_len_compatibility
+from src.utilities.functions import fix_len_compatibility, get_mask_from_len
 from src.utilities.plotting import generate_motion_visualization
+
+
+class TestMotionDecoder(nn.Module):
+    def __init__(self) -> None:
+        super().__init__()
+        self.noise_scheduler = DDPMScheduler()
+        self.loss = nn.MSELoss()
+
+    def forward(self, x, x_lengths, condition=None, reverse=False):
+        if reverse:
+            pass
+        else:
+            mask = get_mask_from_len(x_lengths, x.shape[1], device=x.device, dtype=x.dtype).unsqueeze(1)
+
+            noise = torch.randn_like(x)
+            timesteps = torch.randint(0, 999, (x.shape[0],), dtype=torch.long, device=x.device)
+            noisy_x = self.noise_scheduler.add_noise(x, noise, timesteps)
+            pred = self.network(noisy_x, mask, condition, timesteps)
+
+            loss = self.loss(pred * mask, noise * mask)
 
 
 class TestTrainingModule(pl.LightningModule):
@@ -23,6 +45,7 @@ class TestTrainingModule(pl.LightningModule):
         if type(hparams) != Namespace:
             hparams = Namespace(**hparams)
         self.motion_visualizer = hparams.motion_visualizer
+        self.mel_normaliser = hparams.mel_normaliser
         del hparams.motion_visualizer
         self.save_hyperparameters(hparams)
         hparams.logger = self.logger
@@ -167,7 +190,8 @@ class TestTrainingModule(pl.LightningModule):
             motion_output = rearrange(motion_output, "b t c -> b c t")
             motion_output = self.hparams.motion_normaliser.inverse_normalise(motion_output)
             stft_module = self.train_dataloader().dataset.stft
-            target_audio, sr = stft_module.griffin_lim(mels[0].unsqueeze(0))
+            target_audio = self.mel_normaliser.inverse_normalise(mels)
+            target_audio, sr = stft_module.griffin_lim(target_audio[0].unsqueeze(0))
             logger = self.logger.experiment
             if self.global_step > 0:
                 generate_motion_visualization(
@@ -276,9 +300,10 @@ if __name__ == "__main__":
     hparams.checkpoint_dir = "dummy_checkpoint"
     hparams.motion_decoder_type = "mydiffusion"
     hparams.save_model_checkpoint = 1000
+    hparams.val_check_interval = 100
     hparams.learning_rate = 3e-4
     hparams.gpus = [0]  # Run with CUDA VISIBLE DEVICES
-    # hparams.batch_size=32
+    hparams.batch_size = 32
 
     data_module = LightningLoader(hparams)
     model = TestTrainingModule(hparams)
@@ -288,8 +313,8 @@ if __name__ == "__main__":
         resume_from_checkpoint=args.checkpoint_path,
         gpus=hparams.gpus,
         logger=logger,
-        log_every_n_steps=10,
-        flush_logs_every_n_steps=1,
+        log_every_n_steps=1,
+        flush_logs_every_n_steps=10,
         val_check_interval=hparams.val_check_interval,
         gradient_clip_val=hparams.grad_clip_thresh,
         max_epochs=hparams.max_epochs,

@@ -11,7 +11,7 @@ from einops import rearrange
 
 import src.model.DecoderComponents.flows as flows
 from src.model.diffusion import Diffusion as GradTTSDiffusion
-from src.model.diffusion import MyDiffusion
+from src.model.diffusion import Diffusion_Motion, MyDiffusion
 from src.model.layers import LinearNorm
 from src.model.transformer import Conformer, FFTransformer
 from src.model.wavegrad import WaveGrad
@@ -175,7 +175,7 @@ class RNNDecoder(nn.Module):
 
 class MotionDecoder(nn.Module):
     _FORWARD_DECODERS = ["transformer", "conformer", "rnn"]
-    _DIFFUSION_DECODERS = ["gradtts", "mydiffusion"]
+    _DIFFUSION_DECODERS = ["gradtts", "conformer_diffusion", "new_grad_tts"]
 
     def __init__(self, hparams, decoder_type="transformer"):
         super().__init__()
@@ -209,12 +209,34 @@ class MotionDecoder(nn.Module):
                 nn.Conv1d(hparams.n_mel_channels, hparams.n_motion_joints, 1),
             )
             self.out_proj = None
-        elif decoder_type == "mydiffusion":
+        elif decoder_type == "conformer_diffusion":
+            self.prior_loss = hparams.motion_decoder_param[decoder_type].pop("prior_loss")
             decoder_params = deepcopy(hparams.motion_decoder_param[decoder_type])
+            self.in_proj = nn.ModuleList(
+                [
+                    nn.Conv1d(hparams.n_mel_channels, hparams.motion_decoder_param["conformer"]["hidden_channels"], 1),
+                    Conformer(**hparams.motion_decoder_param["conformer"]),
+                    nn.Conv1d(hparams.motion_decoder_param["conformer"]["hidden_channels"], hparams.n_motion_joints, 1),
+                ]
+            )
             del decoder_params["hidden_channels"]
             self.encoder = MyDiffusion(hparams.n_motion_joints, hparams.n_mel_channels, **decoder_params)
-            self.in_proj = nn.Identity()
             self.out_proj = None
+
+        elif decoder_type == "new_grad_tts":
+            decoder_params = deepcopy(hparams.motion_decoder_param[decoder_type])
+            self.prior_loss = decoder_params.pop("prior_loss")
+            self.in_proj = nn.ModuleList(
+                [
+                    nn.Conv1d(hparams.n_mel_channels, hparams.motion_decoder_param["conformer"]["hidden_channels"], 1),
+                    Conformer(**hparams.motion_decoder_param["conformer"]),
+                    nn.Conv1d(hparams.motion_decoder_param["conformer"]["hidden_channels"], hparams.n_motion_joints, 1),
+                ]
+            )
+            del decoder_params["hidden_channels"]
+            self.encoder = Diffusion_Motion(hparams.n_motion_joints, **decoder_params)
+            self.out_proj = None
+
         else:
             raise ValueError(f"Unknown decoder type: {decoder_type}")
 
@@ -277,7 +299,14 @@ class MotionDecoder(nn.Module):
                 input_lengths, max_input_length, device=input_lengths.device, dtype=input_lengths.dtype
             ).unsqueeze(1)
 
-            x = self.in_proj(x * inputs_mask)
+            if isinstance(self.in_proj, nn.ModuleList):
+                x = self.in_proj[0](x * inputs_mask)
+                for layer in self.in_proj[1:-1]:
+                    x = layer(x, input_lengths)
+                x = self.in_proj[-1](rearrange(x[0], "b t c -> b c t"))
+            else:
+                x = self.in_proj(x * inputs_mask)
+
             if reverse:
                 # Reverse diffusion
                 output = self.encoder(x, inputs_mask, temperature=temperature)

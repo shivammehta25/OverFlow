@@ -211,6 +211,7 @@ def generate_motion_visualization(
         motion_visualizer_pipeline (_type_): Pipeline
         bvh_filename (_type_, optional): str/path. Defaults to None.
     """
+    motion = motion[:, :45]
     audio_filename = Path(audio_filename)
     motion_filename = Path(motion_filename)
 

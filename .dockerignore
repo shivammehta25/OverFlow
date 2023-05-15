@@ -8,3 +8,5 @@ tb_logs_old/
 *.ckpt
 *.pt
 *.wav
+syn_motion_output/
+dummy_tb_logs/

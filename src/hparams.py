@@ -56,8 +56,8 @@ def create_hparams(generate_parameters=False):
         ################################
         # Experiment Parameters        #
         ################################
-        run_name="OverFlowMirrorGPU7",
-        gpus=[7],
+        run_name="new_grad_ttsGPU4",
+        gpus=[4],
         max_epochs=50000,
         val_check_interval=100,
         save_model_checkpoint=500,
@@ -75,7 +75,7 @@ def create_hparams(generate_parameters=False):
         ################################
         # Data Parameters             #
         ################################
-        batch_size=14,
+        batch_size=8,
         load_mel_from_disk=False,
         training_files="data/filelists/cormac_train_with_mirror.txt",
         validation_files="data/filelists/cormac_val.txt",
@@ -100,7 +100,7 @@ def create_hparams(generate_parameters=False):
         ################################
         # Motion Parameters            #
         ################################
-        n_motion_joints=45,
+        n_motion_joints=48,
         motion_visualizer=jl.load("data/cormac/processed_sm0_0_86fps/data_pipe.expmap_86.1328125fps.sav"),
         ################################
         # Data Properties              #
@@ -185,7 +185,7 @@ def create_hparams(generate_parameters=False):
         ################################
         # Decoder Transformer Parameters#
         ################################
-        motion_decoder_type="gradtts",
+        motion_decoder_type="new_grad_tts",
         motion_decoder_param={
             "transformer": {
                 "hidden_channels": 384,
@@ -230,19 +230,28 @@ def create_hparams(generate_parameters=False):
                 "n_timesteps": 50,
                 "prior_loss": True,
             },
-            "mydiffusion": {
+            "conformer_diffusion": {
                 "scheduler": "ddpm",
                 "beta_schedule": "squaredcos_cap_v2",
-                "loss": "l2",
+                "loss": "l1",
                 "n_timesteps_train": 1000,
                 "n_timesteps_inference": 50,
                 "hidden_channels": 64,  # Unused hardcoded values for now
+                "prior_loss": False,
+                "estimator_type": "diffusersunet",
+            },
+            "new_grad_tts": {
+                "beta_min": 0.05,
+                "beta_max": 20,
+                "n_timesteps": 200,
+                "prior_loss": True,
+                "hidden_channels": 128,  # Unused values
             },
         },
         ################################
         # Optimization Hyperparameters #
         ################################
-        learning_rate=3e-4,
+        learning_rate=1e-4,
         weight_decay=1e-6,
         grad_clip_thresh=5.0,
         stochastic_weight_avg=False,

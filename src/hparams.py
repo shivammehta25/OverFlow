@@ -51,7 +51,7 @@ def create_hparams(generate_parameters=False):
         ################################
         # Experiment Parameters        #
         ################################
-        run_name="Cormac",
+        run_name="VCTK",
         gpus=[2],
         max_epochs=50000,
         val_check_interval=100,
@@ -67,6 +67,7 @@ def create_hparams(generate_parameters=False):
         run_tests=False,
         warm_start=False,
         ignore_layers=["model.embedding.weight"],
+        num_speakers=110,  # 1 for LJ-Speech
         ################################
         # Data Parameters             #
         ################################

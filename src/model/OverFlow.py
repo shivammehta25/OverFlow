@@ -18,6 +18,11 @@ class OverFlow(nn.Module):
         # Data Properties
         self.normaliser = hparams.normaliser
 
+        if hparams.num_speakers > 1:
+            self.speaker_embedding = nn.Embedding(
+                hparams.num_speakers, hparams.encoder_params[hparams.encoder_type]["hidden_channels"]
+            )
+
         self.encoder = Encoder(hparams)
         # self.encoder = Tacotron2Encoder(hparams)
         self.hmm = HMM(hparams)
@@ -33,7 +38,7 @@ class OverFlow(nn.Module):
         Returns:
 
         """
-        text_padded, input_lengths, mel_padded, gate_padded, output_lengths = batch
+        text_padded, input_lengths, mel_padded, gate_padded, output_lengths, speaker_id = batch
         text_padded = text_padded.long()
         input_lengths = input_lengths.long()
         max_len = torch.max(input_lengths.data).item()
@@ -42,22 +47,28 @@ class OverFlow(nn.Module):
         output_lengths = output_lengths.long()
 
         return (
-            (text_padded, input_lengths, mel_padded, max_len, output_lengths),
+            (text_padded, input_lengths, mel_padded, max_len, output_lengths, speaker_id),
             (mel_padded, gate_padded),
         )
 
     def forward(self, inputs):
-        text_inputs, text_lengths, mels, max_len, mel_lengths = inputs
+        text_inputs, text_lengths, mels, max_len, mel_lengths, speaker_id = inputs
         text_lengths, mel_lengths = text_lengths.data, mel_lengths.data
+        if self.hparams.num_speakers > 1:
+            speaker_embeddings = self.speaker_embedding(speaker_id).unsqueeze(1)
+        else:
+            speaker_embeddings = 0
         embedded_inputs = self.embedding(text_inputs).transpose(1, 2)
-        encoder_outputs, text_lengths = self.encoder(embedded_inputs, text_lengths)
-        z, z_lengths, logdet = self.decoder(mels, mel_lengths)
+        encoder_outputs, text_lengths = self.encoder(embedded_inputs + speaker_embeddings, text_lengths)
+        z, z_lengths, logdet = self.decoder(
+            mels, mel_lengths, g=speaker_embeddings if self.hparams.num_speakers > 1 else None
+        )
         log_probs = self.hmm(encoder_outputs, text_lengths, z, z_lengths)
         loss = (log_probs + logdet) / (text_lengths.sum() + mel_lengths.sum())
         return loss
 
     @torch.inference_mode()
-    def sample(self, text_inputs, text_lengths=None, sampling_temp=1.0):
+    def sample(self, text_inputs, text_lengths=None, speaker_id=None, sampling_temp=1.0):
         r"""
         Sampling mel spectrogram based on text inputs
         Args:
@@ -79,7 +90,15 @@ class OverFlow(nn.Module):
 
         text_inputs, text_lengths = text_inputs.unsqueeze(0), text_lengths.unsqueeze(0)
         embedded_inputs = self.embedding(text_inputs).transpose(1, 2)
-        encoder_outputs, text_lengths = self.encoder(embedded_inputs, text_lengths)
+
+        if self.hparams.num_speakers > 1:
+            if speaker_id is None:
+                speaker_id = text_inputs.new_zeros(1, 1)
+            speaker_embeddings = self.speaker_embedding(speaker_id).unsqueeze(1)
+        else:
+            speaker_id = 0
+
+        encoder_outputs, text_lengths = self.encoder(embedded_inputs + speaker_id, text_lengths)
 
         (
             mel_latent,
@@ -89,7 +108,10 @@ class OverFlow(nn.Module):
         ) = self.hmm.sample(encoder_outputs, sampling_temp=sampling_temp)
 
         mel_output, mel_lengths, _ = self.decoder(
-            mel_latent.unsqueeze(0).transpose(1, 2), text_lengths.new_tensor([mel_latent.shape[0]]), reverse=True
+            mel_latent.unsqueeze(0).transpose(1, 2),
+            text_lengths.new_tensor([mel_latent.shape[0]]),
+            reverse=True,
+            g=speaker_embeddings if self.hparams.num_speakers > 1 else None,
         )
 
         if self.normaliser:

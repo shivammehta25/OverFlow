@@ -67,14 +67,14 @@ def create_hparams(generate_parameters=False):
         run_tests=False,
         warm_start=False,
         ignore_layers=["model.embedding.weight"],
-        num_speakers=110,  # 1 for LJ-Speech
+        num_speakers=109,  # 1 for LJ-Speech
         ################################
         # Data Parameters             #
         ################################
-        batch_size=16,
+        batch_size=32,
         load_mel_from_disk=False,
-        training_files="data/filelists/cormac_train.txt",
-        validation_files="data/filelists/cormac_val.txt",
+        training_files="data/filelists/vctk_train_filelist.txt",
+        validation_files="data/filelists/vctk_val_filelist.txt",
         text_cleaners=["english_cleaners"],
         # phonetise=False,
         # training_files="data/filelists/ljs_audio_text_train_filelist.txt",
@@ -82,7 +82,7 @@ def create_hparams(generate_parameters=False):
         # text_cleaners=["english_cleaners"],
         phonetise=True,
         add_blank=True,
-        num_workers=40,
+        num_workers=32,
         ################################
         # Audio Parameters             #
         ################################
@@ -170,7 +170,7 @@ def create_hparams(generate_parameters=False):
         n_split=4,
         n_sqz=2,
         sigmoid_scale=False,
-        gin_channels=0,
+        gin_channels=384,
         ################################
         # Optimization Hyperparameters #
         ################################

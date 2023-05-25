@@ -43,14 +43,14 @@ def load_filepaths_and_text(filename, split="|"):
 
 
 def cache_text(data_item, text_cleaners):
-    loc, original_text = data_item
+    loc, original_text, speaker_id = data_item
     cleaned_text = _clean_text(original_text, text_cleaners)
-    output = f"{loc}|{cleaned_text}\n"
+    output = f"{loc}|{cleaned_text}|{speaker_id}\n"
     return output
 
 
 def cache_mel(data_item, mel_function, ext=".npy"):
-    loc, _ = data_item
+    loc, _, _ = data_item
     if Path(loc).with_suffix(ext).exists():
         return 0  # Already cached
     mel = mel_function(loc).numpy()
@@ -81,9 +81,11 @@ class TextMelCollate:
 
         text_padded = torch.LongTensor(len(batch), max_input_len)
         text_padded.zero_()
+        speaker_ids = torch.LongTensor(len(batch))
         for i in range(len(ids_sorted_decreasing)):
             text = batch[ids_sorted_decreasing[i]][0]
             text_padded[i, : text.size(0)] = text
+            speaker_ids[i] = int(batch[ids_sorted_decreasing[i]][2])
 
         # Right zero-pad mel-spec
         num_mels = batch[0][1].size(0)
@@ -100,7 +102,7 @@ class TextMelCollate:
 
         # torch.empty is a substite for gate_padded, will be removed later when more
         # test ensures there is no regression
-        return text_padded, input_lengths, mel_padded, torch.empty([1]), output_lengths
+        return text_padded, input_lengths, mel_padded, torch.empty([1]), output_lengths, speaker_ids
 
 
 class TextMelLoader(Dataset):
@@ -190,7 +192,7 @@ class TextMelLoader(Dataset):
             audiopath_and_text (list): list of size 2
         """
         # separate filename and text (string)
-        audiopath, text = audiopath_and_text[0], audiopath_and_text[1]
+        audiopath, text, speaker_id = audiopath_and_text[0], audiopath_and_text[1], audiopath_and_text[2]
         # This text is int tensor of the input representation
         text = self.get_text(text)
         mel = self.get_mel(audiopath)
@@ -198,7 +200,7 @@ class TextMelLoader(Dataset):
             for t in self.transform:
                 mel = t(mel)
 
-        return (text, mel)
+        return (text, mel, speaker_id)
 
     def get_mel(self, filename):
         r"""

@@ -1,0 +1,873 @@
+data/vctk/wavs/p364/p364_225_mic1.wav|We just have to improve.|0
+data/vctk/wavs/p364/p364_123_mic1.wav|One is too many.|0
+data/vctk/wavs/p364/p364_209_mic1.wav|This is perfectly legal.|0
+data/vctk/wavs/p364/p364_096_mic1.wav|Allison is not convinced.|0
+data/vctk/wavs/p364/p364_162_mic1.wav|I don't know where it went.|0
+data/vctk/wavs/p364/p364_010_mic1.wav|People look, but no one ever finds it.|0
+data/vctk/wavs/p347/p347_421_mic1.wav|Officials say the city must achieve this.|1
+data/vctk/wavs/p347/p347_052_mic1.wav|My parents are exhausted.|1
+data/vctk/wavs/p347/p347_029_mic1.wav|So now this series has had its day.|1
+data/vctk/wavs/p347/p347_235_mic1.wav|He wouldn't allow that to happen.|1
+data/vctk/wavs/p347/p347_101_mic1.wav|We do not get that impression now.|1
+data/vctk/wavs/p347/p347_172_mic1.wav|Yesterday, one, from Aberdeen, was postponed.|1
+data/vctk/wavs/p286/p286_297_mic1.wav|He's been here on numerous occasions.|2
+data/vctk/wavs/p286/p286_108_mic1.wav|We could not get any possession.|2
+data/vctk/wavs/p286/p286_352_mic1.wav|They were impressive against France.|2
+data/vctk/wavs/p286/p286_183_mic1.wav|I've been in two finals, and I've got a medal.|2
+data/vctk/wavs/p286/p286_155_mic1.wav|The striker needed attention before he could resume.|2
+data/vctk/wavs/p286/p286_422_mic1.wav|That was a touch of class.|2
+data/vctk/wavs/p286/p286_105_mic1.wav|The outsourcing deal will take effect in September.|2
+data/vctk/wavs/p286/p286_284_mic1.wav|They must play for each other.|2
+data/vctk/wavs/p282/p282_227_mic1.wav|Jim Wallace, the justice minister, acknowledged that prisoner numbers were a concern.|3
+data/vctk/wavs/p282/p282_051_mic1.wav|It is bizarre.|3
+data/vctk/wavs/p282/p282_082_mic1.wav|I will miss him.|3
+data/vctk/wavs/p282/p282_108_mic1.wav|Health Secretary Frank Dobson made the surprise announcement in the Commons yesterday.|3
+data/vctk/wavs/p282/p282_273_mic1.wav|She looked so young.|3
+data/vctk/wavs/p282/p282_230_mic1.wav|Dewar is certainly under attack from within his own party.|3
+data/vctk/wavs/p282/p282_030_mic1.wav|This is the window.|3
+data/vctk/wavs/p282/p282_080_mic1.wav|Mr Irvine said Mr Rafferty was now in good spirits.|3
+data/vctk/wavs/p282/p282_349_mic1.wav|The shareholders will vote to wind up the company on Friday morning.|3
+data/vctk/wavs/p238/p238_025_mic1.wav|Smoking is also very important.|4
+data/vctk/wavs/p238/p238_128_mic1.wav|He put some colour into Scottish history.|4
+data/vctk/wavs/p238/p238_356_mic1.wav|I've been asked that already, this morning - on the radio.|4
+data/vctk/wavs/p238/p238_340_mic1.wav|Today we must not repeat that mistake.|4
+data/vctk/wavs/p238/p238_402_mic1.wav|Venus rejects the very suggestion.|4
+data/vctk/wavs/p238/p238_015_mic1.wav|The Greeks used to imagine that it was a sign from the gods to foretell war or heavy rain.|4
+data/vctk/wavs/p238/p238_368_mic1.wav|We can have no complaints.|4
+data/vctk/wavs/p316/p316_057_mic1.wav|There was only silence.|5
+data/vctk/wavs/p316/p316_104_mic1.wav|That got me out.|5
+data/vctk/wavs/p316/p316_344_mic1.wav|Not many people like to do that.|5
+data/vctk/wavs/p316/p316_378_mic1.wav|Ali was shot at, but refused to back down.|5
+data/vctk/wavs/p316/p316_074_mic1.wav|We have a major concern about the enforcement action.|5
+data/vctk/wavs/p316/p316_385_mic1.wav|It's time to move on.|5
+data/vctk/wavs/p316/p316_052_mic1.wav|He had no enemies.|5
+data/vctk/wavs/p316/p316_032_mic1.wav|This is not a war on terror.|5
+data/vctk/wavs/p316/p316_228_mic1.wav|In hindsight, it was the wrong decision.|5
+data/vctk/wavs/p316/p316_028_mic1.wav|It's not going to work out that way.|5
+data/vctk/wavs/p298/p298_088_mic1.wav|At the time of watching, however, it is totally convincing.|6
+data/vctk/wavs/p298/p298_282_mic1.wav|She had been sexually assaulted.|6
+data/vctk/wavs/p298/p298_354_mic1.wav|He saw it all as a big game.|6
+data/vctk/wavs/p298/p298_072_mic1.wav|What do they pay to join the club?|6
+data/vctk/wavs/p298/p298_305_mic1.wav|His arguments were supported by Mr Bevan.|6
+data/vctk/wavs/p351/p351_193_mic1.wav|This was an hour before the show.|7
+data/vctk/wavs/p351/p351_210_mic1.wav|If only the problems concerned the players.|7
+data/vctk/wavs/p351/p351_370_mic1.wav|It is a very big problem.|7
+data/vctk/wavs/p351/p351_322_mic1.wav|At the moment, it is very difficult to know.|7
+data/vctk/wavs/p351/p351_422_mic1.wav|They have got off with murder.|7
+data/vctk/wavs/p351/p351_076_mic1.wav|His track record is impressive.|7
+data/vctk/wavs/p351/p351_346_mic1.wav|Our season is not over.|7
+data/vctk/wavs/p351/p351_392_mic1.wav|This is the last straw.|7
+data/vctk/wavs/p351/p351_166_mic1.wav|It feels that the game is off.|7
+data/vctk/wavs/p351/p351_237_mic1.wav|That is important for the club.|7
+data/vctk/wavs/p351/p351_058_mic1.wav|The jury is still out.|7
+data/vctk/wavs/p351/p351_383_mic1.wav|He was the architect.|7
+data/vctk/wavs/p363/p363_032_mic1.wav|If that is the case, it is a breakthrough.|8
+data/vctk/wavs/p363/p363_326_mic1.wav|This is an awful lot of money.|8
+data/vctk/wavs/p363/p363_336_mic1.wav|He is in a lot of pain, it is very distressing.|8
+data/vctk/wavs/p363/p363_061_mic1.wav|He is not alone.|8
+data/vctk/wavs/p363/p363_404_mic1.wav|She doesn't know where to begin.|8
+data/vctk/wavs/p363/p363_059_mic1.wav|That is our objective.|8
+data/vctk/wavs/p363/p363_302_mic1.wav|It was not the right time for me.|8
+data/vctk/wavs/p363/p363_145_mic1.wav|We could easily have lost that game.|8
+data/vctk/wavs/p262/p262_136_mic1.wav|That group reported just before Christmas.|9
+data/vctk/wavs/p262/p262_109_mic1.wav|Holyrood is just a part of the jigsaw.|9
+data/vctk/wavs/p262/p262_143_mic1.wav|Last night he was due to hold talks with Arafat.|9
+data/vctk/wavs/p262/p262_176_mic1.wav|The clarity is vital.|9
+data/vctk/wavs/p262/p262_226_mic1.wav|At the time, he was a living legend.|9
+data/vctk/wavs/p262/p262_163_mic1.wav|It's that sort of night.|9
+data/vctk/wavs/p262/p262_104_mic1.wav|While they went on holiday, we got the contract.|9
+data/vctk/wavs/p262/p262_028_mic1.wav|Their courage, and their honesty, should be respected.|9
+data/vctk/wavs/p262/p262_343_mic1.wav|It will be very, very tight.|9
+data/vctk/wavs/p256/p256_051_mic1.wav|Is a drug dealer?|10
+data/vctk/wavs/p256/p256_055_mic1.wav|He had no enemies.|10
+data/vctk/wavs/p256/p256_298_mic1.wav|I thought it was my only chance.|10
+data/vctk/wavs/p256/p256_256_mic1.wav|The bottom line is that we had to get a win.|10
+data/vctk/wavs/p256/p256_314_mic1.wav|It is all credit to them today.|10
+data/vctk/wavs/p256/p256_317_mic1.wav|She is very distinctive.|10
+data/vctk/wavs/p361/p361_019_mic1.wav|Since then physicists have found that it is not reflection, but refraction by the raindrops which causes the rainbows.|11
+data/vctk/wavs/p361/p361_204_mic1.wav|I am prepared to step down.|11
+data/vctk/wavs/p361/p361_311_mic1.wav|A winter of discontent awaits.|11
+data/vctk/wavs/p361/p361_244_mic1.wav|Sadly it is a mess.|11
+data/vctk/wavs/p361/p361_261_mic1.wav|What can you do?|11
+data/vctk/wavs/p361/p361_209_mic1.wav|She has always been very friendly.|11
+data/vctk/wavs/p361/p361_076_mic1.wav|I've got to be better than that   Quite.|11
+data/vctk/wavs/p361/p361_356_mic1.wav|I did not go looking anywhere else.|11
+data/vctk/wavs/p287/p287_152_mic1.wav|You had to go and see him.|12
+data/vctk/wavs/p287/p287_097_mic1.wav|It's not a lack of confidence.|12
+data/vctk/wavs/p287/p287_200_mic1.wav|The guidelines are expected to be finalised before next spring.|12
+data/vctk/wavs/p287/p287_145_mic1.wav|This action reflects a slump in bookings.|12
+data/vctk/wavs/p287/p287_282_mic1.wav|Frankly, we should all have such problems.|12
+data/vctk/wavs/p287/p287_173_mic1.wav|Our destiny is in our own hands.|12
+data/vctk/wavs/p250/p250_125_mic1.wav|I'm delighted for everyone at Stirling.|13
+data/vctk/wavs/p250/p250_101_mic1.wav|Are you from the rugby?|13
+data/vctk/wavs/p250/p250_404_mic1.wav|It has only been rumours.|13
+data/vctk/wavs/p250/p250_034_mic1.wav|Smoking is also very important.|13
+data/vctk/wavs/p250/p250_244_mic1.wav|During the communist time they were very privileged.|13
+data/vctk/wavs/p250/p250_367_mic1.wav|The Allies intend to maintain the average.|13
+data/vctk/wavs/p250/p250_046_mic1.wav|How are you, sir?|13
+data/vctk/wavs/p250/p250_415_mic1.wav|It's too close to call.|13
+data/vctk/wavs/p241/p241_371_mic1.wav|Well, the big day has arrived.|14
+data/vctk/wavs/p241/p241_151_mic1.wav|We also enjoyed a lot of support.|14
+data/vctk/wavs/p241/p241_153_mic1.wav|Neither side can win this war.|14
+data/vctk/wavs/p241/p241_180_mic1.wav|They know no other way.|14
+data/vctk/wavs/p241/p241_226_mic1.wav|My neighbours are horrified.|14
+data/vctk/wavs/p241/p241_254_mic1.wav|The bottom line is that we had to get a win.|14
+data/vctk/wavs/p241/p241_031_mic1.wav|They were described as being in a serious but stable condition yesterday.|14
+data/vctk/wavs/p241/p241_195_mic1.wav|It's the same old story.|14
+data/vctk/wavs/p228/p228_027_mic1.wav|Because we do not need it.|15
+data/vctk/wavs/p228/p228_329_mic1.wav|The train was on time.|15
+data/vctk/wavs/p228/p228_112_mic1.wav|We have an election in eight days.|15
+data/vctk/wavs/p228/p228_354_mic1.wav|He is very concerned about his fitness as a footballer.|15
+data/vctk/wavs/p228/p228_317_mic1.wav|It was no secret that I wanted to sign him.|15
+data/vctk/wavs/p228/p228_143_mic1.wav|Nobody in the world can get away from him.|15
+data/vctk/wavs/p228/p228_198_mic1.wav|But a final decision will not be taken until after the elections.|15
+data/vctk/wavs/p280/p280_017_mic1.wav|Others have tried to explain the phenomenon physically.|16
+data/vctk/wavs/p280/p280_004_mic1.wav|We also need a small plastic snake and a big toy frog for the kids.|16
+data/vctk/wavs/p280/p280_209_mic1.wav|They are a victim of their own success.|16
+data/vctk/wavs/p280/p280_343_mic1.wav|Getting that balance right can be very difficult.|16
+data/vctk/wavs/p280/p280_011_mic1.wav|When a man looks for something beyond his reach, his friends say he is looking for the pot of gold at the end of the rainbow.|16
+data/vctk/wavs/p280/p280_369_mic1.wav|We have a substantial value of assets on the ground.|16
+data/vctk/wavs/p280/p280_260_mic1.wav|And they never show the same film as a rival.|16
+data/vctk/wavs/p280/p280_215_mic1.wav|The study is entirely into the issue of future funding.|16
+data/vctk/wavs/p280/p280_157_mic1.wav|When it happened, he could hardly believe it.|16
+data/vctk/wavs/p280/p280_192_mic1.wav|I am fighting the force of nature.|16
+data/vctk/wavs/p280/p280_252_mic1.wav|The rise has come too late for some.|16
+data/vctk/wavs/p300/p300_309_mic1.wav|With him are the symbols of his faith.|17
+data/vctk/wavs/p300/p300_262_mic1.wav|They failed in their duty to Mr Logan.|17
+data/vctk/wavs/p300/p300_091_mic1.wav|He then had a swipe at Hearts.|17
+data/vctk/wavs/p300/p300_318_mic1.wav|Too often it is not.|17
+data/vctk/wavs/p300/p300_217_mic1.wav|I told you, you were doing it all wrong.|17
+data/vctk/wavs/p300/p300_281_mic1.wav|This is a great shame.|17
+data/vctk/wavs/p306/p306_300_mic1.wav|We agreed to disagree.|18
+data/vctk/wavs/p306/p306_094_mic1.wav|You had better believe it.|18
+data/vctk/wavs/p306/p306_178_mic1.wav|It's a commission, and for it's work, a year's work.|18
+data/vctk/wavs/p306/p306_056_mic1.wav|It comes on like a tidal wave.|18
+data/vctk/wavs/p306/p306_319_mic1.wav|I tend to not look back.|18
+data/vctk/wavs/p306/p306_034_mic1.wav|Blood samples have been taken.|18
+data/vctk/wavs/p306/p306_017_mic1.wav|Others have tried to explain the phenomenon physically.|18
+data/vctk/wavs/p306/p306_232_mic1.wav|For the other parties, it is back to business as usual.|18
+data/vctk/wavs/p306/p306_308_mic1.wav|He is a law unto himself.|18
+data/vctk/wavs/p272/p272_037_mic1.wav|Other members of the family were too upset to comment last night.|19
+data/vctk/wavs/p272/p272_024_mic1.wav|This is a very common type of bow, one showing mainly red and yellow, with little or no green or blue.|19
+data/vctk/wavs/p272/p272_110_mic1.wav|You should be.|19
+data/vctk/wavs/p272/p272_299_mic1.wav|You are the glory.|19
+data/vctk/wavs/p272/p272_344_mic1.wav|In addition, it was in breach of natural justice.|19
+data/vctk/wavs/p272/p272_107_mic1.wav|I wish I had put on a brighter tie.|19
+data/vctk/wavs/p272/p272_259_mic1.wav|It's very nice.|19
+data/vctk/wavs/p272/p272_023_mic1.wav|If the red of the second bow falls upon the green of the first, the result is to give a bow with an abnormally wide yellow band, since red and green light when mixed form yellow.|19
+data/vctk/wavs/p272/p272_228_mic1.wav|On the ground, the West Bank was again the focus of violence.|19
+data/vctk/wavs/p272/p272_069_mic1.wav|George Robertson described the plan as an outrageous and disgraceful decision.|19
+data/vctk/wavs/p261/p261_066_mic1.wav|Strathclyde police have appealed for witnesses.|20
+data/vctk/wavs/p261/p261_121_mic1.wav|It is too pretty, it is too small.|20
+data/vctk/wavs/p261/p261_187_mic1.wav|He prefers to play for them.|20
+data/vctk/wavs/p261/p261_057_mic1.wav|Why do you want to come to Edinburgh?|20
+data/vctk/wavs/p261/p261_242_mic1.wav|This is a family club.|20
+data/vctk/wavs/p261/p261_297_mic1.wav|He ran into immediate problems with local people and police.|20
+data/vctk/wavs/p261/p261_049_mic1.wav|For the meantime, though, the signs are good.|20
+data/vctk/wavs/p261/p261_467_mic1.wav|Phil Mickelson did that last year.|20
+data/vctk/wavs/p261/p261_219_mic1.wav|They have known the hard times.|20
+data/vctk/wavs/p261/p261_222_mic1.wav|Seven people were critically injured.|20
+data/vctk/wavs/p261/p261_058_mic1.wav|How are you, sir?|20
+data/vctk/wavs/p261/p261_205_mic1.wav|Does the name matter?|20
+data/vctk/wavs/p261/p261_317_mic1.wav|Holland won by five wickets.|20
+data/vctk/wavs/p261/p261_235_mic1.wav|Corporate banking would be based in Edinburgh.|20
+data/vctk/wavs/p240/p240_292_mic1.wav|He will address the nation this evening.|21
+data/vctk/wavs/p240/p240_367_mic1.wav|As, indeed, they would be.|21
+data/vctk/wavs/p240/p240_189_mic1.wav|It was only later that the condition was diagnosed.|21
+data/vctk/wavs/p240/p240_091_mic1.wav|Today I couldn't run on it.|21
+data/vctk/wavs/p283/p283_271_mic1.wav|Do I think about them often?|22
+data/vctk/wavs/p283/p283_067_mic1.wav|This is the year of the Tiger.|22
+data/vctk/wavs/p283/p283_203_mic1.wav|What are you not good at?|22
+data/vctk/wavs/p283/p283_058_mic1.wav|Why do you want to come to Edinburgh?|22
+data/vctk/wavs/p283/p283_134_mic1.wav|Child abuse is a dreadful thing.|22
+data/vctk/wavs/p283/p283_246_mic1.wav|His second was a beauty.|22
+data/vctk/wavs/p283/p283_140_mic1.wav|If not, a deal could take many months.|22
+data/vctk/wavs/p283/p283_326_mic1.wav|What are they for?|22
+data/vctk/wavs/p275/p275_008_mic1.wav|These take the shape of a long round arch, with its path high above, and its two ends apparently beyond the horizon.|23
+data/vctk/wavs/p275/p275_033_mic1.wav|We must provide a long-term solution to tackle this attitude.|23
+data/vctk/wavs/p275/p275_174_mic1.wav|In a way he was.|23
+data/vctk/wavs/p275/p275_002_mic1.wav|Ask her to bring these things with her from the store.|23
+data/vctk/wavs/p275/p275_034_mic1.wav|Then, suddenly, they weren't.|23
+data/vctk/wavs/p275/p275_324_mic1.wav|My view has now completely changed.|23
+data/vctk/wavs/p341/p341_015_mic1.wav|The Greeks used to imagine that it was a sign from the gods to foretell war or heavy rain.|24
+data/vctk/wavs/p341/p341_160_mic1.wav|You shouldn't have a stoppage in November.|24
+data/vctk/wavs/p341/p341_309_mic1.wav|They were the better side on the day.|24
+data/vctk/wavs/p341/p341_144_mic1.wav|He is a very nice man.|24
+data/vctk/wavs/p341/p341_046_mic1.wav|Moray Council could not be contacted last night.|24
+data/vctk/wavs/p341/p341_181_mic1.wav|That's how it worked in Bosnia.|24
+data/vctk/wavs/p341/p341_281_mic1.wav|The manager knew me very well.|24
+data/vctk/wavs/p341/p341_122_mic1.wav|He had other things on his mind.|24
+data/vctk/wavs/p294/p294_265_mic1.wav|This will have no effect on the championship.|25
+data/vctk/wavs/p294/p294_052_mic1.wav|The course record was in his name.|25
+data/vctk/wavs/p294/p294_355_mic1.wav|The support of Britain is assumed.|25
+data/vctk/wavs/p294/p294_161_mic1.wav|There is no shortage of commitment.|25
+data/vctk/wavs/p294/p294_078_mic1.wav|Subs not used, McGraw.|25
+data/vctk/wavs/p294/p294_185_mic1.wav|It's a huge amount.|25
+data/vctk/wavs/p294/p294_167_mic1.wav|It had until tomorrow to comply.|25
+data/vctk/wavs/p294/p294_358_mic1.wav|No decision on that was taken.|25
+data/vctk/wavs/p271/p271_023_mic1.wav|If the red of the second bow falls upon the green of the first, the result is to give a bow with an abnormally wide yellow band, since red and green light when mixed form yellow.|26
+data/vctk/wavs/p271/p271_238_mic1.wav|They tried to give her advice.|26
+data/vctk/wavs/p271/p271_283_mic1.wav|We are a grandmother.|26
+data/vctk/wavs/p271/p271_397_mic1.wav|The jury is expected to return a verdict in the case today.|26
+data/vctk/wavs/p271/p271_264_mic1.wav|However, the force has not yet received a formal complaint.|26
+data/vctk/wavs/p271/p271_326_mic1.wav|They will certainly be visible from every house in our area.|26
+data/vctk/wavs/p271/p271_017_mic1.wav|Others have tried to explain the phenomenon physically.|26
+data/vctk/wavs/p230/p230_203_mic1.wav|The sanctions are about collective punishment.|27
+data/vctk/wavs/p230/p230_357_mic1.wav|The professor said the results were positive.|27
+data/vctk/wavs/p230/p230_071_mic1.wav|What do we do?|27
+data/vctk/wavs/p230/p230_213_mic1.wav|All will be revealed in due course.|27
+data/vctk/wavs/p230/p230_066_mic1.wav|He also received a medal of honour.|27
+data/vctk/wavs/p230/p230_030_mic1.wav|Nonetheless, the overall picture is healthy.|27
+data/vctk/wavs/p230/p230_069_mic1.wav|It is a job creation scheme.|27
+data/vctk/wavs/p230/p230_054_mic1.wav|We should be able to cope.|27
+data/vctk/wavs/p270/p270_408_mic1.wav|Of course, it is nonsense.|28
+data/vctk/wavs/p270/p270_414_mic1.wav|Stevenson was arrested on Monday morning.|28
+data/vctk/wavs/p270/p270_393_mic1.wav|Glasgow University declined to comment.|28
+data/vctk/wavs/p270/p270_095_mic1.wav|We should recognise that others have done a good job.|28
+data/vctk/wavs/p270/p270_284_mic1.wav|I understand the security issue.|28
+data/vctk/wavs/p270/p270_386_mic1.wav|She is obviously very disappointed.|28
+data/vctk/wavs/p270/p270_332_mic1.wav|He will go a long way.|28
+data/vctk/wavs/p270/p270_167_mic1.wav|We did what we had to do.|28
+data/vctk/wavs/p234/p234_308_mic1.wav|The concerns are the same.|29
+data/vctk/wavs/p234/p234_283_mic1.wav|In fact, he is not even in the squad for the game.|29
+data/vctk/wavs/p234/p234_168_mic1.wav|It is not about the money, it is about everything.|29
+data/vctk/wavs/p234/p234_353_mic1.wav|They have to be addressed.|29
+data/vctk/wavs/p234/p234_200_mic1.wav|At the top level, the salaries are far too high.|29
+data/vctk/wavs/p234/p234_064_mic1.wav|It was an amazing result.|29
+data/vctk/wavs/p234/p234_129_mic1.wav|Three days later, he was killed.|29
+data/vctk/wavs/p234/p234_031_mic1.wav|It is on the internet.|29
+data/vctk/wavs/p234/p234_127_mic1.wav|However, it was a different story in the final.|29
+data/vctk/wavs/p234/p234_037_mic1.wav|However, they continued in their pursuit of victory.|29
+data/vctk/wavs/p299/p299_066_mic1.wav|The decision is an absolute disgrace.|30
+data/vctk/wavs/p299/p299_323_mic1.wav|He's very young but he is growing up.|30
+data/vctk/wavs/p299/p299_022_mic1.wav|The actual primary rainbow observed is said to be the effect of super-imposition of a number of bows.|30
+data/vctk/wavs/p299/p299_028_mic1.wav|Gilbert was not amused.|30
+data/vctk/wavs/p299/p299_099_mic1.wav|It was a bit of a struggle today.|30
+data/vctk/wavs/p299/p299_221_mic1.wav|She said No, he's not in Elgin today.|30
+data/vctk/wavs/p299/p299_404_mic1.wav|The euro is your money, it is our money.|30
+data/vctk/wavs/p299/p299_373_mic1.wav|One policeman was killed.|30
+data/vctk/wavs/p299/p299_340_mic1.wav|This is entirely appropriate and overdue.|30
+data/vctk/wavs/p257/p257_111_mic1.wav|I was fighting for my life, I thought.|31
+data/vctk/wavs/p257/p257_084_mic1.wav|Obviously, we were pretty close in a couple of games.|31
+data/vctk/wavs/p257/p257_392_mic1.wav|Not because they want to sing about something.|31
+data/vctk/wavs/p257/p257_256_mic1.wav|He raised the profile of the European Tour to the sky.|31
+data/vctk/wavs/p257/p257_287_mic1.wav|Graeme was prepared.|31
+data/vctk/wavs/p257/p257_332_mic1.wav|I was pleased to be back on the podium in Brazil.|31
+data/vctk/wavs/p257/p257_144_mic1.wav|He sees a difference in the style of the two teams.|31
+data/vctk/wavs/p257/p257_158_mic1.wav|There's a pause.|31
+data/vctk/wavs/p265/p265_126_mic1.wav|It is a time bomb.|32
+data/vctk/wavs/p265/p265_275_mic1.wav|You've got to have both sides.|32
+data/vctk/wavs/p265/p265_021_mic1.wav|The difference in the rainbow depends considerably upon the size of the drops, and the width of the colored band increases as the size of the drops increases.|32
+data/vctk/wavs/p265/p265_096_mic1.wav|Oil embargo endorsed.|32
+data/vctk/wavs/p265/p265_105_mic1.wav|It was the eighties.|32
+data/vctk/wavs/p265/p265_182_mic1.wav|But a final decision will not be taken until after the elections.|32
+data/vctk/wavs/p232/p232_213_mic1.wav|He is slightly confused.|33
+data/vctk/wavs/p232/p232_170_mic1.wav|We've made a couple of albums.|33
+data/vctk/wavs/p232/p232_403_mic1.wav|My house was shaking at the time.|33
+data/vctk/wavs/p232/p232_343_mic1.wav|He also insisted that no concessions had been made to the French.|33
+data/vctk/wavs/p232/p232_363_mic1.wav|But the real problem is the closure of the export market.|33
+data/vctk/wavs/p232/p232_056_mic1.wav|Because we do not need it.|33
+data/vctk/wavs/p232/p232_291_mic1.wav|They were also beside themselves.|33
+data/vctk/wavs/p232/p232_083_mic1.wav|That is bound to happen.|33
+data/vctk/wavs/p232/p232_103_mic1.wav|We recognise the important role of golf in attracting visitors.|33
+data/vctk/wavs/p243/p243_342_mic1.wav|Perhaps she met her husband too early, she says.|34
+data/vctk/wavs/p243/p243_096_mic1.wav|Earlier, both main parties had agreed a crucial stage had been reached.|34
+data/vctk/wavs/p243/p243_024_mic1.wav|This is a very common type of bow, one showing mainly red and yellow, with little or no green or blue.|34
+data/vctk/wavs/p243/p243_332_mic1.wav|I felt it was time for me to leave to develop my career.|34
+data/vctk/wavs/p243/p243_095_mic1.wav|He will be a very hard act to follow.|34
+data/vctk/wavs/p243/p243_081_mic1.wav|I do not attempt to answer that.|34
+data/vctk/wavs/p236/p236_089_mic1.wav|However, there is an issue, isn't there?|35
+data/vctk/wavs/p236/p236_189_mic1.wav|Tomorrow is a new day.|35
+data/vctk/wavs/p236/p236_475_mic1.wav|I could feel the blood on my face.|35
+data/vctk/wavs/p236/p236_139_mic1.wav|That view has not altered.|35
+data/vctk/wavs/p263/p263_335_mic1.wav|He will go a long way.|36
+data/vctk/wavs/p263/p263_380_mic1.wav|This view was echoed by the other Scottish analyst.|36
+data/vctk/wavs/p263/p263_080_mic1.wav|And does it?|36
+data/vctk/wavs/p263/p263_285_mic1.wav|Much of the equipment was new.|36
+data/vctk/wavs/p263/p263_145_mic1.wav|Nobody will know the feeling of the branches until October.|36
+data/vctk/wavs/p263/p263_176_mic1.wav|Worry can have that effect on some citizens.|36
+data/vctk/wavs/p263/p263_451_mic1.wav|It is a tough game but we have a chance.|36
+data/vctk/wavs/p263/p263_141_mic1.wav|What do we want to do that for?|36
+data/vctk/wavs/p263/p263_354_mic1.wav|How do you take them away?|36
+data/vctk/wavs/p263/p263_211_mic1.wav|We must keep our feet on the ground.|36
+data/vctk/wavs/p263/p263_118_mic1.wav|It was won on the issue of the land.|36
+data/vctk/wavs/p263/p263_355_mic1.wav|However, there is an issue, isn't there?|36
+data/vctk/wavs/p233/p233_249_mic1.wav|It is a policy which has the full support of the minister.|37
+data/vctk/wavs/p233/p233_228_mic1.wav|Mental health is a massive issue.|37
+data/vctk/wavs/p233/p233_239_mic1.wav|The role was a knockout, but really difficult.|37
+data/vctk/wavs/p233/p233_247_mic1.wav|The salary changes are long overdue.|37
+data/vctk/wavs/p233/p233_344_mic1.wav|His contract was then not renewed.|37
+data/vctk/wavs/p233/p233_030_mic1.wav|On our numbers, the price is in line with the asset value.|37
+data/vctk/wavs/p254/p254_386_mic1.wav|Family liaison officers are now working to support the family.|38
+data/vctk/wavs/p254/p254_278_mic1.wav|She has fallen in love with Scotland, however.|38
+data/vctk/wavs/p254/p254_096_mic1.wav|All options are open.|38
+data/vctk/wavs/p226/p226_260_mic1.wav|It is a mark of respect from the inmates.|39
+data/vctk/wavs/p226/p226_148_mic1.wav|Three penalties were given.|39
+data/vctk/wavs/p226/p226_144_mic1.wav|Police could not say if the two incidents were connected.|39
+data/vctk/wavs/p226/p226_346_mic1.wav|But the disease has not been confined to the Tory Party.|39
+data/vctk/wavs/p226/p226_247_mic1.wav|We did not compete with any other local farmer.|39
+data/vctk/wavs/p226/p226_318_mic1.wav|Kids are terrible.|39
+data/vctk/wavs/p226/p226_299_mic1.wav|There was no hint of scandal.|39
+data/vctk/wavs/p226/p226_228_mic1.wav|I am immensely sad.|39
+data/vctk/wavs/p226/p226_030_mic1.wav|Because we do not need it.|39
+data/vctk/wavs/p226/p226_067_mic1.wav|It's a matter of balance.|39
+data/vctk/wavs/p226/p226_343_mic1.wav|I'm so pleased the show has won a prize.|39
+data/vctk/wavs/p226/p226_341_mic1.wav|In addition, certain areas are closed at certain times.|39
+data/vctk/wavs/p266/p266_183_mic1.wav|It wasn't a penalty, it was outside the area.|40
+data/vctk/wavs/p266/p266_053_mic1.wav|I expect a rapid response.|40
+data/vctk/wavs/p266/p266_285_mic1.wav|Dialogue is the key.|40
+data/vctk/wavs/p266/p266_109_mic1.wav|It will also require a lengthy series of clinical trials.|40
+data/vctk/wavs/p266/p266_246_mic1.wav|It was a hit.|40
+data/vctk/wavs/p266/p266_139_mic1.wav|I don't know the full story.|40
+data/vctk/wavs/p266/p266_014_mic1.wav|To the Hebrews it was a token that there would be no more universal floods.|40
+data/vctk/wavs/p266/p266_134_mic1.wav|On Friday, the headteacher and deputy headteacher appeared at the door.|40
+data/vctk/wavs/p266/p266_396_mic1.wav|It was a breathtaking moment.|40
+data/vctk/wavs/p266/p266_299_mic1.wav|We lost a boy.|40
+data/vctk/wavs/p307/p307_324_mic1.wav|A friendship that will endure.|41
+data/vctk/wavs/p307/p307_258_mic1.wav|But they cannot go on ignoring the truth.|41
+data/vctk/wavs/p307/p307_377_mic1.wav|It is like a theatre of the absurd.|41
+data/vctk/wavs/p307/p307_064_mic1.wav|We tried everything, but it just wasn't to be today.|41
+data/vctk/wavs/p307/p307_316_mic1.wav|We lost our composure towards the interval, he said.|41
+data/vctk/wavs/p307/p307_084_mic1.wav|It was published yesterday on the internet.|41
+data/vctk/wavs/p307/p307_326_mic1.wav|It needs to be sorted out by Easter.|41
+data/vctk/wavs/p274/p274_179_mic1.wav|What was the matter for concern?|42
+data/vctk/wavs/p274/p274_240_mic1.wav|You will have seen the adverts.|42
+data/vctk/wavs/p274/p274_067_mic1.wav|How are you, sir?|42
+data/vctk/wavs/p274/p274_006_mic1.wav|When the sunlight strikes raindrops in the air, they act as a prism and form a rainbow.|42
+data/vctk/wavs/p274/p274_189_mic1.wav|But there's an upturn in the sector.|42
+data/vctk/wavs/p274/p274_236_mic1.wav|Wilson will tell the truth.|42
+data/vctk/wavs/p274/p274_342_mic1.wav|That's the way it goes.|42
+data/vctk/wavs/p274/p274_310_mic1.wav|The rescue package is public money.|42
+data/vctk/wavs/p274/p274_407_mic1.wav|Nobody will be forced to work.|42
+data/vctk/wavs/p274/p274_158_mic1.wav|Scotland came very close in the second Test.|42
+data/vctk/wavs/p376/p376_208_mic1.wav|I only wanted to give her a fright.|43
+data/vctk/wavs/p376/p376_022_mic1.wav|The actual primary rainbow observed is said to be the effect of super-imposition of a number of bows.|43
+data/vctk/wavs/p376/p376_265_mic1.wav|There is a precedent for the theory.|43
+data/vctk/wavs/p376/p376_273_mic1.wav|We want to sort it out.|43
+data/vctk/wavs/p376/p376_035_mic1.wav|We talk about effective military action.|43
+data/vctk/wavs/p376/p376_363_mic1.wav|I'm delighted for the lads.|43
+data/vctk/wavs/p376/p376_315_mic1.wav|I am extremely cautious.|43
+data/vctk/wavs/p376/p376_349_mic1.wav|It was a tactical change.|43
+data/vctk/wavs/p376/p376_219_mic1.wav|Scotland is the home of golf.|43
+data/vctk/wavs/p376/p376_079_mic1.wav|Health care workers and labourers followed.|43
+data/vctk/wavs/p376/p376_300_mic1.wav|He was really great.|43
+data/vctk/wavs/p281/p281_057_mic1.wav|There will be no repeat of that performance, that I can guarantee.|44
+data/vctk/wavs/p281/p281_384_mic1.wav|Our policy is very clear on this issue.|44
+data/vctk/wavs/p281/p281_382_mic1.wav|On fuel, the Chancellor has a number of options.|44
+data/vctk/wavs/p281/p281_180_mic1.wav|It is not either national standards or local control.|44
+data/vctk/wavs/p281/p281_081_mic1.wav|I first met him last summer.|44
+data/vctk/wavs/p281/p281_363_mic1.wav|They should take their mobile phones.|44
+data/vctk/wavs/p303/p303_274_mic1.wav|My dad was working in Ayrshire.|45
+data/vctk/wavs/p303/p303_121_mic1.wav|They will know they deserve to be there.|45
+data/vctk/wavs/p303/p303_094_mic1.wav|Scotland were beaten again.|45
+data/vctk/wavs/p303/p303_120_mic1.wav|After about a year, the feeling returned to my finger.|45
+data/vctk/wavs/p303/p303_192_mic1.wav|I think we finished fifth.|45
+data/vctk/wavs/p303/p303_307_mic1.wav|Last week, he was taken into hospital.|45
+data/vctk/wavs/p303/p303_252_mic1.wav|Sub Not Used, McKenzie.|45
+data/vctk/wavs/p303/p303_270_mic1.wav|His treatment has been quite atrocious.|45
+data/vctk/wavs/p303/p303_027_mic1.wav|This was the classical period of Beethoven.|45
+data/vctk/wavs/p225/p225_040_mic1.wav|You'd better believe it.|46
+data/vctk/wavs/p225/p225_029_mic1.wav|What do we do?|46
+data/vctk/wavs/p225/p225_169_mic1.wav|Irvine said his company was intent on supporting the Scottish dairy industry.|46
+data/vctk/wavs/p225/p225_019_mic1.wav|Since then physicists have found that it is not reflection, but refraction by the raindrops which causes the rainbows.|46
+data/vctk/wavs/p225/p225_303_mic1.wav|And it had been a marvellous occasion.|46
+data/vctk/wavs/p225/p225_293_mic1.wav|It's great, because it takes a lot of pressure off the players.|46
+data/vctk/wavs/p225/p225_287_mic1.wav|She said the charity would continue to monitor the case.|46
+data/vctk/wavs/p292/p292_059_mic1.wav|I was completely knackered.|47
+data/vctk/wavs/p292/p292_045_mic1.wav|I did not concentrate on my performance.|47
+data/vctk/wavs/p292/p292_242_mic1.wav|His musicals were very much of their time.|47
+data/vctk/wavs/p292/p292_263_mic1.wav|They loved it and it showed.|47
+data/vctk/wavs/p292/p292_132_mic1.wav|What's happening to her?|47
+data/vctk/wavs/p292/p292_270_mic1.wav|She added, The sheriff was obviously frustrated.|47
+data/vctk/wavs/p292/p292_379_mic1.wav|That's not like us at all.|47
+data/vctk/wavs/p292/p292_334_mic1.wav|This country has many challenges.|47
+data/vctk/wavs/p292/p292_025_mic1.wav|I was not involved in these discussions.|47
+data/vctk/wavs/p284/p284_185_mic1.wav|It is a farce.|48
+data/vctk/wavs/p284/p284_073_mic1.wav|Chris Smith, the culture secretary, said he was satisfied with the decision.|48
+data/vctk/wavs/p284/p284_257_mic1.wav|However, the force has not yet received a formal complaint.|48
+data/vctk/wavs/p284/p284_063_mic1.wav|They are real.|48
+data/vctk/wavs/p284/p284_125_mic1.wav|She really suffered for her art.|48
+data/vctk/wavs/p269/p269_114_mic1.wav|It's also important that they are not seen as a soft option.|49
+data/vctk/wavs/p269/p269_393_mic1.wav|On the contrary, it was actually very funny.|49
+data/vctk/wavs/p269/p269_044_mic1.wav|There will be no shortage of quality applicants.|49
+data/vctk/wavs/p269/p269_080_mic1.wav|People must remain vigilant.|49
+data/vctk/wavs/p269/p269_112_mic1.wav|It was the eighties.|49
+data/vctk/wavs/p269/p269_403_mic1.wav|The jury is expected to return a verdict in the case today.|49
+data/vctk/wavs/p249/p249_009_mic1.wav|There is , according to legend, a boiling pot of gold at one end.|50
+data/vctk/wavs/p249/p249_123_mic1.wav|They've got to account for it.|50
+data/vctk/wavs/p249/p249_304_mic1.wav|The whole matter is somewhat in the air.|50
+data/vctk/wavs/p249/p249_212_mic1.wav|The guidelines are expected to be finalised before next spring.|50
+data/vctk/wavs/p249/p249_174_mic1.wav|We have a budget in March.|50
+data/vctk/wavs/p249/p249_260_mic1.wav|He raised the profile of the European Tour to the sky.|50
+data/vctk/wavs/p249/p249_321_mic1.wav|I came into this world with nothing.|50
+data/vctk/wavs/p249/p249_106_mic1.wav|We have always maintained that we would never abandon Scottish football.|50
+data/vctk/wavs/p249/p249_069_mic1.wav|There was a tremendous amount of anger and frustration in that music.|50
+data/vctk/wavs/p249/p249_344_mic1.wav|From our point of view, the player is free to leave.|50
+data/vctk/wavs/p231/p231_026_mic1.wav|I'd just like to play.|51
+data/vctk/wavs/p231/p231_350_mic1.wav|Is there a waiting list?|51
+data/vctk/wavs/p231/p231_298_mic1.wav|They have shown a great desire and attitude.|51
+data/vctk/wavs/p231/p231_178_mic1.wav|We are the gateway to justice.|51
+data/vctk/wavs/p231/p231_200_mic1.wav|Libya is an easy target.|51
+data/vctk/wavs/p231/p231_280_mic1.wav|The morale of the Yugoslav army is beginning to crack.|51
+data/vctk/wavs/p231/p231_288_mic1.wav|The decision was announced at its annual conference in Dunfermline.|51
+data/vctk/wavs/p293/p293_337_mic1.wav|A whole range of factors are involved.|52
+data/vctk/wavs/p293/p293_088_mic1.wav|I could not believe what they were saying.|52
+data/vctk/wavs/p293/p293_166_mic1.wav|It is physical but it is also good.|52
+data/vctk/wavs/p293/p293_096_mic1.wav|But the cost to his health was enormous.|52
+data/vctk/wavs/p293/p293_188_mic1.wav|But Allen is deadly serious.|52
+data/vctk/wavs/p293/p293_381_mic1.wav|When he took over it really took off.|52
+data/vctk/wavs/p293/p293_072_mic1.wav|You see, my back has gone.|52
+data/vctk/wavs/p293/p293_160_mic1.wav|The only answer is a public inquiry.|52
+data/vctk/wavs/p304/p304_094_mic1.wav|He was jailed for five years.|53
+data/vctk/wavs/p304/p304_413_mic1.wav|Which is worse?|53
+data/vctk/wavs/p304/p304_390_mic1.wav|Changes need to be made.|53
+data/vctk/wavs/p304/p304_284_mic1.wav|He called for a public inquiry.|53
+data/vctk/wavs/p304/p304_342_mic1.wav|It's all about money, money, money.|53
+data/vctk/wavs/p304/p304_414_mic1.wav|At the end of the day, one has to be careful.|53
+data/vctk/wavs/p304/p304_021_mic1.wav|The difference in the rainbow depends considerably upon the size of the drops, and the width of the colored band increases as the size of the drops increases.|53
+data/vctk/wavs/p304/p304_271_mic1.wav|Are we going to stay up?|53
+data/vctk/wavs/p323/p323_402_mic1.wav|You can say he gets a sizeable amount.|54
+data/vctk/wavs/p323/p323_155_mic1.wav|The encounter was to change his life.|54
+data/vctk/wavs/p323/p323_261_mic1.wav|They hoped to remain in the Edinburgh area.|54
+data/vctk/wavs/p323/p323_011_mic1.wav|When a man looks for something beyond his reach, his friends say he is looking for the pot of gold at the end of the rainbow.|54
+data/vctk/wavs/p323/p323_404_mic1.wav|Ms Jackson was not at the meeting.|54
+data/vctk/wavs/p333/p333_040_mic1.wav|It is time for a new approach.|55
+data/vctk/wavs/p333/p333_394_mic1.wav|If not, he should go home.|55
+data/vctk/wavs/p333/p333_065_mic1.wav|This is only the start of my season.|55
+data/vctk/wavs/p333/p333_335_mic1.wav|Eleven events are required.|55
+data/vctk/wavs/p333/p333_002_mic1.wav|Ask her to bring these things with her from the store.|55
+data/vctk/wavs/p333/p333_061_mic1.wav|Yesterday her family were too upset to speak.|55
+data/vctk/wavs/p333/p333_198_mic1.wav|Edinburgh, in fact, was not included in the survey.|55
+data/vctk/wavs/p333/p333_239_mic1.wav|I want to play at the highest level.|55
+data/vctk/wavs/p360/p360_294_mic1.wav|We are in it for the long-term.|56
+data/vctk/wavs/p360/p360_366_mic1.wav|It will set the tone.|56
+data/vctk/wavs/p360/p360_365_mic1.wav|She has never been back.|56
+data/vctk/wavs/p360/p360_416_mic1.wav|It's not an impression.|56
+data/vctk/wavs/p360/p360_160_mic1.wav|However, we will have to wait and see.|56
+data/vctk/wavs/p278/p278_162_mic1.wav|So was the first half.|57
+data/vctk/wavs/p278/p278_212_mic1.wav|Bombing is the easy option.|57
+data/vctk/wavs/p278/p278_077_mic1.wav|We have to offer value for money.|57
+data/vctk/wavs/p278/p278_350_mic1.wav|That is a trend which will be encouraged.|57
+data/vctk/wavs/p278/p278_244_mic1.wav|They included certain insurance policies, and his share of the house.|57
+data/vctk/wavs/p278/p278_320_mic1.wav|It's unlikely to be renewed.|57
+data/vctk/wavs/p278/p278_337_mic1.wav|We are on a four-year mission.|57
+data/vctk/wavs/p278/p278_355_mic1.wav|He was at school in Devon.|57
+data/vctk/wavs/p340/p340_113_mic1.wav|The film is on a tightrope.|58
+data/vctk/wavs/p340/p340_248_mic1.wav|Can they be serious?|58
+data/vctk/wavs/p340/p340_143_mic1.wav|It looks like a hit.|58
+data/vctk/wavs/p340/p340_041_mic1.wav|We didn't deserve to win.|58
+data/vctk/wavs/p340/p340_200_mic1.wav|This is your life.|58
+data/vctk/wavs/p340/p340_030_mic1.wav|We've not won anything yet.|58
+data/vctk/wavs/p340/p340_098_mic1.wav|He did not have to stop and think.|58
+data/vctk/wavs/p335/p335_382_mic1.wav|Writing has diminished in value.|59
+data/vctk/wavs/p335/p335_277_mic1.wav|There is great demand for human cloning.|59
+data/vctk/wavs/p335/p335_318_mic1.wav|The actors are confident and polished.|59
+data/vctk/wavs/p335/p335_061_mic1.wav|It's the most beautiful place on earth.|59
+data/vctk/wavs/p335/p335_209_mic1.wav|That has not changed.|59
+data/vctk/wavs/p335/p335_094_mic1.wav|Four other charges were dropped.|59
+data/vctk/wavs/p335/p335_157_mic1.wav|It's because they can't understand the language.|59
+data/vctk/wavs/p335/p335_095_mic1.wav|These guys will not lie down.|59
+data/vctk/wavs/p335/p335_296_mic1.wav|I'd never be free.|59
+data/vctk/wavs/p335/p335_028_mic1.wav|Let's not go overboard.|59
+data/vctk/wavs/p335/p335_210_mic1.wav|John Lennon is a very large industry.|59
+data/vctk/wavs/p335/p335_306_mic1.wav|If not, he should go home.|59
+data/vctk/wavs/p335/p335_084_mic1.wav|They're completely different from each other.|59
+data/vctk/wavs/p335/p335_175_mic1.wav|Stewart will travel with some confidence.|59
+data/vctk/wavs/p335/p335_063_mic1.wav|I've learned from my mistakes.|59
+data/vctk/wavs/p335/p335_350_mic1.wav|He refused to discuss his imminent retiral.|59
+data/vctk/wavs/p335/p335_086_mic1.wav|Hopefully, it will pay off for me.|59
+data/vctk/wavs/p260/p260_257_mic1.wav|However, the force has not yet received a formal complaint.|60
+data/vctk/wavs/p260/p260_143_mic1.wav|It is not just about pay.|60
+data/vctk/wavs/p260/p260_217_mic1.wav|It's a question of creating a future awareness.|60
+data/vctk/wavs/p260/p260_082_mic1.wav|He seems to be pleased with the picture.|60
+data/vctk/wavs/p260/p260_314_mic1.wav|The Government in Westminster is simply not prepared to save him.|60
+data/vctk/wavs/p260/p260_105_mic1.wav|Oil embargo endorsed.|60
+data/vctk/wavs/p260/p260_004_mic1.wav|We also need a small plastic snake and a big toy frog for the kids.|60
+data/vctk/wavs/p260/p260_150_mic1.wav|The departure of Mr Johnston was reported by The Herald yesterday.|60
+data/vctk/wavs/p260/p260_034_mic1.wav|Mr Ferguson became a minister after seven years as a journalist.|60
+data/vctk/wavs/p311/p311_398_mic1.wav|Who can say?|61
+data/vctk/wavs/p311/p311_151_mic1.wav|You just know it.|61
+data/vctk/wavs/p311/p311_378_mic1.wav|We have to start again on Saturday.|61
+data/vctk/wavs/p311/p311_355_mic1.wav|We think a lot of Allan McGregor.|61
+data/vctk/wavs/p311/p311_261_mic1.wav|I want to go now.|61
+data/vctk/wavs/p311/p311_409_mic1.wav|I was furious about it.|61
+data/vctk/wavs/p311/p311_005_mic1.wav|She can scoop these things into three red bags, and we will go meet her Wednesday at the train station.|61
+data/vctk/wavs/p297/p297_333_mic1.wav|He intends to appeal the sentences.|62
+data/vctk/wavs/p297/p297_328_mic1.wav|I'm delighted at Murray's appointment.|62
+data/vctk/wavs/p297/p297_202_mic1.wav|We have a high quality product.|62
+data/vctk/wavs/p297/p297_367_mic1.wav|How is he enjoying life as a senior?|62
+data/vctk/wavs/p297/p297_415_mic1.wav|It's a delightful idea, but a distancing one.|62
+data/vctk/wavs/p297/p297_182_mic1.wav|Others may be trying to catch up.|62
+data/vctk/wavs/p297/p297_027_mic1.wav|And the art of performance is taking risks.|62
+data/vctk/wavs/p264/p264_090_mic1.wav|They would now be able to look forward with confidence.|63
+data/vctk/wavs/p264/p264_386_mic1.wav|They want the style of the sound changed a bit.|63
+data/vctk/wavs/p264/p264_483_mic1.wav|Your bank may offer you a choice of options.|63
+data/vctk/wavs/p264/p264_479_mic1.wav|We were given a break.|63
+data/vctk/wavs/p264/p264_107_mic1.wav|I was born for this moment.|63
+data/vctk/wavs/p264/p264_152_mic1.wav|Did it work?|63
+data/vctk/wavs/p264/p264_260_mic1.wav|We had a grand view.|63
+data/vctk/wavs/p264/p264_165_mic1.wav|It's been my life.|63
+data/vctk/wavs/p264/p264_492_mic1.wav|New York is my home.|63
+data/vctk/wavs/p264/p264_323_mic1.wav|Someone should tell them.|63
+data/vctk/wavs/p264/p264_300_mic1.wav|That was around July, August.|63
+data/vctk/wavs/p258/p258_287_mic1.wav|The death toll included five children.|64
+data/vctk/wavs/p258/p258_231_mic1.wav|Jim Leighton will play in the Scottish Cup final.|64
+data/vctk/wavs/p258/p258_343_mic1.wav|There's no place to hide.|64
+data/vctk/wavs/p258/p258_153_mic1.wav|I've put my own money into this project.|64
+data/vctk/wavs/p258/p258_363_mic1.wav|That would help.|64
+data/vctk/wavs/p258/p258_367_mic1.wav|He is very concerned about his fitness as a footballer.|64
+data/vctk/wavs/p258/p258_061_mic1.wav|He becomes the new Minister for Sport and Culture.|64
+data/vctk/wavs/p253/p253_231_mic1.wav|We are so proud.|65
+data/vctk/wavs/p253/p253_247_mic1.wav|Children should be given the same amount of rights as adults.|65
+data/vctk/wavs/p253/p253_011_mic1.wav|When a man looks for something beyond his reach, his friends say he is looking for the pot of gold at the end of the rainbow.|65
+data/vctk/wavs/p253/p253_156_mic1.wav|My Dad is a hero.|65
+data/vctk/wavs/p253/p253_335_mic1.wav|They should take their mobile phones.|65
+data/vctk/wavs/p253/p253_241_mic1.wav|The scene is about this?|65
+data/vctk/wavs/p253/p253_108_mic1.wav|Health Secretary Frank Dobson made the surprise announcement in the Commons yesterday.|65
+data/vctk/wavs/p253/p253_005_mic1.wav|She can scoop these things into three red bags, and we will go meet her Wednesday at the train station.|65
+data/vctk/wavs/p252/p252_033_mic1.wav|Just look at his fashion sense.|66
+data/vctk/wavs/p252/p252_157_mic1.wav|He said some things which were better left alone.|66
+data/vctk/wavs/p252/p252_385_mic1.wav|Tourism is a vital industry for Scotland.|66
+data/vctk/wavs/p252/p252_129_mic1.wav|We beat the Welsh team.|66
+data/vctk/wavs/p246/p246_246_mic1.wav|I should think so, too.|67
+data/vctk/wavs/p246/p246_047_mic1.wav|Is a drug dealer?|67
+data/vctk/wavs/p246/p246_126_mic1.wav|She said she would not welcome the flowers.|67
+data/vctk/wavs/p246/p246_327_mic1.wav|Is that an issue?|67
+data/vctk/wavs/p246/p246_058_mic1.wav|I feel I did not have enough time.|67
+data/vctk/wavs/p246/p246_148_mic1.wav|He claimed his insurance company contested the damages, not the restaurant.|67
+data/vctk/wavs/p246/p246_192_mic1.wav|I do not own the vessel in question.|67
+data/vctk/wavs/p246/p246_316_mic1.wav|The election is total confusion and chaos.|67
+data/vctk/wavs/p246/p246_017_mic1.wav|Others have tried to explain the phenomenon physically.|67
+data/vctk/wavs/p246/p246_070_mic1.wav|It is a job creation scheme.|67
+data/vctk/wavs/p246/p246_183_mic1.wav|One was a lawyer.|67
+data/vctk/wavs/p246/p246_093_mic1.wav|It is home-grown.|67
+data/vctk/wavs/p246/p246_209_mic1.wav|In each case they were a goal down.|67
+data/vctk/wavs/p237/p237_034_mic1.wav|I think a move would create a lot of interest.|68
+data/vctk/wavs/p237/p237_328_mic1.wav|It is a job creation scheme.|68
+data/vctk/wavs/p268/p268_232_mic1.wav|Years ago it was really quite simple.|69
+data/vctk/wavs/p268/p268_230_mic1.wav|That proved enough to settle the home side down.|69
+data/vctk/wavs/p268/p268_100_mic1.wav|What happened in that game?|69
+data/vctk/wavs/p268/p268_262_mic1.wav|You had to go and see him.|69
+data/vctk/wavs/p268/p268_204_mic1.wav|The refund is fully justified.|69
+data/vctk/wavs/p268/p268_374_mic1.wav|That remains the unanswered question.|69
+data/vctk/wavs/p268/p268_274_mic1.wav|Luckily, our patient was stable.|69
+data/vctk/wavs/p268/p268_191_mic1.wav|That is an entirely unacceptable position.|69
+data/vctk/wavs/p268/p268_393_mic1.wav|Calvin was always recognised as a player with potential.|69
+data/vctk/wavs/p313/p313_133_mic1.wav|I'm sorry to hear this news.|70
+data/vctk/wavs/p313/p313_415_mic1.wav|But that night they killed her housekeeper.|70
+data/vctk/wavs/p313/p313_249_mic1.wav|We should be rewarded for producing.|70
+data/vctk/wavs/p313/p313_055_mic1.wav|Her role in it was small.|70
+data/vctk/wavs/p313/p313_416_mic1.wav|But it's not the end of Scottish football.|70
+data/vctk/wavs/p313/p313_100_mic1.wav|They've just got to believe in themselves.|70
+data/vctk/wavs/p314/p314_062_mic1.wav|Meanwhile, the search continues for Ferguson's replacement.|71
+data/vctk/wavs/p314/p314_400_mic1.wav|This is usually done by the space shuttle.|71
+data/vctk/wavs/p314/p314_263_mic1.wav|Who would have thought it?|71
+data/vctk/wavs/p314/p314_318_mic1.wav|It won't happen overnight, but things will get better.|71
+data/vctk/wavs/p314/p314_261_mic1.wav|Nowadays, it is workers united.|71
+data/vctk/wavs/p314/p314_066_mic1.wav|They were later discharged from hospital.|71
+data/vctk/wavs/p330/p330_079_mic1.wav|I could do a better job.|72
+data/vctk/wavs/p330/p330_057_mic1.wav|And thought we would get away with it.|72
+data/vctk/wavs/p330/p330_391_mic1.wav|He was located after going to Singapore.|72
+data/vctk/wavs/p288/p288_326_mic1.wav|There was some merit in that.|73
+data/vctk/wavs/p288/p288_396_mic1.wav|My house was shaking at the time.|73
+data/vctk/wavs/p288/p288_200_mic1.wav|It's all about money, money, money.|73
+data/vctk/wavs/p288/p288_197_mic1.wav|They are in the euro.|73
+data/vctk/wavs/p288/p288_043_mic1.wav|But it might have done.|73
+data/vctk/wavs/p288/p288_039_mic1.wav|It is hard to avoid the conclusion that lessons have been learned.|73
+data/vctk/wavs/p288/p288_201_mic1.wav|Some realism was needed about time, resources and management.|73
+data/vctk/wavs/p288/p288_031_mic1.wav|It is a case of taking a risk.|73
+data/vctk/wavs/p295/p295_091_mic1.wav|For these people, the ruling is very welcome.|74
+data/vctk/wavs/p295/p295_347_mic1.wav|Four years is a long time.|74
+data/vctk/wavs/p295/p295_385_mic1.wav|We did not want an absentee landlord.|74
+data/vctk/wavs/p295/p295_391_mic1.wav|Our position is not a logic of war.|74
+data/vctk/wavs/p295/p295_263_mic1.wav|It was seriously unpleasant.|74
+data/vctk/wavs/p295/p295_305_mic1.wav|Nobody will be forced to work.|74
+data/vctk/wavs/p295/p295_413_mic1.wav|This is a really serious issue.|74
+data/vctk/wavs/p295/p295_157_mic1.wav|We must get the three points.|74
+data/vctk/wavs/p295/p295_278_mic1.wav|Hopefully, it will come from someone on our side.|74
+data/vctk/wavs/p255/p255_117_mic1.wav|They could not ignore the will of parliament, he claimed.|75
+data/vctk/wavs/p255/p255_242_mic1.wav|Dewar is certainly under attack from within his own party.|75
+data/vctk/wavs/p255/p255_207_mic1.wav|The album was widely expected to be a commercial disaster.|75
+data/vctk/wavs/p255/p255_154_mic1.wav|We shall not be moved.|75
+data/vctk/wavs/p255/p255_311_mic1.wav|It's about my time as a guitarist.|75
+data/vctk/wavs/p255/p255_191_mic1.wav|There is no point in looking any further.|75
+data/vctk/wavs/p255/p255_162_mic1.wav|And sooner than we may think.|75
+data/vctk/wavs/p255/p255_152_mic1.wav|It is not just about pay.|75
+data/vctk/wavs/p255/p255_247_mic1.wav|It's quite a line-up!|75
+data/vctk/wavs/p255/p255_076_mic1.wav|What has changed?|75
+data/vctk/wavs/p227/p227_349_mic1.wav|I came into this world with nothing.|76
+data/vctk/wavs/p227/p227_102_mic1.wav|Saddam Hussein is a devil.|76
+data/vctk/wavs/p227/p227_307_mic1.wav|Size is not the issue.|76
+data/vctk/wavs/p227/p227_094_mic1.wav|Their attitude is all wrong.|76
+data/vctk/wavs/p227/p227_322_mic1.wav|The judge was really nice.|76
+data/vctk/wavs/p227/p227_119_mic1.wav|We did what we had to do.|76
+data/vctk/wavs/p227/p227_002_mic1.wav|Ask her to bring these things with her from the store.|76
+data/vctk/wavs/p227/p227_090_mic1.wav|It is open season on the Old Firm.|76
+data/vctk/wavs/p227/p227_390_mic1.wav|Celtic were pleased to help.|76
+data/vctk/wavs/p227/p227_291_mic1.wav|It was an easy decision to come here.|76
+data/vctk/wavs/p227/p227_378_mic1.wav|Alex Ferguson is the same.|76
+data/vctk/wavs/p227/p227_156_mic1.wav|I'd love to be like Peter.|76
+data/vctk/wavs/p227/p227_257_mic1.wav|Kingfisher can afford to wait.|76
+data/vctk/wavs/p318/p318_297_mic1.wav|What's the point of staying sober?|77
+data/vctk/wavs/p318/p318_049_mic1.wav|He was critically ill in hospital last night.|77
+data/vctk/wavs/p312/p312_252_mic1.wav|Was it a foul?|78
+data/vctk/wavs/p312/p312_146_mic1.wav|It's easy to see why.|78
+data/vctk/wavs/p312/p312_294_mic1.wav|Rather than answer, she resigned.|78
+data/vctk/wavs/p312/p312_339_mic1.wav|He had a horror.|78
+data/vctk/wavs/p312/p312_138_mic1.wav|There was a definite prejudice.|78
+data/vctk/wavs/p312/p312_224_mic1.wav|We want to sort it out.|78
+data/vctk/wavs/p312/p312_050_mic1.wav|Hopefully, it will be built by next year.|78
+data/vctk/wavs/p312/p312_238_mic1.wav|This is a major step forward for carers.|78
+data/vctk/wavs/p312/p312_055_mic1.wav|They have a car and cannot afford another.|78
+data/vctk/wavs/p312/p312_369_mic1.wav|And huge, indeed, it is.|78
+data/vctk/wavs/p312/p312_280_mic1.wav|All were within range of Israeli cities.|78
+data/vctk/wavs/p312/p312_013_mic1.wav|Some have accepted it as a miracle without physical explanation.|78
+data/vctk/wavs/p312/p312_414_mic1.wav|The proposals have been taken out of context.|78
+data/vctk/wavs/p312/p312_026_mic1.wav|This was a rationing decision.|78
+data/vctk/wavs/p312/p312_213_mic1.wav|You can see their point.|78
+data/vctk/wavs/p229/p229_334_mic1.wav|It is difficult to get into the team at the moment.|79
+data/vctk/wavs/p229/p229_265_mic1.wav|Today we can say that a new era has begun.|79
+data/vctk/wavs/p229/p229_251_mic1.wav|Chambers said he would accept the place.|79
+data/vctk/wavs/p229/p229_212_mic1.wav|But we are not immune to the problem.|79
+data/vctk/wavs/p229/p229_141_mic1.wav|Government will intervene.|79
+data/vctk/wavs/p229/p229_353_mic1.wav|This is a sector in overall deficit and urgent action is required.|79
+data/vctk/wavs/p229/p229_032_mic1.wav|Because we do not need it.|79
+data/vctk/wavs/p229/p229_380_mic1.wav|Whether his stance is shared by the incoming manager is another matter.|79
+data/vctk/wavs/p229/p229_170_mic1.wav|Alex has been a huge influence on the club.|79
+data/vctk/wavs/p229/p229_274_mic1.wav|We're in shock.|79
+data/vctk/wavs/p305/p305_283_mic1.wav|It was worth a photograph.|80
+data/vctk/wavs/p305/p305_394_mic1.wav|John Reid, the Northern Ireland secretary, yesterday appealed for restraint.|80
+data/vctk/wavs/p305/p305_398_mic1.wav|Several people were out in the street.|80
+data/vctk/wavs/p305/p305_209_mic1.wav|Others were even less confident.|80
+data/vctk/wavs/p305/p305_174_mic1.wav|We begin, as ever, with a reminder of the end.|80
+data/vctk/wavs/p305/p305_285_mic1.wav|The road was closed for several hours.|80
+data/vctk/wavs/p305/p305_384_mic1.wav|People might not actually want the job.|80
+data/vctk/wavs/p305/p305_374_mic1.wav|This must have been severe.|80
+data/vctk/wavs/p305/p305_047_mic1.wav|They were urged to get themselves in order.|80
+data/vctk/wavs/p305/p305_054_mic1.wav|We see little sign of improvement.|80
+data/vctk/wavs/p305/p305_336_mic1.wav|That might happen in Pakistan, but in Britain?|80
+data/vctk/wavs/p305/p305_214_mic1.wav|The whole thing is utterly transparent.|80
+data/vctk/wavs/p305/p305_028_mic1.wav|They keep the atmosphere in mind.|80
+data/vctk/wavs/p345/p345_181_mic1.wav|We don't know what happened.|81
+data/vctk/wavs/p345/p345_224_mic1.wav|But this is just the start.|81
+data/vctk/wavs/p362/p362_275_mic1.wav|For some, it might not make too much difference.|82
+data/vctk/wavs/p362/p362_163_mic1.wav|Genetic assessment is crucial.|82
+data/vctk/wavs/p362/p362_054_mic1.wav|We certainly hope we have been successful.|82
+data/vctk/wavs/p362/p362_095_mic1.wav|Sure, this is a very important event for me.|82
+data/vctk/wavs/p343/p343_067_mic1.wav|Funding needs to be long term.|83
+data/vctk/wavs/p343/p343_080_mic1.wav|Painful, but only because it's true.|83
+data/vctk/wavs/p343/p343_340_mic1.wav|We're not comparing like with like.|83
+data/vctk/wavs/p343/p343_302_mic1.wav|There is no point of looking any further.|83
+data/vctk/wavs/p277/p277_367_mic1.wav|It was a funny game.|84
+data/vctk/wavs/p277/p277_428_mic1.wav|It was a lot of hard work, but it wasn't difficult.|84
+data/vctk/wavs/p277/p277_168_mic1.wav|We've all had the shots.|84
+data/vctk/wavs/p277/p277_424_mic1.wav|It was little else.|84
+data/vctk/wavs/p277/p277_224_mic1.wav|Half of young people had had contact with the police.|84
+data/vctk/wavs/p277/p277_318_mic1.wav|I was invited to work in Germany.|84
+data/vctk/wavs/p277/p277_303_mic1.wav|He is also keen to win the European order of merit.|84
+data/vctk/wavs/p277/p277_198_mic1.wav|They make a selective perception process.|84
+data/vctk/wavs/p277/p277_020_mic1.wav|Many complicated ideas about the rainbow have been formed.|84
+data/vctk/wavs/p308/p308_250_mic1.wav|And also, whatever he does, can he really win?|85
+data/vctk/wavs/p308/p308_422_mic1.wav|Last night they were being comforted by relatives.|85
+data/vctk/wavs/p308/p308_246_mic1.wav|Thankfully, there were no reports of anything serious.|85
+data/vctk/wavs/p301/p301_380_mic1.wav|It was a job he loved.|86
+data/vctk/wavs/p301/p301_074_mic1.wav|The next thing will be cutting journey times.|86
+data/vctk/wavs/p301/p301_136_mic1.wav|I would ask the fans to be patient.|86
+data/vctk/wavs/p301/p301_014_mic1.wav|To the Hebrews it was a token that there would be no more universal floods.|86
+data/vctk/wavs/p301/p301_250_mic1.wav|I hope it has helped the prisoners.|86
+data/vctk/wavs/p301/p301_105_mic1.wav|Is your life a little too easy?|86
+data/vctk/wavs/p301/p301_382_mic1.wav|Filtering through this material a composite finally emerges.|86
+data/vctk/wavs/p301/p301_183_mic1.wav|It has removed a bit of guilt.|86
+data/vctk/wavs/p301/p301_143_mic1.wav|All things are possible if you believe.|86
+data/vctk/wavs/p301/p301_236_mic1.wav|I came up through the ranks.|86
+data/vctk/wavs/p339/p339_228_mic1.wav|I see it as my job.|87
+data/vctk/wavs/p339/p339_041_mic1.wav|I didn't expect to get one.|87
+data/vctk/wavs/p339/p339_146_mic1.wav|But it does not matter.|87
+data/vctk/wavs/p339/p339_164_mic1.wav|It would be very dangerous.|87
+data/vctk/wavs/p339/p339_404_mic1.wav|I'm delighted with our performance.|87
+data/vctk/wavs/p339/p339_134_mic1.wav|He will be a major challenger next year.|87
+data/vctk/wavs/p339/p339_348_mic1.wav|How do we get a bigger stage?|87
+data/vctk/wavs/p339/p339_216_mic1.wav|They know the language.|87
+data/vctk/wavs/p267/p267_421_mic1.wav|Nobody should believe this story.|88
+data/vctk/wavs/p267/p267_099_mic1.wav|We need to handle it.|88
+data/vctk/wavs/p267/p267_129_mic1.wav|He was seen as the enemy.|88
+data/vctk/wavs/p267/p267_087_mic1.wav|A year ago, she was just a junior Minister at the Treasury.|88
+data/vctk/wavs/p267/p267_030_mic1.wav|We will look into it.|88
+data/vctk/wavs/p267/p267_010_mic1.wav|People look, but no one ever finds it.|88
+data/vctk/wavs/p267/p267_299_mic1.wav|He refused to name the survivors.|88
+data/vctk/wavs/p267/p267_058_mic1.wav|It's just the timing of the game.|88
+data/vctk/wavs/p285/p285_256_mic1.wav|One MP said he feared the job losses were only the beginning.|89
+data/vctk/wavs/p285/p285_197_mic1.wav|We live by the rule of law.|89
+data/vctk/wavs/p285/p285_398_mic1.wav|Thankfully, no-one on the bus is too badly hurt.|89
+data/vctk/wavs/p285/p285_036_mic1.wav|It's a commission, and it's for work, a year's work.|89
+data/vctk/wavs/p285/p285_222_mic1.wav|Clearly, the stakes are high.|89
+data/vctk/wavs/p285/p285_263_mic1.wav|Perhaps it's because I haven't finished the first two races.|89
+data/vctk/wavs/p326/p326_093_mic1.wav|This time, there were no such rewards.|90
+data/vctk/wavs/p326/p326_197_mic1.wav|That is a matter for Mr Graham.|90
+data/vctk/wavs/p326/p326_206_mic1.wav|In the old days, it was easy.|90
+data/vctk/wavs/p326/p326_036_mic1.wav|It was my shortest audition.|90
+data/vctk/wavs/p326/p326_162_mic1.wav|How do you find the youngsters?|90
+data/vctk/wavs/p326/p326_363_mic1.wav|There were no immediate reports of injuries.|90
+data/vctk/wavs/p326/p326_132_mic1.wav|Yet she is one of the lucky ones.|90
+data/vctk/wavs/p326/p326_258_mic1.wav|Technically, it was a very good performance by Scotland.|90
+data/vctk/wavs/p326/p326_382_mic1.wav|You feel the pride.|90
+data/vctk/wavs/p276/p276_176_mic1.wav|It took five months to repair the damage.|91
+data/vctk/wavs/p276/p276_181_mic1.wav|I can see it now.|91
+data/vctk/wavs/p276/p276_178_mic1.wav|Advice and counselling will be offered.|91
+data/vctk/wavs/p276/p276_196_mic1.wav|I did not concentrate on my performance.|91
+data/vctk/wavs/p276/p276_455_mic1.wav|We are aiming for early March.|91
+data/vctk/wavs/p276/p276_102_mic1.wav|Robin Williams is very subdued.|91
+data/vctk/wavs/p276/p276_353_mic1.wav|The move follows a review of the Singapore|91
+data/vctk/wavs/p276/p276_122_mic1.wav|New Zealand rugby is totally different.|91
+data/vctk/wavs/p276/p276_341_mic1.wav|Indeed, he sees a shortage of skilled workers on the horizon.|91
+data/vctk/wavs/p276/p276_301_mic1.wav|This championship is different from the other majors.|91
+data/vctk/wavs/p276/p276_024_mic1.wav|This is a very common type of bow, one showing mainly red and yellow, with little or no green or blue.|91
+data/vctk/wavs/p276/p276_308_mic1.wav|Says the Duke of York.|91
+data/vctk/wavs/p276/p276_052_mic1.wav|You must always attempt to raise the bar.|91
+data/vctk/wavs/p276/p276_300_mic1.wav|Everything else is a bonus.|91
+data/vctk/wavs/p248/p248_102_mic1.wav|Oil embargo endorsed.|92
+data/vctk/wavs/p248/p248_043_mic1.wav|It was ugly.|92
+data/vctk/wavs/p248/p248_065_mic1.wav|Scotland had great assets.|92
+data/vctk/wavs/p248/p248_277_mic1.wav|He looked very sharp.|92
+data/vctk/wavs/p248/p248_115_mic1.wav|This is a scheme that has a lot of potential.|92
+data/vctk/wavs/p248/p248_169_mic1.wav|The post will be unpaid.|92
+data/vctk/wavs/p248/p248_061_mic1.wav|We have to look at everything before we make any final decision.|92
+data/vctk/wavs/p248/p248_354_mic1.wav|It was that bad, that low.|92
+data/vctk/wavs/p245/p245_257_mic1.wav|However, the force has not yet received a formal complaint.|93
+data/vctk/wavs/p245/p245_049_mic1.wav|The boy is no longer with us.|93
+data/vctk/wavs/p245/p245_300_mic1.wav|It's just not funny!|93
+data/vctk/wavs/p302/p302_082_mic1.wav|PR for Westminister is their holy grail.|94
+data/vctk/wavs/p302/p302_117_mic1.wav|I want to play at the highest level.|94
+data/vctk/wavs/p302/p302_131_mic1.wav|I heard some of his remarks.|94
+data/vctk/wavs/p317/p317_344_mic1.wav|This isn't a betrayal of public services, it's their renewal.|95
+data/vctk/wavs/p317/p317_189_mic1.wav|This makes no sense!|95
+data/vctk/wavs/p317/p317_179_mic1.wav|I was delighted with Robbie.|95
+data/vctk/wavs/p317/p317_372_mic1.wav|It broke up my marriage.|95
+data/vctk/wavs/p317/p317_060_mic1.wav|The problem is the book.|95
+data/vctk/wavs/p317/p317_233_mic1.wav|I don't care to recall it.|95
+data/vctk/wavs/p317/p317_107_mic1.wav|This is not a recipe for conflict.|95
+data/vctk/wavs/p317/p317_412_mic1.wav|Then one night only three people turn up.|95
+data/vctk/wavs/p317/p317_285_mic1.wav|He also has a house in Italy.|95
+data/vctk/wavs/p334/p334_279_mic1.wav|Its national defence policy is defensive in nature.|96
+data/vctk/wavs/p334/p334_347_mic1.wav|An appeal was made to the presiding officer.|96
+data/vctk/wavs/p334/p334_026_mic1.wav|I want to win this thing.|96
+data/vctk/wavs/p334/p334_157_mic1.wav|This commitment should be built upon.|96
+data/vctk/wavs/p334/p334_300_mic1.wav|It's a sign of the times.|96
+data/vctk/wavs/p334/p334_210_mic1.wav|You have obviously got an answer to it.|96
+data/vctk/wavs/p334/p334_005_mic1.wav|She can scoop these things into three red bags, and we will go meet her Wednesday at the train station.|96
+data/vctk/wavs/p334/p334_025_mic1.wav|A judicial review is also being considered.|96
+data/vctk/wavs/p334/p334_209_mic1.wav|It is the stop-gap before extinction.|96
+data/vctk/wavs/p334/p334_326_mic1.wav|The law should be changed.|96
+data/vctk/wavs/p334/p334_097_mic1.wav|It means they actually control the programme.|96
+data/vctk/wavs/p334/p334_137_mic1.wav|Inclusion and Autism, Is It Working?|96
+data/vctk/wavs/p239/p239_460_mic1.wav|Further savings would arise from common procurement and IT systems.|97
+data/vctk/wavs/p239/p239_073_mic1.wav|Pulled a huge number of viewers.|97
+data/vctk/wavs/p239/p239_485_mic1.wav|I was there five months ago.|97
+data/vctk/wavs/p239/p239_180_mic1.wav|Does that put pressure on us?|97
+data/vctk/wavs/p239/p239_075_mic1.wav|Let's not be too despondent.|97
+data/vctk/wavs/p239/p239_165_mic1.wav|This was a unique election.|97
+data/vctk/wavs/p239/p239_011_mic1.wav|When a man looks for something beyond his reach, his friends say he is looking for the pot of gold at the end of the rainbow.|97
+data/vctk/wavs/p239/p239_174_mic1.wav|As if that is an achievement.|97
+data/vctk/wavs/p239/p239_218_mic1.wav|IT S all change at Kilmarnock.|97
+data/vctk/wavs/p239/p239_145_mic1.wav|We just have to adapt.|97
+data/vctk/wavs/p239/p239_136_mic1.wav|Western countries condemned the conduct of the poll.|97
+data/vctk/wavs/p239/p239_454_mic1.wav|Similar measures are expected in England and Wales.|97
+data/vctk/wavs/p273/p273_369_mic1.wav|The statement finally came on Wednesday night after the market had closed.|98
+data/vctk/wavs/p273/p273_199_mic1.wav|His injury was completely random.|98
+data/vctk/wavs/p273/p273_280_mic1.wav|We have an excellent record of passenger growth and customer service.|98
+data/vctk/wavs/p273/p273_127_mic1.wav|I love the spectacle of cinema.|98
+data/vctk/wavs/p273/p273_380_mic1.wav|We will win the argument.|98
+data/vctk/wavs/p273/p273_375_mic1.wav|This hasn't happened in a vacuum.|98
+data/vctk/wavs/p273/p273_190_mic1.wav|The early physical reports were clear.|98
+data/vctk/wavs/p336/p336_305_mic1.wav|We meet again in Berlin.|99
+data/vctk/wavs/p336/p336_101_mic1.wav|That is unlikely to happen.|99
+data/vctk/wavs/p336/p336_096_mic1.wav|Sub Not Used, Mackay.|99
+data/vctk/wavs/p336/p336_328_mic1.wav|And it's difficult to argue.|99
+data/vctk/wavs/p336/p336_394_mic1.wav|There were few surprises.|99
+data/vctk/wavs/p310/p310_240_mic1.wav|We can't get over it.|100
+data/vctk/wavs/p310/p310_419_mic1.wav|It would show them a positive way forward.|100
+data/vctk/wavs/p310/p310_268_mic1.wav|That kind of growth is the important thing.|100
+data/vctk/wavs/p310/p310_252_mic1.wav|They were on holiday in Egypt.|100
+data/vctk/wavs/p310/p310_264_mic1.wav|We have not given up hope.|100
+data/vctk/wavs/p310/p310_347_mic1.wav|The new work will begin in the autumn.|100
+data/vctk/wavs/p310/p310_179_mic1.wav|The club are feeling no different today.|100
+data/vctk/wavs/p310/p310_296_mic1.wav|That was the most annoying thing.|100
+data/vctk/wavs/p310/p310_319_mic1.wav|The campaign was raucous.|100
+data/vctk/wavs/p279/p279_334_mic1.wav|That is the very reason why it was so vital.|101
+data/vctk/wavs/p279/p279_150_mic1.wav|In each case they were a goal down.|101
+data/vctk/wavs/p279/p279_299_mic1.wav|Graeme was prepared.|101
+data/vctk/wavs/p279/p279_287_mic1.wav|Who will perform?|101
+data/vctk/wavs/p279/p279_331_mic1.wav|I'm so pleased the show has won a prize.|101
+data/vctk/wavs/p279/p279_230_mic1.wav|Jim Wallace, the justice minister, acknowledged that prisoner numbers were a concern.|101
+data/vctk/wavs/p279/p279_086_mic1.wav|It is a time bomb.|101
+data/vctk/wavs/p279/p279_330_mic1.wav|He did a good job.|101
+data/vctk/wavs/p374/p374_380_mic1.wav|Is something which we just don't do.|102
+data/vctk/wavs/p374/p374_223_mic1.wav|I wonder what they listen to?|102
+data/vctk/wavs/p374/p374_278_mic1.wav|At the end of the day, two men have been shot.|102
+data/vctk/wavs/p374/p374_177_mic1.wav|The Government has to grasp the nettle.|102
+data/vctk/wavs/p374/p374_114_mic1.wav|I don't think it would make any difference.|102
+data/vctk/wavs/p374/p374_273_mic1.wav|We can only do that for so long.|102
+data/vctk/wavs/p374/p374_073_mic1.wav|We're just a family working hard, working seven days a week.|102
+data/vctk/wavs/p329/p329_112_mic1.wav|They could not hear.|103
+data/vctk/wavs/p329/p329_218_mic1.wav|A quality audit officer has also been appointed.|103
+data/vctk/wavs/p329/p329_172_mic1.wav|You probably have never seen them before.|103
+data/vctk/wavs/p329/p329_134_mic1.wav|Is that too much to ask?|103
+data/vctk/wavs/p329/p329_216_mic1.wav|We are opening an inquiry.|103
+data/vctk/wavs/p329/p329_348_mic1.wav|First is open defiance.|103
+data/vctk/wavs/p329/p329_056_mic1.wav|We're into that build-up now.|103
+data/vctk/wavs/p329/p329_088_mic1.wav|He just wants to play.|103
+data/vctk/wavs/p329/p329_340_mic1.wav|It is now time for justice.|103
+data/vctk/wavs/p329/p329_395_mic1.wav|And that started me thinking.|103
+data/vctk/wavs/p329/p329_203_mic1.wav|I am aware that somebody made a threat.|103
+data/vctk/wavs/p329/p329_302_mic1.wav|I'm feeling very pleased.|103
+data/vctk/wavs/p329/p329_324_mic1.wav|The South African defended his work ethic.|103
+data/vctk/wavs/p259/p259_130_mic1.wav|It is a variable condition and the diagnosis is difficult.|104
+data/vctk/wavs/p259/p259_150_mic1.wav|The referee faces a massive job.|104
+data/vctk/wavs/p259/p259_459_mic1.wav|The project is entitled The Composer in Scotland.|104
+data/vctk/wavs/p259/p259_049_mic1.wav|I had come back from London.|104
+data/vctk/wavs/p259/p259_325_mic1.wav|We would hope to make progress on that next year.|104
+data/vctk/wavs/p259/p259_435_mic1.wav|I watch the other visitors.|104
+data/vctk/wavs/p259/p259_104_mic1.wav|They will remember this victory for a while.|104
+data/vctk/wavs/s5/s5_013_mic1.wav|Some have accepted it as a miracle without physical explanation.|105
+data/vctk/wavs/s5/s5_180_mic1.wav|I've learned a huge amount from Michael.|105
+data/vctk/wavs/s5/s5_259_mic1.wav|I enjoyed this summer, which is a big difference from last year.|105
+data/vctk/wavs/s5/s5_008_mic1.wav|These take the shape of a long round arch, with its path high above, and its two ends apparently beyond the horizon.|105
+data/vctk/wavs/s5/s5_398_mic1.wav|That will be a decision for BBC Scotland.|105
+data/vctk/wavs/s5/s5_286_mic1.wav|was everything done to save people?|105
+data/vctk/wavs/s5/s5_109_mic1.wav|I think we can cause a surprise in the first division.|105
+data/vctk/wavs/s5/s5_291_mic1.wav|If he could have taken those words back, he would have.|105
+data/vctk/wavs/s5/s5_394_mic1.wav|This trial has brought the focus back on the inquiry.|105
+data/vctk/wavs/p247/p247_147_mic1.wav|My daughter is an adult.|106
+data/vctk/wavs/p247/p247_228_mic1.wav|The transaction is not feasible.|106
+data/vctk/wavs/p247/p247_258_mic1.wav|Labour was too busy to respond.|106
+data/vctk/wavs/p247/p247_176_mic1.wav|Local managers are already involved in talks with potential investors.|106
+data/vctk/wavs/p247/p247_307_mic1.wav|But it has been an amazing experience.|106
+data/vctk/wavs/p247/p247_057_mic1.wav|Why do you want to come to Edinburgh?|106
+data/vctk/wavs/p247/p247_352_mic1.wav|There was some merit in that.|106
+data/vctk/wavs/p247/p247_055_mic1.wav|We have to keep our clients.|106
+data/vctk/wavs/p247/p247_350_mic1.wav|Is it worth it?|106
+data/vctk/wavs/p251/p251_275_mic1.wav|I am very angry.|107
+data/vctk/wavs/p251/p251_164_mic1.wav|Tell it like it was?|107
+data/vctk/wavs/p251/p251_319_mic1.wav|He was adamant that he was still ahead on everything that matters.|107
+data/vctk/wavs/p251/p251_359_mic1.wav|It is not like working for a living.|107
+data/vctk/wavs/p251/p251_127_mic1.wav|Some of the characters will not be played by humans.|107
+data/vctk/wavs/p251/p251_338_mic1.wav|I am so upset.|107
+data/vctk/wavs/p251/p251_309_mic1.wav|Who did the recruiting?|107
+data/vctk/wavs/p251/p251_222_mic1.wav|Work has started.|107
+data/vctk/wavs/p251/p251_196_mic1.wav|It's a commission, and it's for work, a year's work.|107
+data/vctk/wavs/p251/p251_122_mic1.wav|She has been shot.|107
+data/vctk/wavs/p251/p251_008_mic1.wav|These take the shape of a long round arch, with its path high above, and its two ends apparently beyond the horizon.|107
+data/vctk/wavs/p251/p251_268_mic1.wav|They are interior designers and architects.|107
+data/vctk/wavs/p251/p251_115_mic1.wav|Maybe this battle has been.|107
+data/vctk/wavs/p251/p251_107_mic1.wav|It had been played at festivals.|107
+data/vctk/wavs/p251/p251_020_mic1.wav|Many complicated ideas about the rainbow have been formed.|107
+data/vctk/wavs/p251/p251_292_mic1.wav|Our objective is to tackle poverty.|107
+data/vctk/wavs/p244/p244_060_mic1.wav|We have got to deliver.|108
+data/vctk/wavs/p244/p244_063_mic1.wav|He said it was for sale.|108
+data/vctk/wavs/p244/p244_075_mic1.wav|This time, it might be for real.|108
+data/vctk/wavs/p244/p244_250_mic1.wav|Sadly, it could not be done.|108
+data/vctk/wavs/p244/p244_424_mic1.wav|But it was a struggle.|108
+data/vctk/wavs/p244/p244_378_mic1.wav|I was delighted to accept.|108
+data/vctk/wavs/p244/p244_206_mic1.wav|We can take the city.|108
+data/vctk/wavs/p244/p244_078_mic1.wav|That will be the office.|108
+data/vctk/wavs/p244/p244_271_mic1.wav|But the government has so far failed to listen.|108

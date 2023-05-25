@@ -123,17 +123,18 @@ class TrainingModule(pl.LightningModule):
                 mels,
                 max_len,
                 mel_lengths,
+                speaker_id,
             ) = self.get_an_element_of_validation_dataset()
             (
                 mel_output,
                 state_travelled,
                 input_parameters,
                 output_parameters,
-            ) = self.model.sample(text_inputs[0], text_lengths[0])
+            ) = self.model.sample(text_inputs[0], text_lengths[0], speaker_id=speaker_id[0])
             mel_output_normalised = self.model.normaliser(mel_output)
 
             with torch.inference_mode():
-                _ = self.model((text_inputs, text_lengths, mels, max_len, mel_lengths))
+                _ = self.model((text_inputs, text_lengths, mels, max_len, mel_lengths, speaker_id))
 
             log_validation(
                 self.logger.experiment,
@@ -168,8 +169,9 @@ class TrainingModule(pl.LightningModule):
             mel_lengths (torch.LongTensor): The lengths of the mel spectrogram.
         """
         x, y = self.model.parse_batch(next(iter(self.val_dataloader())))
-        (text_inputs, text_lengths, mels, max_len, mel_lengths) = x
+        (text_inputs, text_lengths, mels, max_len, mel_lengths, speaker_id) = x
         text_inputs = text_inputs[0].unsqueeze(0).to(self.device)
+        speaker_id = speaker_id[0].unsqueeze(0).to(self.device)
         text_lengths = text_lengths[0].unsqueeze(0).to(self.device)
         mels = mels[0].unsqueeze(0).to(self.device)
         max_len = torch.max(text_lengths).data
@@ -179,7 +181,7 @@ class TrainingModule(pl.LightningModule):
         # This prevent the model to break down when plotting validation.
         mels = mels[:, :, : mel_lengths.item()]
 
-        return text_inputs, text_lengths, mels, max_len, mel_lengths
+        return text_inputs, text_lengths, mels, max_len, mel_lengths, speaker_id
 
     @torch.inference_mode()
     def inference(self, text_inputs, sampling_temp=1.0):

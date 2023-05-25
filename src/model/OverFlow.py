@@ -1,4 +1,5 @@
 import torch
+from einops import rearrange
 from torch import nn
 
 from src.model.Encoder import Encoder
@@ -22,7 +23,7 @@ class OverFlow(nn.Module):
             self.speaker_embedding = nn.Embedding(
                 hparams.num_speakers, hparams.encoder_params[hparams.encoder_type]["hidden_channels"]
             )
-
+        self.num_speakers = hparams.num_speakers
         self.encoder = Encoder(hparams)
         # self.encoder = Tacotron2Encoder(hparams)
         self.hmm = HMM(hparams)
@@ -54,16 +55,16 @@ class OverFlow(nn.Module):
     def forward(self, inputs):
         text_inputs, text_lengths, mels, max_len, mel_lengths, speaker_id = inputs
         text_lengths, mel_lengths = text_lengths.data, mel_lengths.data
-        if self.hparams.num_speakers > 1:
+        if self.num_speakers > 1:
             speaker_embeddings = self.speaker_embedding(speaker_id).unsqueeze(1)
         else:
             speaker_embeddings = 0
         embedded_inputs = self.embedding(text_inputs).transpose(1, 2)
-        encoder_outputs, text_lengths = self.encoder(embedded_inputs + speaker_embeddings, text_lengths)
+        encoder_outputs, text_lengths = self.encoder(embedded_inputs, text_lengths)
         z, z_lengths, logdet = self.decoder(
-            mels, mel_lengths, g=speaker_embeddings if self.hparams.num_speakers > 1 else None
+            mels, mel_lengths, g=rearrange(speaker_embeddings, "b 1 c -> b c 1") if self.num_speakers > 1 else None
         )
-        log_probs = self.hmm(encoder_outputs, text_lengths, z, z_lengths)
+        log_probs = self.hmm(encoder_outputs + speaker_embeddings, text_lengths, z, z_lengths)
         loss = (log_probs + logdet) / (text_lengths.sum() + mel_lengths.sum())
         return loss
 
@@ -84,34 +85,40 @@ class OverFlow(nn.Module):
         """
         if text_inputs.ndim > 1:
             text_inputs = text_inputs.squeeze(0)
+        if speaker_id is not None and speaker_id.ndim > 1:
+            speaker_id = speaker_id.squeeze(0)
 
         if text_lengths is None:
             text_lengths = text_inputs.new_tensor(text_inputs.shape[0])
 
-        text_inputs, text_lengths = text_inputs.unsqueeze(0), text_lengths.unsqueeze(0)
+        text_inputs, text_lengths, speaker_id = (
+            text_inputs.unsqueeze(0),
+            text_lengths.unsqueeze(0),
+            speaker_id.unsqueeze(0),
+        )
         embedded_inputs = self.embedding(text_inputs).transpose(1, 2)
 
-        if self.hparams.num_speakers > 1:
+        if self.num_speakers > 1:
             if speaker_id is None:
                 speaker_id = text_inputs.new_zeros(1, 1)
             speaker_embeddings = self.speaker_embedding(speaker_id).unsqueeze(1)
         else:
-            speaker_id = 0
+            speaker_embeddings = 0
 
-        encoder_outputs, text_lengths = self.encoder(embedded_inputs + speaker_id, text_lengths)
+        encoder_outputs, text_lengths = self.encoder(embedded_inputs, text_lengths)
 
         (
             mel_latent,
             states_travelled,
             input_parameters,
             output_parameters,
-        ) = self.hmm.sample(encoder_outputs, sampling_temp=sampling_temp)
+        ) = self.hmm.sample(encoder_outputs + speaker_embeddings, sampling_temp=sampling_temp)
 
         mel_output, mel_lengths, _ = self.decoder(
             mel_latent.unsqueeze(0).transpose(1, 2),
             text_lengths.new_tensor([mel_latent.shape[0]]),
             reverse=True,
-            g=speaker_embeddings if self.hparams.num_speakers > 1 else None,
+            g=rearrange(speaker_embeddings, "b 1 c -> b c 1") if self.num_speakers > 1 else None,
         )
 
         if self.normaliser:

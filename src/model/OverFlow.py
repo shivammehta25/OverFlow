@@ -87,6 +87,8 @@ class OverFlow(nn.Module):
             text_inputs = text_inputs.squeeze(0)
         if speaker_id is not None and speaker_id.ndim > 1:
             speaker_id = speaker_id.squeeze(0)
+        else:
+            speaker_id = text_inputs.new_zeros(1)  # set speaker id to 0 if not provided
 
         if text_lengths is None:
             text_lengths = text_inputs.new_tensor(text_inputs.shape[0])
@@ -98,15 +100,13 @@ class OverFlow(nn.Module):
         )
         embedded_inputs = self.embedding(text_inputs).transpose(1, 2)
 
+        # import pdb; pdb.set_trace()
         if self.num_speakers > 1:
-            if speaker_id is None:
-                speaker_id = text_inputs.new_zeros(1, 1)
-            speaker_embeddings = self.speaker_embedding(speaker_id).unsqueeze(1)
+            speaker_embeddings = self.speaker_embedding(speaker_id)
         else:
             speaker_embeddings = 0
 
         encoder_outputs, text_lengths = self.encoder(embedded_inputs, text_lengths)
-
         (
             mel_latent,
             states_travelled,

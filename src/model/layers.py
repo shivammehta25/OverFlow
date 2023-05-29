@@ -103,7 +103,7 @@ class TacotronSTFT(torch.nn.Module):
         self.stft_fn = STFT(filter_length, hop_length, win_length)  # default values
         # """This produces a linear transformation matrix to project FFT bins onto Mel-frequency bins."""
         mel_basis = librosa_mel_fn(
-            sampling_rate, filter_length, n_mel_channels, mel_fmin, mel_fmax
+            sr=sampling_rate, n_fft=filter_length, n_mels=n_mel_channels, fmin=mel_fmin, fmax=mel_fmax
         )  # all default values
 
         mel_basis = torch.from_numpy(mel_basis).float()

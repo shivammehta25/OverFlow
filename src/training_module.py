@@ -7,14 +7,15 @@ of the main model is implemented
 import os
 from argparse import Namespace
 
-import pytorch_lightning as pl
+import lightning as L
 import torch
+from lightning.pytorch.utilities import grad_norm
 
 from src.model.OverFlow import OverFlow
 from src.validation_plotting import log_validation
 
 
-class TrainingModule(pl.LightningModule):
+class TrainingModule(L.LightningModule):
     def __init__(self, hparams):
         super().__init__()
         if type(hparams) != Namespace:
@@ -67,7 +68,7 @@ class TrainingModule(pl.LightningModule):
         loss = -log_probs.mean()
         self.log(
             "loss/train",
-            loss.item(),
+            float(loss.item()),
             prog_bar=True,
             on_step=True,
             sync_dist=True,
@@ -157,7 +158,7 @@ class TrainingModule(pl.LightningModule):
             max_len (int): The maximum length of the mels spectrogram.
             mel_lengths (torch.LongTensor): The lengths of the mel spectrogram.
         """
-        x, y = self.model.parse_batch(next(iter(self.val_dataloader())))
+        x, y = self.model.parse_batch(next(iter(self.trainer.datamodule.val_dataloader())))
         (text_inputs, text_lengths, mels, max_len, mel_lengths) = x
         text_inputs = text_inputs[0].unsqueeze(0).to(self.device)
         text_lengths = text_lengths[0].unsqueeze(0).to(self.device)
@@ -203,7 +204,7 @@ class TrainingModule(pl.LightningModule):
         """
         return self.model.sample(text_inputs, text_lengths, sampling_temp=sampling_temp)
 
-    def log_grad_norm(self, grad_norm_dict):
+    def on_before_optimizer_step(self, optimizer):
         r"""
         Lightning method to log the grad norm of the model.
         change prog_bar to True to track on progress bar
@@ -212,4 +213,5 @@ class TrainingModule(pl.LightningModule):
             grad_norm_dict: Dictionary containing current grad norm metrics
 
         """
-        self.log_dict(grad_norm_dict, on_step=True, on_epoch=True, prog_bar=False, logger=True)
+        norms = grad_norm(self, norm_type=2)
+        self.log_dict(norms, on_step=True, on_epoch=True, prog_bar=False, logger=True)

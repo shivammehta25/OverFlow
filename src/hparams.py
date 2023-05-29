@@ -49,8 +49,8 @@ def create_hparams(generate_parameters=False):
         ################################
         # Experiment Parameters        #
         ################################
-        run_name="OverFlow",
-        gpus=[0],
+        run_name="UpdatedLightning",
+        gpus=[3],
         max_epochs=50000,
         val_check_interval=100,
         save_model_checkpoint=500,
@@ -59,7 +59,7 @@ def create_hparams(generate_parameters=False):
         checkpoint_dir="checkpoints",
         tensorboard_log_dir="tb_logs",
         gradient_accumulation_steps=1,
-        precision=16,
+        precision="16-mixed",
         # Placeholder to use it later while loading model
         logger=None,
         run_tests=False,
@@ -155,8 +155,7 @@ def create_hparams(generate_parameters=False):
         ################################
         learning_rate=1e-3,
         weight_decay=1e-6,
-        grad_clip_thresh=40000.0,
-        stochastic_weight_avg=False,
+        grad_clip_thresh=5.0,
     )
 
     return hparams

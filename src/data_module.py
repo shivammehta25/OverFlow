@@ -3,17 +3,16 @@ data_module.py
 
 Contains PyTorch-Lightning's datamodule and dataloaders
 """
+import lightning as L
 import nltk
-import pytorch_lightning as pl
 from torch.utils.data import DataLoader
 
 from src.utilities.data import TextMelCollate, TextMelLoader
 
 
-class LightningLoader(pl.LightningDataModule):
+class LightningLoader(L.LightningDataModule):
     def __init__(self, hparams):
         super().__init__()
-
         self.hparams.update(vars(hparams))
         self.collate_fn = TextMelCollate(self.hparams.n_frames_per_step)
         self.num_workers = hparams.num_workers

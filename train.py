@@ -71,10 +71,10 @@ if __name__ == "__main__":
 
     elements = {"Encoder": model.model.encoder, "HMM": model.model.hmm, "Decoder": model.model.decoder}
 
-    print(model.model)
-
     for element_name, element in elements.items():
         print(count_parameters(element, element_name))
+
+    print(f"[+] Total: {count_parameters(model.model, 'Model')}")
 
     if hparams.warm_start:
         model = warm_start_model(args.checkpoint_path, model, hparams.ignore_layers)

@@ -1,11 +1,14 @@
 from typing import Tuple
 
 import torch
+from einops import rearrange
 from torch import nn
 from torch.nn import functional as F
+from transformers import T5Config, T5EncoderModel
 
 from src.model.layers import ConvNorm
 from src.model.transformer import FFTransformer
+from src.utilities.functions import get_mask_from_len
 
 
 class Tacotron2Encoder(nn.Module):
@@ -95,6 +98,32 @@ class TransformerEncoder(nn.Module):
         return x, input_lengths
 
 
+class HFT5Encoder(nn.Module):
+    def __init__(self, hparams, name="hfT5") -> None:
+        super().__init__()
+
+        config = T5Config()
+        encoder_params = hparams.encoder_params[name]
+        config.is_encoder_decoder = False
+        config.d_model = encoder_params["hidden_channels"]
+        config.num_layers = encoder_params["n_layer"]
+        config.vocab_size = 1  # will not be used
+        config.num_heads = encoder_params["d_head"]
+        config.d_ff = encoder_params["d_inner"]
+        config.num_heads = encoder_params["n_head"]
+        config.dropout_rate = encoder_params["dropout"]
+        config.feed_forward_proj = encoder_params["feed_forward_proj"]
+        print(config)
+        self.encoder = T5EncoderModel(config)
+        self.encoder.shared.weight.requires_grad = False
+
+    def forward(self, x, input_lengths):
+        attention_mask = get_mask_from_len(input_lengths, device=x.device, dtype=x.dtype)
+        x = rearrange(x, "b c t -> b t c")
+        t5output = self.encoder(inputs_embeds=x, attention_mask=attention_mask)
+        return t5output.last_hidden_state, input_lengths
+
+
 class Encoder(nn.Module):
     """Wrapper for encoders"""
 
@@ -104,6 +133,8 @@ class Encoder(nn.Module):
             self.encoder = Tacotron2Encoder(hparams)
         elif hparams.encoder_type == "transformer":
             self.encoder = TransformerEncoder(hparams)
+        elif hparams.encoder_type == "hfT5":
+            self.encoder = HFT5Encoder(hparams)
         else:
             raise ValueError(f"Unknown encoder type: {hparams.encoder_type}")
 

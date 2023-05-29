@@ -111,7 +111,7 @@ def create_hparams(generate_parameters=False):
         ################################
         # Encoder parameters           #
         ################################
-        encoder_type="transformer",
+        encoder_type="hfT5",
         encoder_params={
             "conv": {"kernel_size": 5, "n_convolutions": 3, "hidden_channels": 512, "state_per_phone": 2},
             "transformer": {
@@ -128,6 +128,15 @@ def create_hparams(generate_parameters=False):
                 "pre_lnorm": True,
                 "rel_attention": False,
                 "rel_window_size": 10,
+            },
+            "hfT5": {
+                "hidden_channels": 1024,
+                "n_layer": 6,
+                "n_head": 1,
+                "d_head": 64,
+                "d_inner": 1024,
+                "dropout": 0.1,
+                "feed_forward_proj": "gated-gelu",
             },
         },
         ################################
@@ -170,7 +179,7 @@ def create_hparams(generate_parameters=False):
         n_split=4,
         n_sqz=2,
         sigmoid_scale=False,
-        gin_channels=384,
+        gin_channels=1024,
         ################################
         # Optimization Hyperparameters #
         ################################

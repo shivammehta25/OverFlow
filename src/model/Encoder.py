@@ -1,3 +1,4 @@
+from copy import deepcopy
 from typing import Tuple
 
 import torch
@@ -5,6 +6,7 @@ from einops import rearrange
 from torch import nn
 from torch.nn import functional as F
 from transformers import T5Config, T5EncoderModel
+from xformers.factory import xFormer, xFormerConfig
 
 from src.model.layers import ConvNorm
 from src.model.transformer import FFTransformer
@@ -124,6 +126,23 @@ class HFT5Encoder(nn.Module):
         return t5output.last_hidden_state, input_lengths
 
 
+class XformerEncoder(nn.Module):
+    def __init__(self, hparams, name="xformer") -> None:
+        super().__init__()
+
+        encoder_params = deepcopy(hparams.encoder_params[name])
+        encoder_params["dim_model"] = encoder_params["hidden_channels"]
+        del encoder_params["hidden_channels"]
+        config = xFormerConfig([encoder_params])
+        self.encoder = xFormer.from_config(config)
+
+    def forward(self, x, input_lengths):
+        attention_mask = get_mask_from_len(input_lengths, device=x.device, dtype=x.dtype)
+        x = rearrange(x, "b c t -> b t c")
+        output = self.encoder(src=x, encoder_input_mask=attention_mask)
+        return output, input_lengths
+
+
 class Encoder(nn.Module):
     """Wrapper for encoders"""
 
@@ -135,11 +154,10 @@ class Encoder(nn.Module):
             self.encoder = TransformerEncoder(hparams)
         elif hparams.encoder_type == "hfT5":
             self.encoder = HFT5Encoder(hparams)
+        elif hparams.encoder_type == "xformer":
+            self.encoder = XformerEncoder(hparams)
         else:
             raise ValueError(f"Unknown encoder type: {hparams.encoder_type}")
 
     def forward(self, x: torch.FloatTensor, x_len: torch.LongTensor) -> Tuple[torch.FloatTensor, torch.LongTensor]:
         return self.encoder(x, x_len)
-
-    def inference(self, *args, **kwargs):
-        return self.encoder.inference(*args, **kwargs)

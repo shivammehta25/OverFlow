@@ -111,7 +111,7 @@ def create_hparams(generate_parameters=False):
         ################################
         # Encoder parameters           #
         ################################
-        encoder_type="hfT5",
+        encoder_type="xformer",
         encoder_params={
             "conv": {"kernel_size": 5, "n_convolutions": 3, "hidden_channels": 512, "state_per_phone": 2},
             "transformer": {
@@ -137,6 +137,32 @@ def create_hparams(generate_parameters=False):
                 "d_inner": 1024,
                 "dropout": 0.1,
                 "feed_forward_proj": "gated-gelu",
+            },
+            "xformer": {
+                "block_type": "encoder",
+                "hidden_channels": 384,  # will be changed to dim model later
+                "num_layers": 6,
+                "residual_norm_style": "pre",  # Optional, pre/post
+                # "position_encoding_config": {
+                #     "name": "rotary",  # whatever position encodinhg makes sens
+                # },
+                "multi_head_config": {
+                    "num_heads": 1,
+                    # "dim_model": 64,
+                    "use_rotary_embeddings": True,
+                    "attention": {
+                        "name": "scaled_dot_product",
+                        "dropout": 0.1,
+                        "causal": False,
+                    },
+                },
+                "feedforward_config": {
+                    "name": "MLP",
+                    "dropout": 0.1,
+                    "activation": "gelu",
+                    "hidden_layer_multiplier": 4,
+                    # "dim_model": 1024,
+                },
             },
         },
         ################################
@@ -179,7 +205,7 @@ def create_hparams(generate_parameters=False):
         n_split=4,
         n_sqz=2,
         sigmoid_scale=False,
-        gin_channels=1024,
+        gin_channels=384,
         ################################
         # Optimization Hyperparameters #
         ################################
@@ -187,6 +213,10 @@ def create_hparams(generate_parameters=False):
         weight_decay=1e-6,
         grad_clip_thresh=5.0,
         stochastic_weight_avg=False,
+        scheduler=None,
+        scheduler_params={
+            "warmup_steps": 4000,
+        },
     )
 
     return hparams

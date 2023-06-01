@@ -8,6 +8,7 @@ import os
 
 import pytorch_lightning as pl
 import torch
+from pytorch_lightning.callbacks import LearningRateMonitor
 from pytorch_lightning.loggers import TensorBoardLogger
 from pytorch_lightning.plugins import DDPPlugin
 from pytorch_lightning.utilities.seed import seed_everything
@@ -98,6 +99,7 @@ if __name__ == "__main__":
         precision=hparams.precision,
         track_grad_norm=2,
         limit_val_batches=10,
+        callbacks=[LearningRateMonitor(logging_interval="step", log_momentum=True)],
     )
 
     trainer.fit(model, data_module)

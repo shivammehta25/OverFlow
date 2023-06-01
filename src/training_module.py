@@ -46,11 +46,32 @@ class TrainingModule(pl.LightningModule):
         Returns:
             (torch.optim.Optimizer)
         """
-        return torch.optim.Adam(
+
+        optimizer = torch.optim.Adam(
             self.parameters(),
             lr=self.hparams.learning_rate,
             weight_decay=self.hparams.weight_decay,
         )
+        if self.hparams.scheduler is None:
+            return optimizer
+        elif self.hparams.scheduler == "warmup":
+            warmup_steps = self.hparams.scheduler_params["warmup_steps"]
+
+            def warm_decay(step):
+                if step < warmup_steps:
+                    return step / warmup_steps
+                return 1.0
+
+            scheduler = {
+                "scheduler": torch.optim.lr_scheduler.LambdaLR(optimizer, warm_decay),
+                "interval": "step",  # runs per batch rather than per epoch
+                "frequency": 1,
+                "name": "warmup",
+            }
+        else:
+            raise NotImplementedError(f"Scheduler {self.hparams.scheduler} not implemented")
+
+        return [optimizer], [scheduler]
 
     def training_step(self, train_batch, batch_idx):
         r"""

@@ -51,7 +51,7 @@ def create_hparams(generate_parameters=False):
         ################################
         # Experiment Parameters        #
         ################################
-        run_name="VCTK",
+        run_name="Test",
         gpus=[2],
         max_epochs=50000,
         val_check_interval=100,
@@ -61,7 +61,7 @@ def create_hparams(generate_parameters=False):
         checkpoint_dir="checkpoints",
         tensorboard_log_dir="tb_logs",
         gradient_accumulation_steps=1,
-        precision=16,
+        precision="16-mixed",
         # Placeholder to use it later while loading model
         logger=None,
         run_tests=False,

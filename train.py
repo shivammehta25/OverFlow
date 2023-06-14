@@ -6,12 +6,11 @@ PyTorch-Lightning Trainer file, main file to run your training
 import argparse
 import os
 
-import pytorch_lightning as pl
+import lightning as L
 import torch
-from pytorch_lightning.callbacks import LearningRateMonitor
-from pytorch_lightning.loggers import TensorBoardLogger
-from pytorch_lightning.plugins import DDPPlugin
-from pytorch_lightning.utilities.seed import seed_everything
+from lightning import seed_everything
+from lightning.pytorch.callbacks import DeviceStatsMonitor
+from lightning.pytorch.loggers import TensorBoardLogger
 
 from src.data_module import LightningLoader
 from src.hparams import create_hparams
@@ -33,6 +32,7 @@ def warm_start_model(checkpoint_path, model, ignore_layers):
 
 
 if __name__ == "__main__":
+    torch.set_float32_matmul_precision("medium")
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "-c",
@@ -83,23 +83,16 @@ if __name__ == "__main__":
         # We have already loaded the model weights, so we don't want to load optimizer states from checkpoint
 
     logger = TensorBoardLogger(hparams.tensorboard_log_dir, name=hparams.run_name)
-    print(f"[+] Run Name: {hparams.run_name}")
-    trainer = pl.Trainer(
-        resume_from_checkpoint=args.checkpoint_path,
-        gpus=hparams.gpus,
+
+    trainer = L.Trainer(
+        devices=hparams.gpus,
         logger=logger,
         log_every_n_steps=1,
-        flush_logs_every_n_steps=1,
-        plugins=DDPPlugin(find_unused_parameters=False) if len(hparams.gpus) > 1 else None,
-        accelerator="ddp" if len(hparams.gpus) > 1 else None,
         val_check_interval=hparams.val_check_interval,
         gradient_clip_val=hparams.grad_clip_thresh,
         max_epochs=hparams.max_epochs,
-        stochastic_weight_avg=hparams.stochastic_weight_avg,
         precision=hparams.precision,
-        track_grad_norm=2,
-        limit_val_batches=10,
-        callbacks=[LearningRateMonitor(logging_interval="step", log_momentum=True)],
+        callbacks=[DeviceStatsMonitor()],
     )
 
-    trainer.fit(model, data_module)
+    trainer.fit(model=model, datamodule=data_module, ckpt_path=args.checkpoint_path)

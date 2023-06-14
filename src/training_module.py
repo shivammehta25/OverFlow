@@ -7,14 +7,15 @@ of the main model is implemented
 import os
 from argparse import Namespace
 
-import pytorch_lightning as pl
+import lightning as L
 import torch
+from lightning.pytorch.utilities import grad_norm
 
 from src.model.OverFlow import OverFlow
 from src.validation_plotting import log_validation
 
 
-class TrainingModule(pl.LightningModule):
+class TrainingModule(L.LightningModule):
     def __init__(self, hparams):
         super().__init__()
         if type(hparams) != Namespace:
@@ -89,7 +90,7 @@ class TrainingModule(pl.LightningModule):
         loss = -log_probs.mean()
         self.log(
             "loss/train",
-            loss.item(),
+            float(loss.item()),
             prog_bar=True,
             on_step=True,
             sync_dist=True,
@@ -97,7 +98,7 @@ class TrainingModule(pl.LightningModule):
         )
         self.log(
             "Global_Step",
-            int(self.global_step),
+            float(self.global_step),
             prog_bar=True,
             on_step=True,
             sync_dist=True,
@@ -127,16 +128,10 @@ class TrainingModule(pl.LightningModule):
         self.log("loss/val", loss.item(), prog_bar=True, sync_dist=True, logger=True)
         return loss
 
-    def on_before_zero_grad(self, optimizer):
-        r"""
-        Takes actions before zeroing the gradients.
-        We use it to plot the output of the model at
-        the save_model_checkpoint iteration from hparams.
+    def on_train_start(self):
+        self.on_train_batch_end(None, None, None)
 
-        Args:
-            optimizer ([type]): [description]
-        """
-
+    def on_train_batch_end(self, outputs, batch, batch_idx):
         if self.trainer.is_global_zero and (self.global_step % self.hparams.save_model_checkpoint == 0):
             (
                 text_inputs,
@@ -167,7 +162,7 @@ class TrainingModule(pl.LightningModule):
                 input_parameters,
                 output_parameters,
                 self.global_step,
-                self.train_dataloader().dataset.stft,
+                self.trainer.datamodule.train_dataloader().dataset.stft,
             )
 
             self.trainer.save_checkpoint(
@@ -189,7 +184,7 @@ class TrainingModule(pl.LightningModule):
             max_len (int): The maximum length of the mels spectrogram.
             mel_lengths (torch.LongTensor): The lengths of the mel spectrogram.
         """
-        x, y = self.model.parse_batch(next(iter(self.val_dataloader())))
+        x, y = self.model.parse_batch(next(iter(self.trainer.datamodule.val_dataloader())))
         (text_inputs, text_lengths, mels, max_len, mel_lengths, speaker_id) = x
         text_inputs = text_inputs[0].unsqueeze(0).to(self.device)
         speaker_id = speaker_id[0].unsqueeze(0).to(self.device)
@@ -236,7 +231,7 @@ class TrainingModule(pl.LightningModule):
         """
         return self.model.sample(text_inputs, text_lengths, speaker_id=speaker_id, sampling_temp=sampling_temp)
 
-    def log_grad_norm(self, grad_norm_dict):
+    def on_before_optimizer_step(self, optimizer):
         r"""
         Lightning method to log the grad norm of the model.
         change prog_bar to True to track on progress bar
@@ -245,5 +240,5 @@ class TrainingModule(pl.LightningModule):
             grad_norm_dict: Dictionary containing current grad norm metrics
 
         """
-        norm_dict = {"grad_norm/" + k: v for k, v in grad_norm_dict.items()}
-        self.log_dict(norm_dict, on_step=True, on_epoch=True, prog_bar=False, logger=True)
+        norms = grad_norm(self, norm_type=2)
+        self.log_dict(norms, on_step=True, on_epoch=True, prog_bar=False, logger=True)

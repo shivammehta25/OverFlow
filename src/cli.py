@@ -11,7 +11,6 @@ import torch
 from hifigan.env import AttrDict
 from hifigan.hifigandenoiser import Denoiser
 from hifigan.models import Generator
-from src.hparams import create_hparams
 from src.training_module import TrainingModule
 from src.utilities.text import _clean_text, cleaned_text_to_sequence, intersperse
 
@@ -120,9 +119,9 @@ def cli():
     print_config(args)
 
     print("[!] Loading OverFlow!")
-    hparams = create_hparams()
     model = TrainingModule.load_from_checkpoint(args.checkpoint_path, map_location=device)
     model.to(device)
+    hparams = model.hparams
     if device.type.startswith("cuda"):
         model.eval().half()
     else:

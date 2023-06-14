@@ -11,7 +11,6 @@ scipy
 inflect
 pytest
 conformer
-triton
 transformers
 xformers
 phonemizer

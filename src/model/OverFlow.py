@@ -85,10 +85,10 @@ class OverFlow(nn.Module):
         """
         if text_inputs.ndim > 1:
             text_inputs = text_inputs.squeeze(0)
-        if speaker_id is not None and speaker_id.ndim > 1:
-            speaker_id = speaker_id.squeeze(0)
-        else:
+        if speaker_id is None:
             speaker_id = text_inputs.new_zeros(1)  # set speaker id to 0 if not provided
+        else:
+            speaker_id = speaker_id.squeeze().unsqueeze(0)
 
         if text_lengths is None:
             text_lengths = text_inputs.new_tensor(text_inputs.shape[0])

@@ -15,6 +15,7 @@ from src.training_module import TrainingModule
 from src.utilities.text import _clean_text, cleaned_text_to_sequence, intersperse
 
 HIFIGAN_URL = "https://drive.google.com/file/d/1qpgI41wNXFcH-iKq1Y42JlBC9j0je8PW/view?usp=drive_link"
+HIFIGAN_CONFIG = "https://drive.google.com/file/d/1pAB2kQunkDuv6W5fcJiQ0CY8xcJKB22e/view?usp=drive_link"
 OVERFLOW_URL = "https://drive.google.com/file/d/1bkHVlM_NutczEBd9ZxzuF6cJBuIvnWLX/view?usp=sharing"
 
 
@@ -64,6 +65,7 @@ def validate_args(args):
     assert args.speaker_id >= 0 and args.speaker_id < 109, "Speaker ID must be between 0 and 108"
     assert_model_downloaded(args.hifigan_path, HIFIGAN_URL)
     assert_model_downloaded(args.checkpoint_path, OVERFLOW_URL)
+    assert_model_downloaded("config.json", HIFIGAN_CONFIG)
 
 
 def load_hifi_gan(hifi_gan_checkpoint_path, config_file, device):
@@ -133,7 +135,7 @@ def cli():
     print("[+] OverFlow loaded!")
 
     print("[!] Loading HiFiGAN model!")
-    generator, denoiser = load_hifi_gan(args.hifigan_path, "hifigan/config_v1.json", device)
+    generator, denoiser = load_hifi_gan(args.hifigan_path, "config.json", device)
     print("[+] HiFiGAN model loaded!")
 
     texts = get_texts(args)

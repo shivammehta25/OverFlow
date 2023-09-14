@@ -101,11 +101,13 @@ If you have any questions or comments, please open an [issue][github_new_issue_l
 ## Citation information
 If you use or build on our method or code for your research, please cite our paper:
 ```
-@article{mehta2022overflow,
-  title={OverFlow: Putting flows on top of neural transducers for better {TTS}},
+@inproceedings{mehta2023overflow,
+  title={{O}ver{F}low: {P}utting flows on top of neural transducers for better {TTS}},
   author={Mehta, Shivam and Kirkland, Ambika and Lameris, Harm and Beskow, Jonas and Sz{\'e}kely, {\'E}va and Henter, Gustav Eje},
-  journal={arXiv preprint arXiv:2211.06892},
-  year={2022}
+  booktitle={Proc. Interspeech},
+  pages={4279--4283},
+  doi={10.21437/Interspeech.2023-1996},
+  year={2023}
 }
 ```
 ## Acknowledgements

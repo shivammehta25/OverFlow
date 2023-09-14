@@ -1499,7 +1499,7 @@ tts --model_name tts_models/en/ljspeech/glow-tts --out_path output.wav --text "T
 
 ```
 @inproceedings{mehta2023overflow,
-  title={{O}ver{F}low: {P}utting flows on top of neural transducers for better {TTS}},
+  title={OverFlow: Putting flows on top of neural transducers for better TTS},
   author={Mehta, Shivam and Kirkland, Ambika and Lameris, Harm and Beskow, Jonas and Sz{\'e}kely, {\'E}va and Henter, Gustav Eje},
   booktitle={Proc. Interspeech},
   pages={4279--4283},
